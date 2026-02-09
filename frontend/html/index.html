@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#06070c">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="OrdenC">
+    <link rel="apple-touch-icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%23ffffff' width='180' height='180' rx='40'/><text x='90' y='130' font-size='100' font-weight='800' text-anchor='middle' fill='%23000000' font-family='system-ui'>C</text></svg>">
+    <link rel="manifest" href="../manifest.json">
+    <title>Dashboard - OrdenC</title>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Modern Theme - OrdenC UI -->
+    <link rel="stylesheet" href="../css/modern-theme.css">
+    <link rel="stylesheet" href="../css/unified-pages.css">
+    <link rel="stylesheet" href="../css/mobile-native.css">
+    <link rel="stylesheet" href="../css/lang-selector.css">
+    <link rel="stylesheet" href="../css/ux-improvements.css">
+    <link rel="stylesheet" href="../css/header-minimal.css">
+    <link rel="stylesheet" href="../css/bottom-navigation.css">
+</head>
+
+<body>
+    <!-- Navigation Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="header-logo" onclick="window.location.href='index.html'">
+                <div class="header-logo-icon">C</div>
+                <span>OrdenC</span>
+            </div>
+            <nav class="header-nav">
+                <a href="index.html" class="header-nav-item active" data-i18n="Dashboard">Panel</a>
+                <a href="accounts.html" class="header-nav-item" data-i18n="Accounts">Cuentas</a>
+                <a href="transactions.html" class="header-nav-item" data-i18n="Transactions">Transacciones</a>
+                <a href="reports.html" class="header-nav-item" data-i18n="Reports">Reportes</a>
+            </nav>
+        </div>
+        <div class="header-right">
+            <!-- Selector Compacto de Idioma y Moneda -->
+            <div class="compact-selector" id="compactSelector">
+                <button class="lang-btn" data-lang-btn="es" title="Español">ES</button>
+                <button class="lang-btn" data-lang-btn="en" title="English">EN</button>
+                <div class="separator"></div>
+                <span class="currency-value" id="currencyValue" title="Click para cambiar moneda">COP</span>
+                <div class="currency-dropdown" id="currencyDropdown">
+                    <div class="currency-option" data-currency="COP">COP</div>
+                    <div class="currency-option" data-currency="USD">USD</div>
+                    <div class="currency-option" data-currency="EUR">EUR</div>
+                    <div class="currency-option" data-currency="MXN">MXN</div>
+                </div>
+            </div>
+
+            <div class="header-profile" id="userMenuToggle">
+                <div class="profile-avatar">
+                    <img id="profileAvatar" src="https://ui-avatars.com/api/?name=User&background=667eea" alt="User">
+                </div>
+                <i class="fas fa-chevron-down profile-dropdown-icon"></i>
+
+                <!-- Dropdown Menu -->
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="dropdown-header">
+                        <div class="dropdown-user-name" id="dropdownUserName">Usuario</div>
+                        <div class="dropdown-user-email" id="dropdownUserEmail">user@example.com</div>
+                    </div>
+                    <div class="dropdown-menu">
+                        <a href="accounts.html" class="dropdown-item">
+                            <i class="fas fa-wallet"></i>
+                            <span data-i18n="My Accounts">Mis Cuentas</span>
+                        </a>
+                        <a href="transactions.html" class="dropdown-item">
+                            <i class="fas fa-exchange-alt"></i>
+                            <span data-i18n="Transactions">Transacciones</span>
+                        </a>
+                        <a href="ai-chat.html" class="dropdown-item">
+                            <i class="fas fa-robot"></i>
+                            <span data-i18n="AI Assistant">Asistente IA</span>
+                        </a>
+                        <a href="reports.html" class="dropdown-item">
+                            <i class="fas fa-chart-line"></i>
+                            <span data-i18n="Reports">Reportes</span>
+                        </a>
+                        <a href="welcome.html" class="dropdown-item">
+                            <i class="fas fa-lightbulb"></i>
+                            <span data-i18n="User Guide">Guía de uso</span>
+                        </a>
+                        <div class="dropdown-item logout" data-action="logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span data-i18n="Logout">Cerrar Sesión</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="dashboard-container">
+            <!-- LEFT SECTION: Card + Buttons -->
+            <div class="left-section">
+                <!-- Card Section -->
+                <section class="card-section">
+                    <div class="section-header">
+                        <h1 class="section-title" data-i18n="dashboard.cards.title">Mis Tarjetas Virtuales</h1>
+                        <button class="btn-add-card" onclick="window.location.href='accounts.html'">
+                            <span data-i18n="dashboard.add.card">Agregar Nueva Tarjeta</span> <i
+                                class="fas fa-plus-circle"></i>
+                        </button>
+                    </div>
+
+                    <div class="card-wrapper" onclick="window.location.href='accounts.html'">
+                        <div class="virtual-card" id="virtualCard">
+                            <div class="card-bg-circle"></div>
+                            <div class="card-top-row">
+                                <div class="card-chip-icon">C</div>
+                                <div class="card-currency" id="cardCurrency">USD</div>
+                            </div>
+                            <div class="card-number" id="cardNumber">**** **** **** ----</div>
+                            <div class="card-bottom-row">
+                                <div class="card-expiry" id="cardHolder">Cuenta</div>
+                                <div class="card-brand" id="cardBrand">VISA</div>
+                            </div>
+                            <div class="card-balance-overlay" id="cardBalance">$0</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Actions Section -->
+                <section class="actions-section">
+                    <div class="actions-grid">
+                        <button class="action-btn btn-blue" onclick="window.location.href='new-transaction.html'">
+                            <div class="action-btn-icon"><i class="fas fa-plus"></i></div>
+                            <div class="action-btn-text" data-i18n="dashboard.add.transaction">Agregar Transacción</div>
+                        </button>
+                        <button class="action-btn btn-purple" onclick="window.location.href='scan-receipt.html'">
+                            <div class="action-btn-icon"><i class="fas fa-file-upload"></i></div>
+                            <div class="action-btn-text" data-i18n="dashboard.upload.files">Subir Archivos</div>
+                        </button>
+                        <button class="action-btn btn-purple-dark" onclick="window.location.href='ai-chat.html'">
+                            <div class="action-btn-icon"><i class="fas fa-robot"></i></div>
+                            <div class="action-btn-text" data-i18n="AI Chat">Chat IA</div>
+                        </button>
+                        <button class="action-btn btn-purple-light" onclick="window.location.href='voice-input.html'">
+                            <div class="action-btn-icon"><i class="fas fa-microphone-lines"></i></div>
+                            <div class="action-btn-text" data-i18n="dashboard.voice.input">Entrada de Voz</div>
+                        </button>
+                    </div>
+                </section>
+            </div>
+
+            <!-- RIGHT SECTION: Transactions -->
+            <div class="right-section">
+                <section class="activity-section">
+                    <div class="activity-header">
+                        <h2 class="activity-title" data-i18n="Transactions">Transacciones</h2>
+                    </div>
+
+                    <div class="activity-list" id="activityList">
+                        <div class="activity-group-header" data-i18n="Loading">Cargando...</div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions FAB -->
+    <div class="quick-actions-fab">
+        <button class="fab-button" id="fabToggle" data-i18n-title="Quick Actions" title="Acciones Rápidas">
+            <i class="fas fa-plus"></i>
+        </button>
+        <div class="fab-menu" id="fabMenu">
+            <a href="new-transaction.html" class="fab-menu-item">
+                <i class="fas fa-plus-circle"></i>
+                <span data-i18n="New Transaction">Nueva Transacción</span>
+            </a>
+            <a href="accounts.html" class="fab-menu-item">
+                <i class="fas fa-credit-card"></i>
+                <span data-i18n="Add Account">Agregar Cuenta</span>
+            </a>
+            <a href="ai-chat.html" class="fab-menu-item">
+                <i class="fas fa-robot"></i>
+                <span data-i18n="AI Assistant">Asistente IA</span>
+            </a>
+            <a href="scan-receipt.html" class="fab-menu-item">
+                <i class="fas fa-camera"></i>
+                <span data-i18n="dashboard.scan.receipt">Escanear Recibo</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation (Mobile) -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="bottom-nav-item active">
+            <i class="fas fa-home"></i>
+            <span>Inicio</span>
+        </a>
+        <a href="accounts.html" class="bottom-nav-item">
+            <i class="fas fa-wallet"></i>
+            <span>Cuentas</span>
+        </a>
+        <a href="new-transaction.html" class="bottom-nav-item bottom-nav-item-add">
+            <i class="fas fa-plus"></i>
+        </a>
+        <a href="transactions.html" class="bottom-nav-item">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Movimientos</span>
+        </a>
+        <a href="reports.html" class="bottom-nav-item">
+            <i class="fas fa-chart-line"></i>
+            <span>Reportes</span>
+        </a>
+    </nav>
+
+    <!-- Scripts -->
+    <script src="../js/i18n.js"></script>
+    <script src="../js/api.js?v=26"></script>
+    <script src="../js/auth-handler.js?v=19"></script>
+    <script src="../js/dashboard.js?v=8"></script>
+    <script>
+        // Toggle FAB menu
+        document.getElementById('fabToggle').addEventListener('click', () => {
+            document.getElementById('fabMenu').classList.toggle('show');
+        });
+
+        // Cerrar FAB al hacer click fuera
+        document.addEventListener('click', (e) => {
+            const fab = document.querySelector('.quick-actions-fab');
+            if (!fab.contains(e.target)) {
+                document.getElementById('fabMenu').classList.remove('show');
+            }
+        });
+
+        // Registrar Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('../service-worker.js')
+                .then(reg => console.log('Service Worker registrado:', reg))
+                .catch(err => console.log('Error registrando Service Worker:', err));
+        }
+    </script>
+
+</body>
+
+</html>

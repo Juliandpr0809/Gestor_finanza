@@ -1,0 +1,7 @@
+/* Selector de idioma en auth pages */
+.auth-form-section .lang-selector {
+    position: absolute !important;
+    top: 30px !important;
+    right: 30px !important;
+    z-index: 1000 !important;
+}

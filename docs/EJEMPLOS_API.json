@@ -1,0 +1,302 @@
+{
+  "ejemplos_api": {
+    "iniciar_chat": {
+      "metodo": "POST",
+      "endpoint": "/api/chat/init",
+      "headers": {
+        "Authorization": "Bearer {token_jwt}",
+        "Content-Type": "application/json"
+      },
+      "body": {},
+      "respuesta_exitosa": {
+        "status": 200,
+        "body": {
+          "initialized": false,
+          "message": "👋 **¡Bienvenido a tu Gestor Financiero!**\n\n¿Cuál es tu moneda preferida?\n\n...",
+          "message_id": 1
+        }
+      },
+      "descricpion": "Inicia el chat y pregunta la moneda si es primera vez"
+    },
+    "establecer_moneda": {
+      "metodo": "POST",
+      "endpoint": "/api/chat/set-currency",
+      "headers": {
+        "Authorization": "Bearer {token_jwt}",
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "currency": "USD"
+      },
+      "respuesta_exitosa": {
+        "status": 200,
+        "body": {
+          "success": true,
+          "currency": "USD",
+          "message": "Moneda establecida a USD",
+          "confirmation_id": 2
+        }
+      },
+      "monedas_validas": ["USD", "EUR", "COP", "MXN", "ARS", "PEN", "CLP", "BRL"],
+      "descripcion": "Establece la moneda preferida del usuario"
+    },
+    "registrar_gasto": {
+      "metodo": "POST",
+      "endpoint": "/api/chat/send",
+      "headers": {
+        "Authorization": "Bearer {token_jwt}",
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "content": "Compré 25 dólares de aceite de motor con mi tarjeta nequi"
+      },
+      "respuesta_exitosa": {
+        "status": 201,
+        "body": {
+          "user_message": {
+            "id": 3,
+            "role": "user",
+            "content": "Compré 25 dólares de aceite de motor con mi tarjeta nequi",
+            "created_at": "2026-01-02T10:41:00"
+          },
+          "assistant_message": {
+            "id": 4,
+            "role": "assistant",
+            "content": "✅ **Transacción registrada**\n- **Monto:** USD 25.00\n- **Cuenta:** tarjeta nequi (credit)\n- **Descripción:** aceite de motor\n\n🔄 **Balances actualizados**\n\n- **tarjeta nequi (credit):** USD 5.00\n- **efectivo (savings):** USD 40.00\n\n**Balance Total:** USD 45.00\n\n💡 **Consejo:** El gasto en mantenimiento del vehículo es importante, pero puedes intentar buscar ofertas o comprar en mayor cantidad para reducir el costo por unidad. Mantener un registro de estos gastos te ayudará a planificar mejor tu presupuesto mensual.\n\nSi necesitas revisar tus últimas transacciones o quieres recibir más recomendaciones de ahorro, ¡avísame! 💬✅",
+            "created_at": "2026-01-02T10:41:05"
+          }
+        }
+      },
+      "notas": [
+        "Requiere chat_initialized = true",
+        "Detecta automáticamente intención de transacción",
+        "Crea registro REAL en la BD",
+        "Actualiza balance de cuenta automáticamente"
+      ],
+      "descripcion": "Envía un mensaje al chat (puede registrar transacción automáticamente)"
+    },
+    "consulta_balance": {
+      "metodo": "POST",
+      "endpoint": "/api/chat/send",
+      "headers": {
+        "Authorization": "Bearer {token_jwt}",
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "content": "¿Cuál es mi balance total?"
+      },
+      "respuesta_exitosa": {
+        "status": 201,
+        "body": {
+          "user_message": {
+            "id": 5,
+            "role": "user",
+            "content": "¿Cuál es mi balance total?",
+            "created_at": "2026-01-02T10:42:00"
+          },
+          "assistant_message": {
+            "id": 6,
+            "role": "assistant",
+            "content": "Tu balance total es de USD 45.00, distribuido en:\n- tarjeta nequi: USD 5.00\n- efectivo: USD 40.00\n\n¿Hay algo más en lo que pueda ayudarte?",
+            "created_at": "2026-01-02T10:42:05"
+          }
+        }
+      },
+      "notas": [
+        "No crea transacción",
+        "Responde solo con chat normal"
+      ],
+      "descripcion": "Consulta información financiera"
+    },
+    "simular_transaccion": {
+      "metodo": "POST",
+      "endpoint": "/api/chat/send",
+      "headers": {
+        "Authorization": "Bearer {token_jwt}",
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "content": "¿Qué pasaría si gastara 100 dólares en comida?"
+      },
+      "respuesta_exitosa": {
+        "status": 201,
+        "body": {
+          "user_message": {
+            "id": 7,
+            "role": "user",
+            "content": "¿Qué pasaría si gastara 100 dólares en comida?",
+            "created_at": "2026-01-02T10:43:00"
+          },
+          "assistant_message": {
+            "id": 8,
+            "role": "assistant",
+            "content": "Si gastaras USD 100.00 en comida:\n\n📊 Escenario:\n- Balance actual: USD 45.00\n- Gasto simulado: USD 100.00\n- Balance resultante: USD -55.00 (¡deuda!)\n\n⚠️ Recomendación: Ese gasto excedería tu balance disponible.\nActualmente tienes USD 5.00 en tarjeta nequi y USD 40.00 en efectivo.\n\n💡 Consejo: Es mejor distribuir gastos grandes entre tus cuentas para no quedar sin fondos.",
+            "created_at": "2026-01-02T10:43:05"
+          }
+        }
+      },
+      "notas": [
+        "Detecta palabras clave: 'simula', 'qué pasaría', 'como sería'",
+        "NO crea transacción real",
+        "Solo proporciona análisis"
+      ],
+      "descripcion": "Simula una transacción sin crear registro real"
+    },
+    "obtener_historial": {
+      "metodo": "GET",
+      "endpoint": "/api/chat/messages",
+      "query_params": {
+        "page": 1,
+        "per_page": 50
+      },
+      "headers": {
+        "Authorization": "Bearer {token_jwt}"
+      },
+      "respuesta_exitosa": {
+        "status": 200,
+        "body": {
+          "messages": [
+            {
+              "id": 1,
+              "role": "assistant",
+              "content": "👋 **¡Bienvenido a tu Gestor Financiero!**...",
+              "metadata": {
+                "type": "initialization",
+                "ai_service": "system"
+              },
+              "created_at": "2026-01-02T10:30:00"
+            },
+            {
+              "id": 3,
+              "role": "user",
+              "content": "Compré 25 dólares de aceite de motor con mi tarjeta nequi",
+              "metadata": null,
+              "created_at": "2026-01-02T10:41:00"
+            }
+          ],
+          "pagination": {
+            "page": 1,
+            "per_page": 50,
+            "total": 8,
+            "pages": 1
+          }
+        }
+      },
+      "descripcion": "Obtiene el historial de mensajes del chat paginado"
+    },
+    "limpiar_historial": {
+      "metodo": "POST",
+      "endpoint": "/api/chat/clear",
+      "headers": {
+        "Authorization": "Bearer {token_jwt}",
+        "Content-Type": "application/json"
+      },
+      "body": {},
+      "respuesta_exitosa": {
+        "status": 200,
+        "body": {
+          "message": "Historial limpiado"
+        }
+      },
+      "advertencia": "Esta acción elimina todo el historial de mensajes",
+      "descripcion": "Limpia el historial de chat del usuario"
+    }
+  },
+  "flujo_completo": {
+    "paso_1_inicializar": {
+      "accion": "POST /api/chat/init",
+      "descripcion": "Usuario abre el chat por primera vez",
+      "respuesta": "Bot pregunta qué moneda prefiere"
+    },
+    "paso_2_moneda": {
+      "accion": "POST /api/chat/send",
+      "body": {
+        "content": "USD"
+      },
+      "descripcion": "Usuario responde con su moneda",
+      "respuesta": "Bot confirma moneda establecida"
+    },
+    "paso_3_transaccion": {
+      "accion": "POST /api/chat/send",
+      "body": {
+        "content": "Compré 25 dólares de aceite de motor con mi tarjeta nequi"
+      },
+      "descripcion": "Usuario registra transacción",
+      "respuesta": "Bot crea transacción + muestra balances + consejo"
+    },
+    "paso_4_consulta": {
+      "accion": "POST /api/chat/send",
+      "body": {
+        "content": "¿Cuál es mi balance?"
+      },
+      "descripcion": "Usuario consulta información",
+      "respuesta": "Bot responde con datos actualizados"
+    },
+    "paso_5_historial": {
+      "accion": "GET /api/chat/messages",
+      "descripcion": "Usuario revisa historial",
+      "respuesta": "Lista de todos los mensajes ordenados"
+    }
+  },
+  "errores_posibles": {
+    "401_no_autorizado": {
+      "status": 401,
+      "causa": "Token JWT inválido o expirado",
+      "solucion": "Obtener nuevo token de login"
+    },
+    "400_solicitud_invalida": {
+      "status": 400,
+      "causa": "Falta campo 'content' en body",
+      "solucion": "Enviar: { 'content': 'tu mensaje' }"
+    },
+    "404_no_encontrado": {
+      "status": 404,
+      "causa": "Usuario no existe",
+      "solucion": "Verificar token JWT y usuario"
+    },
+    "500_error_servidor": {
+      "status": 500,
+      "causa": "Error en procesamiento de IA o BD",
+      "solucion": "Revisar logs del servidor"
+    }
+  },
+  "palabras_clave": {
+    "crear_transaccion": [
+      "registra",
+      "agrega",
+      "crea",
+      "anota",
+      "guarda",
+      "añade"
+    ],
+    "tipo_gasto": [
+      "gast",
+      "compra",
+      "pag",
+      "compr"
+    ],
+    "tipo_ingreso": [
+      "ingreso",
+      "cobr",
+      "recib",
+      "gan"
+    ],
+    "simular": [
+      "simula",
+      "ejemplo",
+      "simulación",
+      "muestra ejemplo",
+      "como sería",
+      "cómo quedaría"
+    ]
+  },
+  "notas_importantes": [
+    "Todas las transacciones se crean REALES en la BD",
+    "Los balances se actualizan automáticamente",
+    "No hay confirmación previa, se crea directamente",
+    "Los mensajes se guardan en el historial",
+    "La IA genera consejos basados en la transacción",
+    "Las simulaciones no crean registros reales",
+    "Requiere usuario autenticado con JWT válido"
+  ]
+}

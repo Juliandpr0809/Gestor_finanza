@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - OrdenC</title>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Modern Theme -->
+    <link rel="stylesheet" href="../css/modern-theme.css">
+    <link rel="stylesheet" href="../css/auth.css">
+    <link rel="stylesheet" href="../css/lang-selector.css">
+    <link rel="stylesheet" href="../css/auth-lang-fix.css">
+</head>
+
+<body class="auth-body">
+    <div class="auth-container">
+        <!-- Left Side - Branding -->
+        <div class="auth-branding">
+            <div class="branding-content">
+                <div class="logo-large">
+                    <div class="logo-icon">C</div>
+                    <h1>OrdenC</h1>
+                </div>
+                <p class="tagline" data-i18n="login.tagline">Tu asistente financiero personal</p>
+
+                <div class="features-list">
+                    <div class="feature-item">
+                        <i class="fas fa-shield-check"></i>
+                        <div>
+                            <h3 data-i18n="Bank-level Security">Seguridad Bancaria</h3>
+                            <p data-i18n="login.security.desc">Encriptación de extremo a extremo</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-chart-line"></i>
+                        <div>
+                            <h3 data-i18n="Smart Insights">Análisis Inteligentes</h3>
+                            <p data-i18n="login.insights.desc">Analítica financiera con IA</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-mobile-alt"></i>
+                        <div>
+                            <h3 data-i18n="Multi-Platform">Multi-Plataforma</h3>
+                            <p data-i18n="login.platform.desc">Accede desde cualquier lugar</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number">10K+</div>
+                        <div class="stat-label" data-i18n="Active Users">Usuarios Activos</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">$2M+</div>
+                        <div class="stat-label" data-i18n="Managed">Gestionado</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">4.9★</div>
+                        <div class="stat-label" data-i18n="Rating">Calificación</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side - Login Form -->
+        <div class="auth-form-section" style="position: relative;">
+            <div class="lang-selector"
+                style="position: absolute; top: 20px; right: 30px; z-index: 100; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 8px;">
+                <button class="lang-btn" data-lang-btn="es" style="margin: 0 4px;">ES</button>
+                <button class="lang-btn" data-lang-btn="en" style="margin: 0 4px;">EN</button>
+            </div>
+            <div class="auth-form-container">
+                <div class="form-header">
+                    <h2 data-i18n="Welcome Back">Bienvenido de Vuelta</h2>
+                    <p data-i18n="login.subtitle">Inicia sesión para continuar</p>
+                </div>
+
+                <form class="auth-form" id="loginForm">
+                    <div id="loginFeedback" class="auth-feedback" role="status" aria-live="polite"></div>
+                    <div class="form-group">
+                        <label for="email">
+                            <i class="fas fa-envelope"></i>
+                            <span data-i18n="Email Address">Correo Electrónico</span>
+                        </label>
+                        <div class="email-input-wrapper" style="position: relative;">
+                            <input type="email" id="email" class="form-input" placeholder="your@email.com" required>
+                            <span class="saved-email-indicator" id="savedEmailIndicator"
+                                style="display: none; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #00D46A; font-size: 14px;">
+                                <i class="fas fa-check-circle"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">
+                            <i class="fas fa-lock"></i>
+                            <span data-i18n="Password">Contraseña</span>
+                        </label>
+                        <div class="password-input-wrapper">
+                            <input type="password" id="password" class="form-input"
+                                data-i18n-placeholder="Enter your password" required>
+                            <button type="button" class="btn-toggle-password" id="togglePassword">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-options">
+                        <label class="checkbox-container" title="Mantener sesión iniciada y recordar tu email">
+                            <input type="checkbox" id="remember">
+                            <span class="checkbox-custom"></span>
+                            <span class="checkbox-label">
+                                <span data-i18n="Remember me for 30 days">Recuérdame 30 días</span>
+                                <i class="fas fa-info-circle"
+                                    style="font-size: 12px; opacity: 0.5; margin-left: 4px;"></i>
+                            </span>
+                        </label>
+                        <a href="#" class="link-forgot" data-i18n="Forgot password?">¿Olvidaste tu contraseña?</a>
+                    </div>
+
+                    <!-- Aceptación de términos para login -->
+                    <div class="form-group">
+                        <label class="checkbox-container" title="Debes aceptar los términos para continuar">
+                            <input type="checkbox" id="loginTerms">
+                            <span class="checkbox-custom"></span>
+                            <span class="checkbox-label">
+                                <span>Acepto los </span>
+                                <a href="#" class="link-primary">Términos de Servicio</a>
+                                <span> y la </span>
+                                <a href="#" class="link-primary">Política de Privacidad</a>
+                            </span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn-primary btn-large">
+                        <span data-i18n="Sign In">Iniciar Sesión</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+
+                    <div class="divider">
+                        <span data-i18n="or continue with">o continúa con</span>
+                    </div>
+
+                    <div class="social-login">
+                        <button type="button" class="btn-social">
+                            <i class="fab fa-google"></i>
+                            <span>Google</span>
+                        </button>
+                        <button type="button" class="btn-social">
+                            <i class="fab fa-apple"></i>
+                            <span>Apple</span>
+                        </button>
+                    </div>
+
+                    <div class="form-footer">
+                        <p><span data-i18n="Don't have an account?">¿No tienes cuenta?</span> <a href="register.html"
+                                class="link-primary" data-i18n="Sign up">Regístrate</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cache-busting query para evitar usar JS viejo del navegador -->
+    <script src="../js/i18n.js"></script>
+    <script src="../js/api.js?v=27"></script>
+    <script src="../js/auth.js?v=27"></script>
+</body>
+
+</html>

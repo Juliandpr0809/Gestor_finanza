@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Simple</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 20px;
+        }
+        form { display: flex; flex-direction: column; gap: 10px; }
+        input, button { padding: 10px; font-size: 16px; }
+        button { background: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        #message { margin-top: 20px; padding: 10px; }
+        .error { background: #ffcccc; color: red; }
+        .success { background: #ccffcc; color: green; }
+    </style>
+</head>
+<body>
+    <h1>Login Simple</h1>
+    <form id="loginForm">
+        <input type="email" id="email" placeholder="Email" value="demo@demo.com" required>
+        <input type="password" id="password" placeholder="Password" value="demo1234" required>
+        <button type="submit">Login</button>
+    </form>
+    <div id="message"></div>
+
+    <script>
+        console.log('Script loaded');
+        
+        const form = document.getElementById('loginForm');
+        const messageDiv = document.getElementById('message');
+        
+        console.log('Form:', form);
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            console.log('Form submitted!');
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            console.log('Email:', email);
+            console.log('Password:', password);
+            
+            messageDiv.textContent = 'Enviando...';
+            messageDiv.className = '';
+            
+            try {
+                const response = await fetch('http://127.0.0.1:5000/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        identifier: email,
+                        password: password
+                    })
+                });
+                
+                const data = await response.json();
+                console.log('Response:', data);
+                
+                if (response.ok) {
+                    messageDiv.textContent = '✓ Login exitoso! Token: ' + data.access_token.substring(0, 20) + '...';
+                    messageDiv.className = 'success';
+                    
+                    localStorage.setItem('auth_token', data.access_token);
+                    
+                    setTimeout(() => {
+                        window.location.href = '/frontend/html/index.html';
+                    }, 1000);
+                } else {
+                    messageDiv.textContent = '✗ Error: ' + data.error;
+                    messageDiv.className = 'error';
+                }
+            } catch (err) {
+                console.error('Error:', err);
+                messageDiv.textContent = '✗ Error de conexión: ' + err.message;
+                messageDiv.className = 'error';
+            }
+        });
+    </script>
+</body>
+</html>

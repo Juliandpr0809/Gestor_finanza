@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#06070c">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="OrdenC">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%23ffffff' width='180' height='180' rx='40'/><text x='90' y='130' font-size='100' font-weight='800' text-anchor='middle' fill='%23000000' font-family='system-ui'>C</text></svg>">
+    <link rel="manifest" href="../manifest.json">
+    <title>Bienvenido - OrdenC</title>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Modern Theme -->
+    <link rel="stylesheet" href="../css/modern-theme.css">
+    <link rel="stylesheet" href="../css/mobile-native.css">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #0a0a0f 0%, #12121a 50%, #1a1a24 100%);
+            overflow-x: hidden;
+        }
+
+        .welcome-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .welcome-logo {
+            width: 80px;
+            height: 80px;
+            background: #ffffff;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 40px;
+            color: #000000;
+            margin-bottom: 24px;
+            animation: scaleIn 0.5s ease;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .welcome-title {
+            font-size: 36px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 12px;
+            text-align: center;
+            background: linear-gradient(135deg, #6B9FFF 0%, #00E5C7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .welcome-subtitle {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            margin-bottom: 48px;
+            max-width: 600px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            width: 100%;
+            margin-bottom: 48px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .feature-card:nth-child(1) { animation-delay: 0.1s; }
+        .feature-card:nth-child(2) { animation-delay: 0.2s; }
+        .feature-card:nth-child(3) { animation-delay: 0.3s; }
+        .feature-card:nth-child(4) { animation-delay: 0.4s; }
+
+        @keyframes fadeInUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .feature-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(107, 159, 255, 0.3);
+            transform: translateY(-4px);
+        }
+
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+
+        .feature-icon.blue {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .feature-icon.green {
+            background: linear-gradient(135deg, #00d4aa 0%, #00a67e 100%);
+            color: white;
+        }
+
+        .feature-icon.orange {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        .feature-icon.purple {
+            background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+            color: white;
+        }
+
+        .feature-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+
+        .feature-description {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .feature-examples {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            font-family: 'Courier New', monospace;
+        }
+
+        .feature-example {
+            margin: 4px 0;
+        }
+
+        .ai-examples-section {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 32px;
+        }
+
+        .ai-examples-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .ai-examples-subtitle {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 24px;
+        }
+
+        .example-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .example-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .example-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(107, 159, 255, 0.3);
+        }
+
+        .example-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .example-text {
+            flex: 1;
+        }
+
+        .example-phrase {
+            font-size: 14px;
+            color: #ffffff;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .example-result {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .cta-section {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .cta-button {
+            padding: 16px 48px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            min-height: 56px;
+        }
+
+        .cta-button.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+        }
+
+        .cta-button.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(102, 126, 234, 0.4);
+        }
+
+        .cta-button.secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .cta-button.secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        @media (max-width: 768px) {
+            .welcome-container {
+                padding: 32px 16px;
+            }
+
+            .welcome-logo {
+                width: 64px;
+                height: 64px;
+                font-size: 32px;
+            }
+
+            .welcome-title {
+                font-size: 28px;
+            }
+
+            .welcome-subtitle {
+                font-size: 16px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .ai-examples-section {
+                padding: 24px 16px;
+            }
+
+            .cta-button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="welcome-container">
+        <!-- Logo -->
+        <div class="welcome-logo">C</div>
+
+        <!-- Title -->
+        <h1 class="welcome-title">¡Bienvenido a OrdenC!</h1>
+        <p class="welcome-subtitle">
+            Tu asistente financiero inteligente que te ayuda a gestionar tu dinero de forma fácil y natural
+        </p>
+
+        <!-- Features Grid -->
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon blue">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="feature-title">Chat con IA</h3>
+                <p class="feature-description">
+                    Registra transacciones hablando naturalmente. La IA entiende tu lenguaje y crea las transacciones automáticamente.
+                </p>
+                <div class="feature-examples">
+                    <div class="feature-example">💬 "gasté 3500 en pan"</div>
+                    <div class="feature-example">💬 "me llegaron 120.000"</div>
+                    <div class="feature-example">💬 "¿cuánto llevo gastado?"</div>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon green">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <h3 class="feature-title">Gestión de Cuentas</h3>
+                <p class="feature-description">
+                    Administra múltiples cuentas bancarias, tarjetas y efectivo. Ve tu saldo total en tiempo real.
+                </p>
+                <div class="feature-examples">
+                    <div class="feature-example">🏦 Cuentas bancarias</div>
+                    <div class="feature-example">💳 Tarjetas de crédito</div>
+                    <div class="feature-example">💵 Efectivo</div>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon orange">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3 class="feature-title">Análisis Financiero</h3>
+                <p class="feature-description">
+                    Consulta tus gastos, ingresos y tendencias. La IA te da consejos personalizados para ahorrar.
+                </p>
+                <div class="feature-examples">
+                    <div class="feature-example">📊 Gráficos detallados</div>
+                    <div class="feature-example">💡 Consejos de ahorro</div>
+                    <div class="feature-example">🎯 Metas financieras</div>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon purple">
+                    <i class="fas fa-globe"></i>
+                </div>
+                <h3 class="feature-title">Multi-moneda</h3>
+                <p class="feature-description">
+                    Trabaja con cualquier moneda. Convierte automáticamente y lleva tus finanzas en diferentes divisas.
+                </p>
+                <div class="feature-examples">
+                    <div class="feature-example">💵 Pesos colombianos (COP)</div>
+                    <div class="feature-example">💵 Dólares (USD)</div>
+                    <div class="feature-example">💶 Euros (EUR)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Examples Section -->
+        <div class="ai-examples-section">
+            <h2 class="ai-examples-title">
+                <i class="fas fa-lightbulb" style="color: #f59e0b;"></i>
+                ¿Qué puedes decirle a la IA?
+            </h2>
+            <p class="ai-examples-subtitle">
+                Habla naturalmente, como le hablarías a un amigo. Estos son algunos ejemplos:
+            </p>
+
+            <div class="example-list">
+                <div class="example-item">
+                    <div class="example-icon">💰</div>
+                    <div class="example-text">
+                        <div class="example-phrase">"gasté 50.000 en supermercado"</div>
+                        <div class="example-result">→ Crea un gasto de $50,000 en categoría Alimentación</div>
+                    </div>
+                </div>
+
+                <div class="example-item">
+                    <div class="example-icon">💵</div>
+                    <div class="example-text">
+                        <div class="example-phrase">"me pagaron 800.000 del trabajo"</div>
+                        <div class="example-result">→ Crea un ingreso de $800,000 en categoría Salario</div>
+                    </div>
+                </div>
+
+                <div class="example-item">
+                    <div class="example-icon">🍕</div>
+                    <div class="example-text">
+                        <div class="example-phrase">"pagué 35000 de pizza anoche"</div>
+                        <div class="example-result">→ Crea un gasto de $35,000 en categoría Alimentación (fecha de ayer)</div>
+                    </div>
+                </div>
+
+                <div class="example-item">
+                    <div class="example-icon">📊</div>
+                    <div class="example-text">
+                        <div class="example-phrase">"¿cuánto llevo gastado este mes?"</div>
+                        <div class="example-result">→ Te muestra el total de gastos del mes actual</div>
+                    </div>
+                </div>
+
+                <div class="example-item">
+                    <div class="example-icon">💡</div>
+                    <div class="example-text">
+                        <div class="example-phrase">"dame consejos para ahorrar"</div>
+                        <div class="example-result">→ Te da recomendaciones basadas en tus gastos</div>
+                    </div>
+                </div>
+
+                <div class="example-item">
+                    <div class="example-icon">🏦</div>
+                    <div class="example-text">
+                        <div class="example-phrase">"crea una cuenta llamada Ahorros"</div>
+                        <div class="example-result">→ Crea una nueva cuenta bancaria</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA Buttons -->
+        <div class="cta-section">
+            <a href="ai-chat.html" class="cta-button primary">
+                <i class="fas fa-robot"></i>
+                Comenzar a Chatear con la IA
+            </a>
+            <a href="index.html" class="cta-button secondary">
+                <i class="fas fa-home"></i>
+                Ir al Dashboard
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Registrar Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('../service-worker.js')
+                .then(reg => console.log('Service Worker registrado:', reg))
+                .catch(err => console.log('Error registrando Service Worker:', err));
+        }
+    </script>
+</body>
+
+</html>

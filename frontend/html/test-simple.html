@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Simple</title>
+</head>
+<body>
+    <h1>Test de JavaScript</h1>
+    <form id="testForm">
+        <input type="text" id="testInput" placeholder="Escribe algo">
+        <button type="submit">Submit</button>
+    </form>
+    
+    <script>
+        console.log('1. Script cargado');
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('2. DOMContentLoaded');
+            
+            const form = document.getElementById('testForm');
+            console.log('3. Form found:', !!form);
+            
+            if (form) {
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    console.log('4. Form submitted!');
+                    alert('Form capturado por JavaScript!');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

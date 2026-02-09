@@ -1,0 +1,616 @@
+/* ========================================
+   UX REFINEMENTS - Mejoras del Análisis UX
+   Sistema de colores refinado, jerarquía visual, micro-interacciones
+   ======================================== */
+
+:root {
+    /* Color Base Refinado - Gris oscuro en lugar de negro puro */
+    --bg-base: #0A0A0A;          /* Gris muy oscuro (antes: #06070c) */
+    --bg-surface-1: #121212;     /* Superficie nivel 1 */
+    --bg-surface-2: #1E1E1E;     /* Superficie nivel 2 */
+    --bg-surface-3: #2A2A2A;     /* Superficie nivel 3 */
+    
+    /* Bordes sutiles */
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-medium: rgba(255, 255, 255, 0.12);
+    --border-strong: rgba(255, 255, 255, 0.16);
+    
+    /* Gradientes sutiles para profundidad */
+    --gradient-surface: linear-gradient(135deg, #121212 0%, #1A1A1A 100%);
+    --gradient-card: linear-gradient(135deg, #1E1E1E 0%, #161616 100%);
+    
+    /* Colores de estado refinados */
+    --success-soft: #10b981;      /* Verde mantener */
+    --danger-soft: #F87171;       /* Rojo suavizado (antes: #ef4444) */
+    --warning-soft: #FBBF24;
+    --info-soft: #60A5FA;
+    
+    /* Texto con mejor contraste */
+    --text-primary: #FAFAFA;      /* Blanco suave */
+    --text-secondary: #D1D5DB;    /* Gris claro */
+    --text-tertiary: #9CA3AF;     /* Gris medio */
+    --text-quaternary: #6B7280;   /* Gris oscuro */
+    
+    /* Espaciado consistente */
+    --spacing-xs: 8px;
+    --spacing-sm: 12px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    --spacing-2xl: 48px;
+    
+    /* Tipografía - Números monoespaciados */
+    --font-mono: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+    --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+}
+
+/* ========================================
+   BASE - Aplicar colores refinados
+   ======================================== */
+
+body {
+    background: var(--bg-base);
+}
+
+/* ========================================
+   DASHBOARD - Reorganización con jerarquía clara
+   ======================================== */
+
+/* RESUMEN RÁPIDO - Cards horizontales compactas */
+.summary-quick {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+}
+
+.summary-quick-card {
+    background: var(--gradient-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.summary-quick-card:hover {
+    border-color: var(--border-medium);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.summary-quick-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.summary-quick-icon.balance {
+    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+}
+
+.summary-quick-icon.income {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+}
+
+.summary-quick-icon.expense {
+    background: linear-gradient(135deg, #F87171 0%, #EF4444 100%);
+}
+
+.summary-quick-content {
+    flex: 1;
+}
+
+.summary-quick-label {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.summary-quick-value {
+    font-size: 20px;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    color: var(--text-primary);
+}
+
+/* ACCIONES PRINCIPALES - Botones grandes destacados */
+.main-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+}
+
+.main-action-btn {
+    background: var(--gradient-card);
+    border: 1px solid var(--border-medium);
+    border-radius: 12px;
+    padding: var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-sm);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    color: var(--text-primary);
+}
+
+.main-action-btn:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    border-color: var(--border-strong);
+}
+
+.main-action-btn:active {
+    transform: translateY(-2px) scale(1.01);
+}
+
+.main-action-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    transition: transform 0.3s ease;
+}
+
+.main-action-btn:hover .main-action-icon {
+    transform: rotate(5deg) scale(1.1);
+}
+
+.main-action-icon.primary {
+    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+}
+
+.main-action-icon.secondary {
+    background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+}
+
+.main-action-icon.tertiary {
+    background: linear-gradient(135deg, #EC4899 0%, #DB2777 100%);
+}
+
+.main-action-text {
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* TRANSACCIONES - Lista agrupada por fecha */
+.transactions-grouped {
+    background: var(--bg-surface-1);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.transaction-group {
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.transaction-group:last-child {
+    border-bottom: none;
+}
+
+.transaction-group-date {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: rgba(59, 130, 246, 0.05);
+    border-left: 3px solid #3B82F6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.transaction-group-date-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.transaction-group-total {
+    font-size: 14px;
+    font-weight: 700;
+    font-family: var(--font-mono);
+}
+
+.transaction-group-total.positive {
+    color: var(--success-soft);
+}
+
+.transaction-group-total.negative {
+    color: var(--danger-soft);
+}
+
+.transaction-item {
+    padding: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid transparent;
+}
+
+.transaction-item:hover {
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom-color: var(--border-subtle);
+}
+
+.transaction-item:active {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.transaction-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.transaction-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.transaction-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.transaction-category {
+    font-size: 12px;
+    color: var(--text-tertiary);
+}
+
+.transaction-amount {
+    font-size: 16px;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    white-space: nowrap;
+}
+
+.transaction-amount.income {
+    color: var(--success-soft);
+}
+
+.transaction-amount.expense {
+    color: var(--text-primary);
+}
+
+/* ========================================
+   CARDS DE CUENTAS - Iconos distintivos y bordes con gradiente
+   ======================================== */
+
+.account-card-enhanced {
+    background: var(--gradient-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    padding: var(--spacing-lg);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.account-card-enhanced::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, 
+        rgba(59, 130, 246, 0) 0%,
+        rgba(59, 130, 246, 1) 50%,
+        rgba(59, 130, 246, 0) 100%
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.account-card-enhanced:hover::before {
+    opacity: 1;
+}
+
+.account-card-enhanced:hover {
+    transform: translateY(-4px);
+    border-color: var(--border-medium);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+}
+
+.account-type-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    margin-bottom: var(--spacing-md);
+    position: relative;
+}
+
+/* Iconos distintivos por tipo */
+.account-type-icon.credit {
+    background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+}
+
+.account-type-icon.credit::after {
+    content: '💳';
+    position: absolute;
+}
+
+.account-type-icon.cash {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+}
+
+.account-type-icon.cash::after {
+    content: '💵';
+    position: absolute;
+}
+
+.account-type-icon.bank {
+    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+}
+
+.account-type-icon.bank::after {
+    content: '🏦';
+    position: absolute;
+}
+
+.account-type-icon.savings {
+    background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+}
+
+.account-type-icon.savings::after {
+    content: '🐷';
+    position: absolute;
+}
+
+/* Estado activo con punto luminoso */
+.account-status-indicator {
+    position: absolute;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid var(--bg-surface-1);
+}
+
+.account-status-indicator.active {
+    background: var(--success-soft);
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+    animation: pulse-glow 2s infinite;
+}
+
+.account-status-indicator.inactive {
+    background: var(--text-quaternary);
+}
+
+@keyframes pulse-glow {
+    0%, 100% {
+        box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(16, 185, 129, 0.8);
+    }
+}
+
+/* ========================================
+   TIPOGRAFÍA - Números monoespaciados
+   ======================================== */
+
+.amount,
+.balance,
+.total,
+.price,
+.currency-value,
+.account-balance,
+.summary-value,
+.stat-number {
+    font-family: var(--font-mono) !important;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+}
+
+/* ========================================
+   BADGES - Consistencia visual
+   ======================================== */
+
+.badge-consistent {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 1px solid transparent;
+}
+
+.badge-consistent.status-active {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success-soft);
+    border-color: rgba(16, 185, 129, 0.2);
+}
+
+.badge-consistent.status-inactive {
+    background: rgba(107, 114, 128, 0.1);
+    color: var(--text-quaternary);
+    border-color: rgba(107, 114, 128, 0.2);
+}
+
+.badge-consistent.type-income {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success-soft);
+    border-color: rgba(16, 185, 129, 0.2);
+}
+
+.badge-consistent.type-expense {
+    background: rgba(248, 113, 113, 0.1);
+    color: var(--danger-soft);
+    border-color: rgba(248, 113, 113, 0.2);
+}
+
+/* ========================================
+   MICRO-INTERACCIONES
+   ======================================== */
+
+/* Feedback al hacer clic */
+.clickable {
+    transition: all 0.15s ease;
+}
+
+.clickable:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+}
+
+/* Transición de expansión suave */
+.expandable {
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+/* Hover suave en filas */
+.row-hover {
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.row-hover:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+/* Shimmer loading effect */
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+.loading-shimmer {
+    background: linear-gradient(
+        90deg,
+        var(--bg-surface-1) 0px,
+        var(--bg-surface-2) 40px,
+        var(--bg-surface-1) 80px
+    );
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite linear;
+}
+
+/* ========================================
+   ESPACIADO CONSISTENTE
+   ======================================== */
+
+.section-spacing {
+    margin-bottom: var(--spacing-xl);
+}
+
+.card-spacing {
+    padding: var(--spacing-lg);
+}
+
+.item-spacing {
+    gap: var(--spacing-md);
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+    .summary-quick {
+        grid-template-columns: 1fr;
+    }
+    
+    .main-actions {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .main-action-btn {
+        padding: var(--spacing-md);
+    }
+    
+    .main-action-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 20px;
+    }
+    
+    .transaction-item {
+        padding: var(--spacing-sm);
+    }
+    
+    .transaction-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+}
+
+/* ========================================
+   UTILIDADES
+   ======================================== */
+
+.text-mono {
+    font-family: var(--font-mono);
+}
+
+.text-display {
+    font-family: var(--font-display);
+}
+
+.surface-1 {
+    background: var(--bg-surface-1);
+}
+
+.surface-2 {
+    background: var(--bg-surface-2);
+}
+
+.surface-3 {
+    background: var(--bg-surface-3);
+}
+
+.border-subtle {
+    border: 1px solid var(--border-subtle);
+}
+
+.border-medium {
+    border: 1px solid var(--border-medium);
+}
+
+.border-strong {
+    border: 1px solid var(--border-strong);
+}

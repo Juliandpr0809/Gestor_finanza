@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Transaction - OrdenC</title>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Modern Theme -->
+    <link rel="stylesheet" href="../css/modern-theme.css">
+    <link rel="stylesheet" href="../css/unified-pages.css">
+    <link rel="stylesheet" href="../css/new-transaction.css">
+    <link rel="stylesheet" href="../css/lang-selector.css">
+    <link rel="stylesheet" href="../css/header-minimal.css">
+    <link rel="stylesheet" href="../css/bottom-navigation.css">
+</head>
+
+<body>
+    <header class="header">
+        <div class="header-left">
+            <div class="header-logo" onclick="window.location.href='index.html'">
+                <div class="header-logo-icon">C</div>
+                <span>OrdenC</span>
+            </div>
+            <nav class="header-nav">
+                <a href="index.html" class="header-nav-item" data-i18n="Dashboard">Panel</a>
+                <a href="accounts.html" class="header-nav-item" data-i18n="Accounts">Cuentas</a>
+                <a href="transactions.html" class="header-nav-item" data-i18n="Transactions">Transacciones</a>
+                <a href="reports.html" class="header-nav-item" data-i18n="Reports">Reportes</a>
+            </nav>
+        </div>
+        <div class="header-right">
+            <div class="lang-selector">
+                <button class="lang-btn" data-lang-btn="es">ES</button>
+                <button class="lang-btn" data-lang-btn="en">EN</button>
+            </div>
+            <div class="header-actions">
+                <button class="header-icon-btn" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                </button>
+            </div>
+            <div class="header-profile">
+                <div class="profile-avatar">KW</div>
+                <span class="profile-name">Kristin Watson</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="new-transaction-container">
+        <div class="mobile-header">
+            <button class="btn-back-mobile" onclick="window.location.href='transactions.html'">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h1 data-i18n="New Transaction">New Transaction</h1>
+        </div>
+
+        <form id="transaction-form" class="transaction-form-mobile">
+            <div class="form-column-left">
+                <div class="section-label"><i class="fas fa-random"></i> <span>Transaction Type</span></div>
+                <div class="type-tabs">
+                    <div class="type-tab active" data-type="expense">
+                        <i class="fas fa-arrow-down"></i>
+                        <span>Expense</span>
+                    </div>
+                    <div class="type-tab" data-type="income">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>Income</span>
+                    </div>
+                    <div class="type-tab" data-type="transfer">
+                        <i class="fas fa-exchange-alt"></i>
+                        <span>Transfer</span>
+                    </div>
+                </div>
+
+                <div class="amount-section" style="display: flex; gap: 10px; align-items: flex-end;">
+                    <div style="flex: 1;">
+                        <div class="currency-symbol" style="display:none">$</div>
+                        <input type="number" id="amount" class="amount-input" placeholder="0" step="0.01" required>
+                        <div class="amount-underline"></div>
+                    </div>
+                    <div style="width: 100px; margin-bottom: 5px;">
+                        <select id="currency" class="select-dark"
+                            style="padding: 5px; font-size: 14px; border: none; border-bottom: 1px solid #3a3a3c; border-radius: 0;">
+                            <option value="COP">COP</option>
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                            <option value="MXN">MXN</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="datetime-row">
+                    <div class="datetime-item" id="dateTrigger">
+                        <i class="fas fa-calendar"></i>
+                        <span id="dateDisplay">Today</span>
+                        <input type="date" id="date" required>
+                    </div>
+                    <div class="datetime-divider">|</div>
+                    <div class="datetime-item" id="timeTrigger">
+                        <i class="fas fa-clock"></i>
+                        <span id="timeDisplay">12:00</span>
+                        <input type="time" id="time">
+                    </div>
+                </div>
+
+                <div class="section-label"><i class="fas fa-wallet"></i> <span>Account</span></div>
+                <div id="accountChips" class="account-chips"></div>
+                <select id="account" class="select-dark" required aria-label="Account" style="display:none"></select>
+
+                <div class="input-field-wrapper">
+                    <div class="input-field">
+                        <i class="fas fa-heading"></i>
+                        <input type="text" id="title" placeholder="Title">
+                    </div>
+                    <small class="input-hint">Title/Notes will trigger AI categorization</small>
+                </div>
+
+                <div class="input-field-wrapper">
+                    <div class="input-field">
+                        <i class="fas fa-align-left"></i>
+                        <input type="text" id="description" placeholder="Notes">
+                    </div>
+                </div>
+
+                <div class="input-field-wrapper category-select-container" style="position: relative;">
+                    <div class="category-trigger" id="categoryTriggerVisual">
+                        <div class="category-trigger-content">
+                            <i class="fas fa-tag"></i>
+                            <div>
+                                <span id="categoryLabel">Select a Category</span>
+                                <div class="input-hint" id="categoryHint">AI suggestion will appear here</div>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                    <!-- Native Select Overlay for better mobile compatibility -->
+                    <select id="category" required aria-label="Category"
+                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; z-index: 100; cursor: pointer;">
+                    </select>
+                </div>
+
+                <div class="input-field-wrapper">
+                    <div class="input-field" id="tags-container">
+                        <i class="fas fa-hashtag"></i>
+                        <input type="text" id="tags-input" placeholder="urgent, monthly...">
+                    </div>
+                    <small class="input-hint">Separate tags with comma</small>
+                </div>
+
+                <button type="button" class="btn-more-options" id="toggleAdvanced">
+                    More options <i class="fas fa-chevron-down"></i>
+                </button>
+
+                <div class="advanced-fields" id="advancedFields" style="display: none;">
+
+
+                    <div class="toggle-row">
+                        <div class="toggle-label">Recurring Transaction</div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="recurring">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="attachment-field" id="drop-zone">
+                        <i class="fas fa-paperclip"></i>
+                        <span>Click to upload or drag and drop (JPG, PNG, PDF max 5MB)</span>
+                        <i class="fas fa-chevron-right"></i>
+                        <input type="file" id="file-input" hidden>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit btn-submit-mobile">
+                    <i class="fas fa-check"></i>
+                    Save Transaction
+                </button>
+            </div>
+
+            <div class="form-column-right">
+                <div class="preview-section">
+                    <div class="preview-label">Category Preview</div>
+                    <div class="category-preview-large">
+                        <div class="category-icon-large" id="categoryPreviewIcon">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <div class="category-name-large" id="categoryPreviewName">No Category</div>
+                    </div>
+                </div>
+
+                <div class="preview-section transaction-summary">
+                    <div class="preview-label">Transaction Summary</div>
+                    <div class="summary-items">
+                        <div class="summary-item">
+                            <span class="summary-label">Amount</span>
+                            <span class="summary-amount" id="summaryAmount">$0.00</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Account</span>
+                            <span class="summary-value" id="summaryAccount">-</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Date</span>
+                            <span class="summary-value" id="summaryDate">-</span>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-submit btn-submit-desktop">
+                        <i class="fas fa-check"></i>
+                        Save Transaction
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div id="createCategoryModal" class="modal hidden"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; overflow-y: auto; padding: 20px 0;">
+        <div
+            style="background: #1C1C1E; border-radius: 16px; padding: 24px; width: 90%; max-width: 500px; border: 1px solid #2C2C2E; max-height: 90vh; overflow-y: auto; margin: auto;">
+            <h3 style="margin: 0 0 20px 0; color: white; font-size: 20px;">Create New Category</h3>
+
+            <form id="createCategoryForm">
+                <div style="margin-bottom: 16px;">
+                    <label style="color: #8E8E93; font-size: 14px; display: block; margin-bottom: 8px;">Category Name
+                        *</label>
+                    <input type="text" id="newCategoryName" required
+                        style="width: 100%; padding: 12px; background: #2C2C2E; border: 1px solid #3C3C3E; border-radius: 8px; color: white; font-size: 14px; box-sizing: border-box;">
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="color: #8E8E93; font-size: 14px; display: block; margin-bottom: 8px;">Type *</label>
+                    <select id="newCategoryType" required
+                        style="width: 100%; padding: 12px; background: #2C2C2E; border: 1px solid #3C3C3E; border-radius: 8px; color: white; font-size: 14px; box-sizing: border-box;">
+                        <option value="">Select type...</option>
+                        <option value="income">Income</option>
+                        <option value="expense">Expense</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="color: #8E8E93; font-size: 14px; display: block; margin-bottom: 8px;">Icon *</label>
+                    <input type="hidden" id="newCategoryIcon" value="fa-wallet">
+
+                    <div id="iconGrid"
+                        style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; max-height: 220px; overflow-y: auto; padding: 12px; background: #2C2C2E; border: 1px solid #3C3C3E; border-radius: 8px;">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="color: #8E8E93; font-size: 14px; display: block; margin-bottom: 8px;">Color *</label>
+                    <input type="hidden" id="newCategoryColor" value="#2196F3">
+
+                    <div id="colorGrid"
+                        style="display: grid; grid-template-columns: repeat(10, 1fr); gap: 8px; max-height: 220px; overflow-y: auto; padding: 12px; background: #2C2C2E; border: 1px solid #3C3C3E; border-radius: 8px;">
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 12px; margin-top: 24px;">
+                    <button type="button" onclick="closeCreateCategoryModal()"
+                        style="flex: 1; padding: 12px; background: #2C2C2E; border: 1px solid #3C3C3E; border-radius: 8px; color: white; cursor: pointer; font-size: 14px;">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                        style="flex: 1; padding: 12px; background: #007AFF; border: none; border-radius: 8px; color: white; cursor: pointer; font-size: 14px; font-weight: 600;">
+                        Create Category
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/i18n.js"></script>
+    <script src="../js/api.js?v=27"></script>
+    <script src="../js/auth-handler.js?v=19"></script>
+    <script src="../js/ai-chat.js?v=23"></script>
+    <script src="../js/new-transaction.js?v=29"></script>
+
+    <nav class="bottom-nav">
+        <a href="index.html" class="bottom-nav-item">
+            <i class="fas fa-home"></i>
+            <span>Inicio</span>
+        </a>
+        <a href="accounts.html" class="bottom-nav-item">
+            <i class="fas fa-wallet"></i>
+            <span>Cuentas</span>
+        </a>
+        <a href="new-transaction.html" class="bottom-nav-item bottom-nav-item-add active">
+            <i class="fas fa-plus"></i>
+        </a>
+        <a href="transactions.html" class="bottom-nav-item">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Movimientos</span>
+        </a>
+        <a href="reports.html" class="bottom-nav-item">
+            <i class="fas fa-chart-line"></i>
+            <span>Reportes</span>
+        </a>
+    </nav>
+</body>
+
+</html>

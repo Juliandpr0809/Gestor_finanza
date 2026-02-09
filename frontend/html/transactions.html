@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#06070c">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="OrdenC">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%23ffffff' width='180' height='180' rx='40'/><text x='90' y='130' font-size='100' font-weight='800' text-anchor='middle' fill='%23000000' font-family='system-ui'>C</text></svg>">
+    <link rel="manifest" href="../manifest.json">
+    <title>Transactions - OrdenC</title>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Modern Theme -->
+    <link rel="stylesheet" href="../css/modern-theme.css">
+    <link rel="stylesheet" href="../css/unified-pages.css">
+    <link rel="stylesheet" href="../css/transactions.css">
+    <link rel="stylesheet" href="../css/mobile-native.css">
+    <link rel="stylesheet" href="../css/bottom-navigation.css">
+    <link rel="stylesheet" href="../css/lang-selector.css">
+    <link rel="stylesheet" href="../css/ux-improvements.css">
+    <link rel="stylesheet" href="../css/header-minimal.css">
+</head>
+
+<body>
+    <!-- Navigation Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="header-logo" onclick="window.location.href='index.html'">
+                <div class="header-logo-icon">C</div>
+                <span>OrdenC</span>
+            </div>
+            <nav class="header-nav">
+                <a href="index.html" class="header-nav-item" data-i18n="Dashboard">Panel</a>
+                <a href="accounts.html" class="header-nav-item" data-i18n="Accounts">Cuentas</a>
+                <a href="transactions.html" class="header-nav-item active" data-i18n="Transactions">Transacciones</a>
+                <a href="reports.html" class="header-nav-item" data-i18n="Reports">Reportes</a>
+            </nav>
+        </div>
+        <div class="header-right">
+            <div class="compact-selector" id="compactSelector">
+                <button class="lang-btn" data-lang-btn="es" title="Español">ES</button>
+                <button class="lang-btn" data-lang-btn="en" title="English">EN</button>
+                <div class="separator"></div>
+                <span class="currency-value" id="currencyValue">COP</span>
+                <div class="currency-dropdown" id="currencyDropdown">
+                    <div class="currency-option" data-currency="COP">COP</div>
+                    <div class="currency-option" data-currency="USD">USD</div>
+                    <div class="currency-option" data-currency="EUR">EUR</div>
+                    <div class="currency-option" data-currency="MXN">MXN</div>
+                </div>
+            </div>
+            <div class="header-ticker" id="headerTicker"></div>
+            <div class="header-actions">
+                <button class="header-icon-btn" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">25</span>
+                </button>
+            </div>
+            <div class="header-profile" id="userMenuToggle">
+                <div class="profile-avatar">
+                    <img id="profileAvatar" src="https://ui-avatars.com/api/?name=User&background=667eea" alt="User">
+                </div>
+                <i class="fas fa-chevron-down profile-dropdown-icon"></i>
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="dropdown-header">
+                        <div class="dropdown-user-name" id="dropdownUserName">Usuario</div>
+                        <div class="dropdown-user-email" id="dropdownUserEmail">user@example.com</div>
+                    </div>
+                    <div class="dropdown-menu">
+                        <a href="accounts.html" class="dropdown-item">
+                            <i class="fas fa-wallet"></i>
+                            <span>Mis Cuentas</span>
+                        </a>
+                        <a href="transactions.html" class="dropdown-item">
+                            <i class="fas fa-exchange-alt"></i>
+                            <span>Transacciones</span>
+                        </a>
+                        <a href="ai-chat.html" class="dropdown-item">
+                            <i class="fas fa-robot"></i>
+                            <span>Asistente IA</span>
+                        </a>
+                        <a href="reports.html" class="dropdown-item">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Reportes</span>
+                        </a>                        <a href="welcome.html" class="dropdown-item">
+                            <i class="fas fa-lightbulb"></i>
+                            <span>Guía de uso</span>
+                        </a>                        <div class="dropdown-item logout" data-action="logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Cerrar Sesión</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Page Header -->
+        <div class="page-header-simple">
+            <div>
+                <h1 class="page-title-large" data-i18n="Transactions">Transacciones</h1>
+                <p class="page-subtitle" data-i18n="transactions.subtitle">Rastrea tus ingresos y gastos.</p>
+            </div>
+            <div class="page-actions">
+                <button class="btn-glass"><i class="fas fa-file-export"></i> <span data-i18n="Export">Exportar</span></button>
+                <button class="btn-primary-glow" onclick="window.location.href='new-transaction.html'">
+                    <span data-i18n="New Transaction">Nueva Transacción</span> <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="stats-overview">
+            <div class="stat-box summary-card">
+                <div class="stat-icon-box green">
+                    <i class="fas fa-arrow-down"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-label" data-i18n="Income">Ingreso</span>
+                    <span class="stat-number summary-value">$0.00</span>
+                </div>
+            </div>
+            <div class="stat-box summary-card">
+                <div class="stat-icon-box red">
+                    <i class="fas fa-arrow-up"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-label" data-i18n="Expense">Gasto</span>
+                    <span class="stat-number summary-value">$0.00</span>
+                </div>
+            </div>
+            <div class="stat-box summary-card">
+                <div class="stat-icon-box blue">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-label" data-i18n="Balance">Balance</span>
+                    <span class="stat-number summary-value">$0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros Rápidos UX Improvement -->
+        <div class="quick-filters">
+            <div class="filter-chip active" data-filter="all" onclick="applyQuickFilter('all')">
+                <i class="fas fa-list"></i>
+                <span data-i18n="filter.all">Todos</span>
+            </div>
+            <div class="filter-chip" data-filter="today" onclick="applyQuickFilter('today')">
+                <i class="fas fa-calendar-day"></i>
+                <span data-i18n="filter.today">Hoy</span>
+            </div>
+            <div class="filter-chip" data-filter="week" onclick="applyQuickFilter('week')">
+                <i class="fas fa-calendar-week"></i>
+                <span data-i18n="filter.week">Esta Semana</span>
+            </div>
+            <div class="filter-chip" data-filter="month" onclick="applyQuickFilter('month')">
+                <i class="fas fa-calendar"></i>
+                <span data-i18n="filter.month">Este Mes</span>
+            </div>
+            <div class="filter-chip" data-filter="high" onclick="applyQuickFilter('high')">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span data-i18n="filter.high">Montos Altos</span>
+            </div>
+            <div class="filter-chip" data-filter="income" onclick="applyQuickFilter('income')">
+                <i class="fas fa-arrow-down"></i>
+                <span data-i18n="filter.income">Ingresos</span>
+            </div>
+            <div class="filter-chip" data-filter="expense" onclick="applyQuickFilter('expense')">
+                <i class="fas fa-arrow-up"></i>
+                <span data-i18n="filter.expense">Gastos</span>
+            </div>
+        </div>
+
+        <!-- Filters & Table Section -->
+        <div class="content-panel">
+            <div class="filters-toolbar">
+                <div class="search-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" data-i18n-placeholder="Search transactions..." placeholder="Buscar transacciones..." class="search-input-clean">
+                </div>
+                <div class="filters-group">
+                    <select id="filterType" class="select-clean">
+                        <option value="" data-i18n="All Types">Todos los Tipos</option>
+                        <option value="income" data-i18n="Income">Ingreso</option>
+                        <option value="expense" data-i18n="Expense">Gasto</option>
+                    </select>
+                    <select id="filterCategory" class="select-clean">
+                        <option value="" data-i18n="All Categories">Todas las Categorías</option>
+                        <option value="food" data-i18n="Food & Dining">Comida</option>
+                        <option value="transport" data-i18n="Transportation">Transporte</option>
+                        <option value="entertainment" data-i18n="Entertainment">Entretenimiento</option>
+                        <option value="shopping" data-i18n="Shopping">Compras</option>
+                        <option value="bills" data-i18n="Bills & Utilities">Facturas</option>
+                        <option value="health" data-i18n="Healthcare">Salud</option>
+                        <option value="salary" data-i18n="Salary">Salario</option>
+                        <option value="freelance" data-i18n="Freelance">Freelance</option>
+                        <option value="other" data-i18n="Other">Otro</option>
+                    </select>
+                    <select id="filterAccount" class="select-clean">
+                        <option value="" data-i18n="All Accounts">Todas las Cuentas</option>
+                        <option value="1">Main Checking</option>
+                        <option value="2">Business Account</option>
+                        <option value="3">Emergency Fund</option>
+                        <option value="4">Visa Platinum</option>
+                        <option value="5">Mastercard Gold</option>
+                    </select>
+                    <input type="date" id="filterDateFrom" class="date-input-clean" placeholder="From">
+                    <input type="date" id="filterDateTo" class="date-input-clean" placeholder="To">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table-clean" id="transactionsTable">
+                    <thead>
+                        <tr>
+                            <th width="50"></th> <!-- Icon -->
+                            <th class="sortable" data-sort="name"><span data-i18n="NAME">NOMBRE</span> <i class="fas fa-sort"></i></th>
+                            <th class="sortable" data-sort="date"><span data-i18n="DATE">FECHA</span> <i class="fas fa-sort"></i></th>
+                            <th class="sortable" data-sort="category"><span data-i18n="CATEGORY">CATEGORÍA</span> <i class="fas fa-sort"></i></th>
+                            <th class="sortable text-right" data-sort="amount"><span data-i18n="AMOUNT">MONTO</span> <i class="fas fa-sort"></i></th>
+                            <th width="50"><span data-i18n="ACTIONS">ACCIONES</span></th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionsBody">
+                        <!-- Transactions will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination-clean">
+                <div class="pagination-info" style="color: #666; font-size: 13px; display: none;">
+                    Showing <span id="showingStart">0</span>-<span id="showingEnd">0</span> of <span
+                        id="totalTransactions">0</span>
+                </div>
+                <button class="btn-page-clean" id="btnPrevPage"><i class="fas fa-chevron-left"></i></button>
+                <div id="pageNumbers" style="display: flex; gap: 8px;"></div>
+                <button class="btn-page-clean" id="btnNextPage"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Edit Transaction Modal -->
+    <div class="modal hidden" id="editModal">
+        <div class="modal-overlay" onclick="closeEditModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Transaction</h2>
+                <button class="btn-close-modal" onclick="closeEditModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form class="modal-form" id="editForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Transaction Type</label>
+                        <select id="editType" class="form-input" required>
+                            <option value="expense">Expense</option>
+                            <option value="income">Income</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Amount</label>
+                        <input type="number" id="editAmount" class="form-input" step="0.01" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="editDate" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="editCategory" class="form-input" required>
+                            <option value="food">Food & Dining</option>
+                            <option value="transport">Transportation</option>
+                            <option value="entertainment">Entertainment</option>
+                            <option value="shopping">Shopping</option>
+                            <option value="bills">Bills & Utilities</option>
+                            <option value="health">Healthcare</option>
+                            <option value="salary">Salary</option>
+                            <option value="freelance">Freelance</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" id="editDescription" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Account</label>
+                    <select id="editAccount" class="form-input" required>
+                        <option value="1">Main Checking</option>
+                        <option value="2">Business Account</option>
+                        <option value="3">Emergency Fund</option>
+                        <option value="4">Visa Platinum</option>
+                        <option value="5">Mastercard Gold</option>
+                    </select>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="closeEditModal()">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i>
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Registrar Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('../service-worker.js')
+                .then(reg => console.log('Service Worker registrado:', reg))
+                .catch(err => console.log('Error registrando Service Worker:', err));
+        }
+    </script>
+
+    <script src="../js/i18n.js?v=100"></script>
+    <script src="../js/api.js?v=100"></script>
+    <script src="../js/auth-handler.js?v=100"></script>
+    <script src="../js/ux-improvements.js?v=100"></script>
+    <script src="../js/transactions.js?v=103"></script>
+
+    <!-- Bottom Navigation (Mobile) -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="bottom-nav-item">
+            <i class="fas fa-home"></i>
+            <span>Inicio</span>
+        </a>
+        <a href="accounts.html" class="bottom-nav-item">
+            <i class="fas fa-wallet"></i>
+            <span>Cuentas</span>
+        </a>
+        <a href="new-transaction.html" class="bottom-nav-item bottom-nav-item-add">
+            <i class="fas fa-plus"></i>
+        </a>
+        <a href="transactions.html" class="bottom-nav-item active">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Movimientos</span>
+        </a>
+        <a href="reports.html" class="bottom-nav-item">
+            <i class="fas fa-chart-line"></i>
+            <span>Reportes</span>
+        </a>
+    </nav>
+</body>
+
+</html>

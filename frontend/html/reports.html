@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - OrdenC</title>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Modern Theme -->
+    <link rel="stylesheet" href="../css/modern-theme.css">
+    <link rel="stylesheet" href="../css/unified-pages.css">
+    <link rel="stylesheet" href="../css/lang-selector.css">
+    <link rel="stylesheet" href="../css/header-minimal.css">
+    <link rel="stylesheet" href="../css/bottom-navigation.css">
+
+    <style>
+        .coming-soon-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 60px;
+            min-height: calc(100vh - 70px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .coming-soon-content {
+            text-align: center;
+            max-width: 600px;
+        }
+
+        .coming-soon-icon {
+            font-size: 120px;
+            margin-bottom: 32px;
+            opacity: 0.3;
+        }
+
+        .coming-soon-title {
+            font-size: 48px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 16px;
+        }
+
+        .coming-soon-subtitle {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 40px;
+        }
+
+        .coming-soon-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+        }
+
+        .btn-action {
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary-action {
+            background: linear-gradient(135deg, #6B9FFF 0%, #8B6BFF 100%);
+            border: none;
+            color: white;
+        }
+
+        .btn-primary-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(107, 159, 255, 0.4);
+        }
+
+        .btn-secondary-action {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .btn-secondary-action:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #FFFFFF;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="header-logo" onclick="window.location.href='index.html'">
+                <div class="header-logo-icon">C</div>
+                <span>OrdenC</span>
+            </div>
+            <nav class="header-nav">
+                <a href="index.html" class="header-nav-item" data-i18n="Dashboard">Panel</a>
+                <a href="accounts.html" class="header-nav-item" data-i18n="Accounts">Cuentas</a>
+                <a href="transactions.html" class="header-nav-item" data-i18n="Transactions">Transacciones</a>
+                <a href="reports.html" class="header-nav-item active" data-i18n="Reports">Reportes</a>
+            </nav>
+        </div>
+        <div class="header-right">
+            <div class="lang-selector">
+                <button class="lang-btn" data-lang-btn="es">ES</button>
+                <button class="lang-btn" data-lang-btn="en">EN</button>
+            </div>
+            <div class="header-balance">
+                <span class="header-balance-label">TOTAL BALANCE</span>
+                <span class="header-balance-amount">$1,456.00</span>
+            </div>
+            <button class="header-icon-btn">
+                <i class="fas fa-bell"></i>
+            </button>
+            <button class="header-icon-btn">
+                <i class="fas fa-cog"></i>
+            </button>
+            <div class="header-avatar">
+                <span>KW</span>
+            </div>
+            <span class="header-username">Kristin Watson</span>
+        </div>
+    </header>
+
+    <!-- Coming Soon Content -->
+    <main class="coming-soon-container">
+        <div class="coming-soon-content">
+            <div class="coming-soon-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <h1 class="coming-soon-title" data-i18n="Reports & Analytics">Reportes y Análisis</h1>
+            <p class="coming-soon-subtitle" data-i18n="reports.subtitle">
+                Panel de reportes financieros y análisis próximamente. ¡Rastrea tus patrones de gasto e insights!
+            </p>
+            <div class="coming-soon-actions">
+                <button class="btn-action btn-primary-action" onclick="window.location.href='ai-chat.html'">
+                    <i class="fas fa-comments"></i>
+                    <span data-i18n="Ask AI Assistant">Preguntar a IA</span>
+                </button>
+                <button class="btn-action btn-secondary-action" onclick="window.location.href='index.html'">
+                    <i class="fas fa-home"></i>
+                    <span data-i18n="Back to Dashboard">Volver al Panel</span>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/i18n.js"></script>
+    <script src="../js/i18n.js"></script>
+
+    <!-- Bottom Navigation (Mobile) -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="bottom-nav-item">
+            <i class="fas fa-home"></i>
+            <span>Inicio</span>
+        </a>
+        <a href="accounts.html" class="bottom-nav-item">
+            <i class="fas fa-wallet"></i>
+            <span>Cuentas</span>
+        </a>
+        <a href="new-transaction.html" class="bottom-nav-item bottom-nav-item-add">
+            <i class="fas fa-plus"></i>
+        </a>
+        <a href="transactions.html" class="bottom-nav-item">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Movimientos</span>
+        </a>
+        <a href="reports.html" class="bottom-nav-item active">
+            <i class="fas fa-chart-line"></i>
+            <span>Reportes</span>
+        </a>
+    </nav>
+</body>
+
+</html>

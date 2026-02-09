@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Transacciones</title>
+</head>
+<body>
+    <h1>Test de Carga de Transacciones</h1>
+    <button onclick="testLoad()">Cargar Transacciones</button>
+    <div id="result"></div>
+
+    <script src="../js/api.js"></script>
+    <script>
+        async function testLoad() {
+            const token = localStorage.getItem('token');
+            console.log('Token:', token ? 'EXISTE' : 'NO EXISTE');
+            
+            if (!token) {
+                document.getElementById('result').innerHTML = '<p style="color:red">No hay token. Inicia sesión primero.</p>';
+                return;
+            }
+
+            try {
+                console.log('Llamando a api.getTransactions()...');
+                const data = await api.getTransactions({ per_page: 100 });
+                console.log('Respuesta completa:', data);
+                
+                let html = '<h2>Respuesta del API:</h2>';
+                html += '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                
+                if (data.transactions) {
+                    html += `<h3>Se encontraron ${data.transactions.length} transacciones</h3>`;
+                    html += '<ul>';
+                    data.transactions.forEach(t => {
+                        html += `<li>${t.description || t.category_name} - $${t.amount} - ${t.type}</li>`;
+                    });
+                    html += '</ul>';
+                } else {
+                    html += '<p style="color:orange">No se encontró la propiedad "transactions" en la respuesta</p>';
+                }
+                
+                document.getElementById('result').innerHTML = html;
+            } catch (err) {
+                console.error('Error:', err);
+                document.getElementById('result').innerHTML = '<p style="color:red">Error: ' + err.message + '</p>';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#06070c">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="OrdenC">
+    <link rel="apple-touch-icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%23ffffff' width='180' height='180' rx='40'/><text x='90' y='130' font-size='100' font-weight='800' text-anchor='middle' fill='%23000000' font-family='system-ui'>C</text></svg>">
+    <link rel="manifest" href="../manifest.json">
+    <title>Accounts - OrdenC</title>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Modern Theme -->
+    <link rel="stylesheet" href="../css/modern-theme.css">
+    <link rel="stylesheet" href="../css/unified-pages.css">
+    <link rel="stylesheet" href="../css/accounts.css">
+    <link rel="stylesheet" href="../css/mobile-native.css">
+    <link rel="stylesheet" href="../css/lang-selector.css">
+    <link rel="stylesheet" href="../css/ux-improvements.css">
+    <link rel="stylesheet" href="../css/header-minimal.css">
+    <link rel="stylesheet" href="../css/bottom-navigation.css">
+</head>
+
+<body>
+    <!-- Navigation Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="header-logo" onclick="window.location.href='index.html'">
+                <div class="header-logo-icon">C</div>
+                <span>OrdenC</span>
+            </div>
+            <nav class="header-nav">
+                <a href="index.html" class="header-nav-item" data-i18n="Dashboard">Panel</a>
+                <a href="accounts.html" class="header-nav-item active" data-i18n="Accounts">Cuentas</a>
+                <a href="transactions.html" class="header-nav-item" data-i18n="Transactions">Transacciones</a>
+                <a href="reports.html" class="header-nav-item" data-i18n="Reports">Reportes</a>
+            </nav>
+        </div>
+        <div class="header-right">
+            <div class="compact-selector" id="compactSelector">
+                <button class="lang-btn" data-lang-btn="es" title="Español">ES</button>
+                <button class="lang-btn" data-lang-btn="en" title="English">EN</button>
+                <div class="separator"></div>
+                <span class="currency-value" id="currencyValue">COP</span>
+                <div class="currency-dropdown" id="currencyDropdown">
+                    <div class="currency-option" data-currency="COP">COP</div>
+                    <div class="currency-option" data-currency="USD">USD</div>
+                    <div class="currency-option" data-currency="EUR">EUR</div>
+                    <div class="currency-option" data-currency="MXN">MXN</div>
+                </div>
+            </div>
+            <div class="header-ticker" id="headerTicker"></div>
+            <div class="header-actions">
+                <button class="header-icon-btn" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">25</span>
+                </button>
+            </div>
+            <div class="header-profile" id="userMenuToggle">
+                <div class="profile-avatar">
+                    <img id="profileAvatar" src="https://ui-avatars.com/api/?name=User&background=667eea" alt="User">
+                </div>
+                <i class="fas fa-chevron-down profile-dropdown-icon"></i>
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="dropdown-header">
+                        <div class="dropdown-user-name" id="dropdownUserName">Usuario</div>
+                        <div class="dropdown-user-email" id="dropdownUserEmail">user@example.com</div>
+                    </div>
+                    <div class="dropdown-menu">
+                        <a href="accounts.html" class="dropdown-item">
+                            <i class="fas fa-wallet"></i>
+                            <span data-i18n="My Accounts">Mis Cuentas</span>
+                        </a>
+                        <a href="transactions.html" class="dropdown-item">
+                            <i class="fas fa-exchange-alt"></i>
+                            <span data-i18n="Transactions">Transacciones</span>
+                        </a>
+                        <a href="ai-chat.html" class="dropdown-item">
+                            <i class="fas fa-robot"></i>
+                            <span data-i18n="AI Assistant">Asistente IA</span>
+                        </a>
+                        <a href="reports.html" class="dropdown-item">
+                            <i class="fas fa-chart-line"></i>
+                            <span data-i18n="Reports">Reportes</span>
+                        </a> <a href="welcome.html" class="dropdown-item">
+                            <i class="fas fa-lightbulb"></i>
+                            <span data-i18n="User Guide">Guía de uso</span>
+                        </a>
+                        <div class="dropdown-item logout" data-action="logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span data-i18n="Logout">Cerrar Sesión</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="accounts-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-header-left">
+                <h1 data-i18n="Accounts">Cuentas</h1>
+                <p data-i18n="accounts.subtitle">Gestiona tus cuentas bancarias y balances</p>
+            </div>
+            <button class="btn-add-account" id="btnAddAccount">
+                <i class="fas fa-plus"></i>
+                <span data-i18n="Add Account">Agregar Cuenta</span>
+            </button>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-cards">
+            <div class="summary-card">
+                <div class="summary-icon">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <div class="summary-content">
+                    <div class="summary-label" data-i18n="Total Balance">Balance Total</div>
+                    <div class="summary-value">$4,856.00</div>
+                    <div class="summary-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span data-i18n="accounts.change.lastmonth">+12.5% desde el mes pasado</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-icon">
+                    <i class="fas fa-university"></i>
+                </div>
+                <div class="summary-content">
+                    <div class="summary-label" data-i18n="Bank Accounts">Cuentas Bancarias</div>
+                    <div class="summary-value">3</div>
+                    <div class="summary-subtitle" data-i18n="accounts.checking.savings">2 corriente, 1 ahorros</div>
+                </div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-icon">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <div class="summary-content">
+                    <div class="summary-label" data-i18n="Credit Cards">Tarjetas de Crédito</div>
+                    <div class="summary-value">2</div>
+                    <div class="summary-subtitle" data-i18n="accounts.available.credit">$2,340 crédito disponible</div>
+                </div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-icon">
+                    <i class="fas fa-piggy-bank"></i>
+                </div>
+                <div class="summary-content">
+                    <div class="summary-label" data-i18n="Savings Goals">Metas de Ahorro</div>
+                    <div class="summary-value">$1,200</div>
+                    <div class="summary-change">
+                        <i class="fas fa-bullseye"></i>
+                        60% <span data-i18n="of target">of target</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="filter-tabs">
+            <button class="tab-btn active" data-filter="all">
+                <span data-i18n="All Accounts">Todas las Cuentas</span>
+                <span class="tab-count">5</span>
+            </button>
+            <button class="tab-btn" data-filter="checking">
+                <i class="fas fa-university"></i>
+                <span data-i18n="Checking">Corriente</span>
+                <span class="tab-count">2</span>
+            </button>
+            <button class="tab-btn" data-filter="savings">
+                <i class="fas fa-piggy-bank"></i>
+                <span data-i18n="Savings">Ahorros</span>
+                <span class="tab-count">1</span>
+            </button>
+            <button class="tab-btn" data-filter="credit">
+                <i class="fas fa-credit-card"></i>
+                <span data-i18n="Credit">Crédito</span>
+                <span class="tab-count">2</span>
+            </button>
+        </div>
+
+        <!-- Accounts Grid -->
+        <div class="accounts-grid" id="accountsGrid">
+            <!-- Loading state or empty state will be injected by JS -->
+            <div class="loading-spinner">
+                <i class="fas fa-spinner fa-spin"></i> Cargando cuentas...
+            </div>
+        </div>
+    </main>
+
+    <!-- Add/Edit Account Modal -->
+    <div class="modal hidden" id="accountModal">
+        <div class="modal-overlay" onclick="closeModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle" data-i18n="Add New Account">Add New Account</h2>
+                <button class="btn-close-modal" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form class="modal-form" id="accountForm">
+                <div class="form-group">
+                    <label data-i18n="Account Name">
+                        <i class="fas fa-tag"></i>
+                        Account Name
+                    </label>
+                    <input type="text" id="accountName" class="form-input" data-i18n-placeholder="e.g., Main Checking"
+                        placeholder="e.g., Main Checking" required>
+                </div>
+
+                <div class="form-group">
+                    <label data-i18n="Account Type">
+                        <i class="fas fa-list"></i>
+                        Account Type
+                    </label>
+                    <select id="accountType" class="form-input" required>
+                        <option value="" data-i18n="Select type">Select type</option>
+                        <option value="checking" data-i18n="Checking Account">Checking Account</option>
+                        <option value="savings" data-i18n="Savings Account">Savings Account</option>
+                        <option value="credit" data-i18n="Credit Card">Credit Card</option>
+                        <option value="cash" data-i18n="Cash / Wallet">Cash / Wallet</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label data-i18n="Currency">
+                        <i class="fas fa-coins"></i>
+                        Currency
+                    </label>
+                    <select id="accountCurrency" class="form-input" required>
+                        <option value="COP" data-i18n="COP - Colombian Peso">COP - Colombian Peso</option>
+                        <option value="USD" data-i18n="USD - US Dollar">USD - US Dollar</option>
+                        <option value="EUR" data-i18n="EUR - Euro">EUR - Euro</option>
+                        <option value="MXN" data-i18n="MXN - Mexican Peso">MXN - Mexican Peso</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label data-i18n="Bank/Institution">
+                        <i class="fas fa-building"></i>
+                        Bank/Institution
+                    </label>
+                    <input type="text" id="accountBank" class="form-input" data-i18n-placeholder="e.g., Chase Bank"
+                        placeholder="e.g., Chase Bank" required>
+                </div>
+
+                <div class="form-group">
+                    <label data-i18n="Account Number (Last 4 digits)">
+                        <i class="fas fa-hashtag"></i>
+                        Account Number (Last 4 digits)
+                    </label>
+                    <input type="text" id="accountNumber" class="form-input" placeholder="1234" maxlength="4" required>
+                </div>
+
+                <div class="form-group">
+                    <label data-i18n="Current Balance">
+                        <i class="fas fa-dollar-sign"></i>
+                        Current Balance
+                    </label>
+                    <input type="number" id="accountBalance" class="form-input" placeholder="0.00" step="0.01" required>
+                </div>
+
+                <div class="form-group credit-limit-group hidden">
+                    <label data-i18n="Credit Limit">
+                        <i class="fas fa-chart-line"></i>
+                        Credit Limit
+                    </label>
+                    <input type="number" id="creditLimit" class="form-input" placeholder="5000.00" step="0.01">
+                </div>
+
+                <div class="form-group savings-goal-group hidden">
+                    <label data-i18n="Savings Goal (Optional)">
+                        <i class="fas fa-bullseye"></i>
+                        Savings Goal (Optional)
+                    </label>
+                    <input type="number" id="savingsGoal" class="form-input" placeholder="10000.00" step="0.01">
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal()" data-i18n="Cancel">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i>
+                        <span data-i18n="Save Account">Save Account</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Registrar Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('../service-worker.js')
+                .then(reg => console.log('Service Worker registrado:', reg))
+                .catch(err => console.log('Error registrando Service Worker:', err));
+        }
+    </script>
+
+    <script src="../js/i18n.js"></script>
+    <script src="../js/api.js?v=16"></script>
+    <script src="../js/auth-handler.js?v=19"></script>
+    <script src="../js/accounts.js?v=4"></script>
+    <script src="../js/accounts.js?v=4"></script>
+
+    <!-- Bottom Navigation (Mobile) -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="bottom-nav-item">
+            <i class="fas fa-home"></i>
+            <span>Inicio</span>
+        </a>
+        <a href="accounts.html" class="bottom-nav-item active">
+            <i class="fas fa-wallet"></i>
+            <span>Cuentas</span>
+        </a>
+        <a href="new-transaction.html" class="bottom-nav-item bottom-nav-item-add">
+            <i class="fas fa-plus"></i>
+        </a>
+        <a href="transactions.html" class="bottom-nav-item">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Movimientos</span>
+        </a>
+        <a href="reports.html" class="bottom-nav-item">
+            <i class="fas fa-chart-line"></i>
+            <span>Reportes</span>
+        </a>
+    </nav>
+</body>
+
+</html>

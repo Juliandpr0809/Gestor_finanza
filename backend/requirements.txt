@@ -1,0 +1,20 @@
+Flask==3.0.0
+Flask-SQLAlchemy==3.1.1
+SQLAlchemy==2.0.23
+Flask-CORS==4.0.0
+python-dotenv==1.0.0
+requests==2.31.0
+Werkzeug==3.0.1
+PyJWT==2.8.0
+pymysql==1.1.0
+Flask-Migrate==4.0.5
+cryptography==46.0.3
+groq==0.4.2
+httpx==0.24.1
+rapidfuzz==3.9.3
+
+# Security dependencies
+Flask-Limiter==3.5.0
+marshmallow==3.20.1
+email-validator==2.1.0
+bleach==6.1.0

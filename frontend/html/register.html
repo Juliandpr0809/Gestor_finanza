@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - OrdenC</title>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Modern Theme -->
+    <link rel="stylesheet" href="../css/modern-theme.css">
+    <link rel="stylesheet" href="../css/auth.css">
+    <link rel="stylesheet" href="../css/lang-selector.css">
+</head>
+
+<body class="auth-body">
+    <div class="auth-container">
+        <!-- Left Side - Branding -->
+        <div class="auth-branding">
+            <div class="branding-content">
+                <div class="logo-large">
+                    <div class="logo-icon">C</div>
+                    <h1>OrdenC</h1>
+                </div>
+                <p class="tagline" data-i18n="register.tagline">Comienza tu viaje financiero hoy</p>
+
+                <div class="features-list">
+                    <div class="feature-item">
+                        <i class="fas fa-rocket"></i>
+                        <div>
+                            <h3 data-i18n="Quick Setup">Configuración Rápida</h3>
+                            <p data-i18n="register.quicksetup.desc">Comienza en menos de 2 minutos</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-gift"></i>
+                        <div>
+                            <h3 data-i18n="Free Forever">Gratis Siempre</h3>
+                            <p data-i18n="register.free.desc">Sin cargos ocultos ni suscripciones</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-headset"></i>
+                        <div>
+                            <h3 data-i18n="24/7 Support">Soporte 24/7</h3>
+                            <p data-i18n="register.support.desc">Estamos aquí cuando nos necesites</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial">
+                    <div class="testimonial-content">
+                        <i class="fas fa-quote-left"></i>
+                        <p>"OrdenC transformed how I manage my finances. Best decision ever!"</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <img src="https://i.pravatar.cc/150?img=1" alt="User">
+                        <div>
+                            <div class="author-name">Sarah Johnson</div>
+                            <div class="author-title">Product Designer</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side - Register Form -->
+        <div class="auth-form-section">
+            <div class="lang-selector" style="position: absolute; top: 20px; right: 20px; z-index: 10;">
+                <button class="lang-btn" data-lang-btn="es">ES</button>
+                <button class="lang-btn" data-lang-btn="en">EN</button>
+            </div>
+            <div class="auth-form-container">
+                <div class="form-header">
+                    <h2 data-i18n="Create Account">Crear Cuenta</h2>
+                    <p data-i18n="register.subtitle">Únete a miles de usuarios gestionando mejor sus finanzas</p>
+                </div>
+
+                <form class="auth-form" id="registerForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstName">
+                                <i class="fas fa-user"></i>
+                                <span data-i18n="First Name">Nombre</span>
+                            </label>
+                            <input type="text" id="firstName" class="form-input" data-i18n-placeholder="First Name" placeholder="Juan" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="lastName">
+                                <i class="fas fa-user"></i>
+                                <span data-i18n="Last Name">Apellido</span>
+                            </label>
+                            <input type="text" id="lastName" class="form-input" data-i18n-placeholder="Last Name" placeholder="Pérez" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="emailRegister">
+                            <i class="fas fa-envelope"></i>
+                            <span data-i18n="Email Address">Correo Electrónico</span>
+                        </label>
+                        <input type="email" id="emailRegister" class="form-input" placeholder="tu@correo.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="passwordRegister">
+                            <i class="fas fa-lock"></i>
+                            <span data-i18n="Password">Contraseña</span>
+                        </label>
+                        <div class="password-input-wrapper">
+                            <input type="password" id="passwordRegister" class="form-input"
+                                data-i18n-placeholder="Create a strong password" required>
+                            <button type="button" class="btn-toggle-password" id="togglePasswordRegister">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="password-strength" id="passwordStrength">
+                            <div class="strength-bar">
+                                <div class="strength-fill" id="strengthFill"></div>
+                            </div>
+                            <span class="strength-text" id="strengthText" data-i18n="Enter password">Ingresa contraseña</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword">
+                            <i class="fas fa-lock"></i>
+                            <span data-i18n="Confirm Password">Confirmar Contraseña</span>
+                        </label>
+                        <div class="password-input-wrapper">
+                            <input type="password" id="confirmPassword" class="form-input"
+                                data-i18n-placeholder="Confirm your password" required>
+                            <button type="button" class="btn-toggle-password" id="toggleConfirmPassword">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="terms" required>
+                            <span class="checkbox-label">
+                                <span data-i18n="register.terms"> Acepto los </span><a href="#" class="link-primary" data-i18n="Terms of Service">Términos de Servicio</a><span data-i18n="register.and"> y la </span><a href="#"
+                                    class="link-primary" data-i18n="Privacy Policy">Política de Privacidad</a>
+                            </span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn-primary btn-large">
+                        <span data-i18n="Create Account">Crear Cuenta</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+
+                    <div class="divider">
+                        <span data-i18n="or sign up with">o regístrate con</span>
+                    </div>
+
+                    <div class="social-login">
+                        <button type="button" class="btn-social">
+                            <i class="fab fa-google"></i>
+                            <span>Google</span>
+                        </button>
+                        <button type="button" class="btn-social">
+                            <i class="fab fa-apple"></i>
+                            <span>Apple</span>
+                        </button>
+                    </div>
+
+                    <div class="form-footer">
+                        <p><span data-i18n="Already have an account?">¿Ya tienes cuenta?</span> <a href="login.html" class="link-primary" data-i18n="Sign in">Inicia sesión</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/i18n.js"></script>
+    <script src="../js/api.js?v=16"></script>
+    <script src="../js/auth.js?v=2"></script>
+</body>
+
+</html>

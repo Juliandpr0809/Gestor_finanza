@@ -1,0 +1,203 @@
+/* ==========================================
+   HEADER MINIMAL - Tamaños Armónicos
+   ========================================== */
+
+.header {
+    height: 64px !important;
+    padding: 0 20px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+.header-right {
+    gap: 12px !important;
+}
+
+/* Ocultar elementos de ruido */
+.header-ticker {
+    display: none !important;
+}
+
+.notification-badge {
+    display: none !important;
+}
+
+.header-icon-btn {
+    display: none !important;
+}
+
+/* ==========================================
+   SELECTOR COMPACTO - Idioma + Moneda
+   ========================================== */
+
+.compact-selector {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    padding: 4px 6px;
+    height: 28px;
+    position: relative;
+}
+
+/* Botones de idioma */
+.lang-btn {
+    padding: 4px 8px !important;
+    min-width: 24px !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    color: rgba(255, 255, 255, 0.4) !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 3px !important;
+    letter-spacing: 0.4px !important;
+    line-height: 1 !important;
+    cursor: pointer;
+    transition: color 0.15s ease, background 0.15s ease;
+    text-transform: uppercase;
+}
+
+.lang-btn:hover {
+    color: rgba(255, 255, 255, 0.6) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+.lang-btn.active {
+    color: rgba(255, 255, 255, 0.85) !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Separador */
+.compact-selector .separator {
+    width: 1px;
+    height: 14px;
+    background: rgba(255, 255, 255, 0.08);
+    margin: 0 3px;
+}
+
+/* Moneda */
+.currency-value {
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    color: rgba(255, 255, 255, 0.4) !important;
+    padding: 0 8px;
+    cursor: pointer;
+    transition: color 0.15s ease, background 0.15s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    border-radius: 3px;
+}
+
+.currency-value:hover {
+    color: rgba(255, 255, 255, 0.6) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Dropdown de moneda */
+.currency-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 4px;
+    background: #0a0a0a;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    padding: 4px;
+    min-width: 70px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px);
+    transition: all 0.2s ease;
+    z-index: 1000;
+}
+
+.currency-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.currency-option {
+    padding: 5px 8px;
+    font-size: 11px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.45);
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.15s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.currency-option:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.currency-option.active {
+    color: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* ==========================================
+   PERFIL - Tamaños Armónicos
+   ========================================== */
+
+.header-profile {
+    padding: 0 !important;
+    gap: 6px !important;
+    height: 32px !important;
+}
+
+.profile-avatar {
+    width: 32px !important;
+    height: 32px !important;
+}
+
+.profile-avatar img {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 6px;
+}
+
+.profile-dropdown-icon {
+    font-size: 10px !important;
+    color: rgba(255, 255, 255, 0.35) !important;
+}
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+
+@media (max-width: 768px) {
+    .header {
+        height: 60px !important;
+        padding: 0 12px !important;
+    }
+    
+    .compact-selector {
+        padding: 3px 5px;
+        height: 24px;
+    }
+    
+    .lang-btn {
+        padding: 3px 6px !important;
+        min-width: 20px !important;
+        font-size: 9px !important;
+    }
+    
+    .currency-value {
+        font-size: 9px !important;
+        padding: 0 6px;
+    }
+    
+    .currency-dropdown {
+        min-width: 60px;
+    }
+    
+    .currency-option {
+        padding: 4px 6px;
+        font-size: 9px;
+    }
+}

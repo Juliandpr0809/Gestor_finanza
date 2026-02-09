@@ -1,0 +1,521 @@
+/* ========================================
+   MINIMAL DASHBOARD - Enfoque Blanco/Negro
+   Diseño limpio, intuitivo, menos ruido visual
+   ======================================== */
+
+:root {
+    --minimal-bg: #000000;
+    --minimal-surface: #0A0A0A;
+    --minimal-card: #121212;
+    --minimal-border: rgba(255, 255, 255, 0.06);
+    --minimal-text: #FFFFFF;
+    --minimal-text-muted: rgba(255, 255, 255, 0.5);
+    --minimal-accent: rgba(255, 255, 255, 0.03);
+}
+
+/* ========================================
+   CONTENEDOR PRINCIPAL - Espaciado generoso
+   ======================================== */
+
+.dashboard-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 48px 24px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 48px;
+}
+
+/* ========================================
+   TARJETA VIRTUAL MINIMALISTA
+   ======================================== */
+
+.card-section {
+    margin-bottom: 0;
+}
+
+.section-header {
+    margin-bottom: 24px;
+}
+
+.section-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--minimal-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0;
+}
+
+.btn-add-card {
+    display: none; /* Ocultar para reducir ruido */
+}
+
+.card-wrapper {
+    margin-bottom: 0;
+}
+
+.virtual-card {
+    background: var(--minimal-card) !important;
+    border: 1px solid var(--minimal-border) !important;
+    border-radius: 16px !important;
+    padding: 32px !important;
+    position: relative;
+    overflow: visible;
+    cursor: default !important;
+    box-shadow: none !important;
+    transition: border-color 0.3s ease;
+}
+
+.virtual-card:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Remover gradientes y efectos */
+.card-bg-circle,
+.virtual-card::before,
+.virtual-card::after {
+    display: none !important;
+}
+
+.card-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 48px;
+}
+
+.card-chip-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    background: var(--minimal-accent);
+    border: 1px solid var(--minimal-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--minimal-text);
+}
+
+.card-currency {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--minimal-text-muted);
+    letter-spacing: 1px;
+}
+
+.card-number {
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    color: var(--minimal-text-muted) !important;
+    margin-bottom: 24px;
+    letter-spacing: 2px;
+}
+
+.card-bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.card-expiry,
+.card-brand {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--minimal-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.card-balance-overlay {
+    font-size: 36px !important;
+    font-weight: 700 !important;
+    color: var(--minimal-text) !important;
+    position: static !important;
+    margin: 0 !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Mono', monospace;
+}
+
+/* ========================================
+   SELECTOR DE CUENTAS MINIMALISTA
+   ======================================== */
+
+.account-switcher {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+}
+
+.account-switcher::-webkit-scrollbar {
+    height: 2px;
+}
+
+.account-switcher::-webkit-scrollbar-thumb {
+    background: var(--minimal-border);
+    border-radius: 2px;
+}
+
+.account-chip {
+    background: var(--minimal-card);
+    border: 1px solid var(--minimal-border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 140px;
+}
+
+.account-chip:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.account-chip.active {
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.chip-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--minimal-text);
+}
+
+.chip-type {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--minimal-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.chip-balance {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--minimal-text);
+    margin-top: 4px;
+}
+
+/* ========================================
+   ACCIONES - Solo íconos minimalistas
+   ======================================== */
+
+.actions-section {
+    margin-top: 48px;
+}
+
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.action-btn {
+    background: transparent !important;
+    border: 1px solid var(--minimal-border) !important;
+    border-radius: 12px !important;
+    padding: 20px !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    height: auto !important;
+    min-height: 120px;
+}
+
+.action-btn:hover {
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    background: rgba(255, 255, 255, 0.02) !important;
+    transform: translateY(-2px);
+}
+
+.action-btn-icon {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 50% !important;
+    background: var(--minimal-accent) !important;
+    border: 1px solid var(--minimal-border) !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: var(--minimal-text) !important;
+}
+
+.action-btn-text {
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    color: var(--minimal-text) !important;
+    text-align: center;
+}
+
+/* Remover colores de los botones */
+.action-btn.btn-blue,
+.action-btn.btn-purple,
+.action-btn.btn-purple-dark,
+.action-btn.btn-purple-light {
+    background: transparent !important;
+}
+
+/* ========================================
+   TRANSACCIONES - Lista limpia
+   ======================================== */
+
+.activity-section {
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+.activity-header {
+    margin-bottom: 24px;
+    padding: 0;
+}
+
+.activity-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--minimal-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0;
+}
+
+.activity-list {
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+.activity-group-header {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--minimal-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 12px 0;
+    margin-top: 24px;
+    border-bottom: 1px solid var(--minimal-border);
+}
+
+.activity-group-header:first-child {
+    margin-top: 0;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--minimal-border);
+    gap: 16px;
+    transition: opacity 0.2s ease;
+}
+
+.activity-item:hover {
+    opacity: 0.7;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-icon-wrapper {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: var(--minimal-accent);
+    border: 1px solid var(--minimal-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.activity-icon {
+    font-size: 18px;
+    color: var(--minimal-text-muted);
+}
+
+.activity-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.activity-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--minimal-text);
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.activity-category {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--minimal-text-muted);
+}
+
+.activity-amount {
+    font-size: 15px;
+    font-weight: 600;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Mono', monospace;
+    white-space: nowrap;
+}
+
+.activity-amount.income {
+    color: #FFFFFF;
+}
+
+.activity-amount.expense {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* ========================================
+   FAB - Más discreto
+   ======================================== */
+
+.quick-actions-fab {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    z-index: 1000;
+}
+
+.fab-button {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--minimal-text) !important;
+    border: none;
+    color: var(--minimal-bg) !important;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    transition: all 0.2s ease;
+}
+
+.fab-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
+}
+
+.fab-menu {
+    position: absolute;
+    bottom: 70px;
+    right: 0;
+    background: var(--minimal-card);
+    border: 1px solid var(--minimal-border);
+    border-radius: 12px;
+    padding: 8px;
+    min-width: 200px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.2s ease;
+}
+
+.fab-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.fab-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    color: var(--minimal-text);
+    text-decoration: none;
+    font-size: 14px;
+    transition: background 0.2s ease;
+}
+
+.fab-menu-item:hover {
+    background: var(--minimal-accent);
+}
+
+.fab-menu-item i {
+    font-size: 16px;
+    color: var(--minimal-text-muted);
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (min-width: 1024px) {
+    .dashboard-container {
+        grid-template-columns: 420px 1fr;
+        gap: 64px;
+    }
+    
+    .left-section {
+        position: sticky;
+        top: 100px;
+        height: fit-content;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 24px 16px;
+        gap: 32px;
+    }
+    
+    .actions-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .card-balance-overlay {
+        font-size: 28px !important;
+    }
+    
+    .fab-button {
+        width: 48px;
+        height: 48px;
+        bottom: 24px;
+        right: 24px;
+    }
+}
+
+/* ========================================
+   LIMPIEZA GENERAL - Remover excesos
+   ======================================== */
+
+/* Simplificar header */
+.header {
+    background: var(--minimal-bg) !important;
+    border-bottom: 1px solid var(--minimal-border) !important;
+    backdrop-filter: none;
+}
+
+/* Ocultar elementos de ruido */
+.notification-badge {
+    display: none;
+}
+
+.header-ticker {
+    display: none;
+}
+
+/* Container más limpio */
+.container {
+    max-width: 1600px;
+    padding: 0 24px;
+}

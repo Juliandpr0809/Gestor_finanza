@@ -1,0 +1,223 @@
+/* ========================================
+   BOTTOM NAVIGATION BAR
+   Mobile-first navigation for responsive design
+   ======================================== */
+
+/* Bottom Navigation Container */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    background: linear-gradient(180deg, var(--bg-darker) 0%, var(--bg-dark) 100%);
+    border-top: 1px solid var(--border-color);
+    display: none;
+    /* Hidden by default, shown in mobile */
+    justify-content: space-around;
+    align-items: center;
+    z-index: 100;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+    padding: 0 8px;
+}
+
+/* Bottom Navigation Item */
+.bottom-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 500;
+    gap: 4px;
+    transition: all 0.2s ease;
+    min-height: 60px;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    background: none;
+    border: none;
+    padding: 8px 4px;
+    border-radius: 12px;
+    position: relative;
+}
+
+.bottom-nav-item i {
+    font-size: 22px;
+    transition: transform 0.2s ease;
+}
+
+.bottom-nav-item span {
+    font-size: 11px;
+    margin-top: 2px;
+    white-space: nowrap;
+}
+
+/* Active State */
+.bottom-nav-item.active {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.bottom-nav-item.active i {
+    transform: scale(1.1);
+}
+
+/* Hover State */
+.bottom-nav-item:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Central Add Button (Special) */
+.bottom-nav-item-add {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 50%;
+    width: 56px;
+    height: 56px;
+    margin: 0 8px;
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+    flex: 0 0 56px;
+}
+
+.bottom-nav-item-add i {
+    font-size: 24px;
+    margin: 0;
+}
+
+.bottom-nav-item-add span {
+    display: none;
+}
+
+.bottom-nav-item-add:hover {
+    background: linear-gradient(135deg, #7c8ff6 0%, #8558b3 100%);
+    transform: scale(1.05);
+}
+
+.bottom-nav-item-add.active {
+    background: linear-gradient(135deg, #7c8ff6 0%, #8558b3 100%);
+}
+
+/* iOS Safe Area Support */
+@supports (padding: max(0px)) {
+    .bottom-nav {
+        padding-bottom: max(8px, env(safe-area-inset-bottom));
+        height: calc(70px + env(safe-area-inset-bottom));
+    }
+}
+
+/* ========================================
+   RESPONSIVE - MOBILE
+   Show bottom nav on mobile/tablet
+   ======================================== */
+@media (max-width: 768px) {
+    .bottom-nav {
+        display: flex;
+    }
+
+    /* Add padding to body to prevent content from being hidden */
+    body {
+        padding-bottom: 70px;
+    }
+
+    /* Adjust safe area padding */
+    @supports (padding: max(0px)) {
+        body {
+            padding-bottom: calc(70px + env(safe-area-inset-bottom));
+        }
+    }
+
+    /* Hide top navigation on mobile */
+    .header-nav {
+        display: none !important;
+    }
+
+    /* Adjust FAB position if it exists */
+    .quick-actions-fab {
+        bottom: 90px;
+    }
+}
+
+/* ========================================
+   TABLET ADJUSTMENTS
+   ======================================== */
+@media (min-width: 481px) and (max-width: 768px) {
+    .bottom-nav-item {
+        font-size: 12px;
+    }
+
+    .bottom-nav-item i {
+        font-size: 24px;
+    }
+
+    .bottom-nav-item-add {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+/* ========================================
+   DESKTOP - HIDE BOTTOM NAV
+   ======================================== */
+@media (min-width: 769px) {
+    .bottom-nav {
+        display: none !important;
+    }
+}
+
+/* ========================================
+   LANDSCAPE MODE
+   Adjust for landscape on mobile
+   ======================================== */
+@media (max-width: 768px) and (orientation: landscape) {
+    .bottom-nav {
+        height: 60px;
+    }
+
+    .bottom-nav-item {
+        min-height: 50px;
+        font-size: 10px;
+    }
+
+    .bottom-nav-item i {
+        font-size: 20px;
+    }
+
+    .bottom-nav-item-add {
+        width: 48px;
+        height: 48px;
+    }
+
+    @supports (padding: max(0px)) {
+        .bottom-nav {
+            height: calc(60px + env(safe-area-inset-bottom));
+        }
+
+        body {
+            padding-bottom: calc(60px + env(safe-area-inset-bottom));
+        }
+    }
+}
+
+/* ========================================
+   TOUCH OPTIMIZATIONS
+   ======================================== */
+.bottom-nav-item {
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* Active/Touch Feedback */
+.bottom-nav-item:active {
+    transform: scale(0.95);
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.bottom-nav-item-add:active {
+    transform: scale(0.90);
+}

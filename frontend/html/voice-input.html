@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Input - OrdenC</title>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Modern Theme -->
+    <link rel="stylesheet" href="../css/modern-theme.css">
+    <link rel="stylesheet" href="../css/unified-pages.css">
+    <link rel="stylesheet" href="../css/voice-input.css">
+    <link rel="stylesheet" href="../css/lang-selector.css">
+</head>
+
+<body>
+    <!-- Navigation Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="header-logo" onclick="window.location.href='index.html'">
+                <div class="header-logo-icon">C</div>
+                <span>OrdenC</span>
+            </div>
+            <nav class="header-nav">
+                <a href="index.html" class="header-nav-item" data-i18n="Dashboard">Panel</a>
+                <a href="accounts.html" class="header-nav-item" data-i18n="Accounts">Cuentas</a>
+                <a href="transactions.html" class="header-nav-item" data-i18n="Transactions">Transacciones</a>
+                <a href="reports.html" class="header-nav-item" data-i18n="Reports">Reportes</a>
+            </nav>
+        </div>
+        <div class="header-right">
+            <div class="lang-selector">
+                <button class="lang-btn" data-lang-btn="es">ES</button>
+                <button class="lang-btn" data-lang-btn="en">EN</button>
+            </div>
+            <div class="header-balance">
+                <span class="header-balance-label">TOTAL BALANCE</span>
+                <span class="header-balance-amount">$1,456.00</span>
+            </div>
+            <button class="header-icon-btn">
+                <i class="fas fa-bell"></i>
+            </button>
+            <button class="header-icon-btn">
+                <i class="fas fa-cog"></i>
+            </button>
+            <div class="header-avatar">
+                <span>KW</span>
+            </div>
+            <span class="header-username">Kristin Watson</span>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="voice-container">
+        <!-- Main Voice Input Section -->
+        <section class="voice-main-section">
+            <div class="voice-header">
+                <div class="voice-header-content">
+                    <h1><i class="fas fa-microphone-lines"></i> Voice Input</h1>
+                    <p>Speak naturally to create transactions. Just say what you spent!</p>
+                </div>
+                <button class="btn-settings" id="settingsBtn">
+                    <i class="fas fa-sliders"></i>
+                </button>
+            </div>
+
+            <!-- Voice Visualizer -->
+            <div class="voice-visualizer" id="voiceVisualizer">
+                <div class="visualizer-circle" id="visualizerCircle">
+                    <button class="voice-button" id="voiceButton">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <svg class="pulse-ring" viewBox="0 0 200 200">
+                        <circle cx="100" cy="100" r="90" />
+                    </svg>
+                    <svg class="pulse-ring-2" viewBox="0 0 200 200">
+                        <circle cx="100" cy="100" r="90" />
+                    </svg>
+                </div>
+
+                <!-- Audio Wave Animation -->
+                <div class="audio-waves hidden" id="audioWaves">
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                </div>
+            </div>
+
+            <!-- Status Display -->
+            <div class="voice-status">
+                <div class="status-indicator" id="statusIndicator">
+                    <i class="fas fa-microphone-slash"></i>
+                    <span>Tap to start speaking</span>
+                </div>
+            </div>
+
+            <!-- Transcript Display -->
+            <div class="transcript-display hidden" id="transcriptDisplay">
+                <div class="transcript-label">You said:</div>
+                <div class="transcript-text" id="transcriptText"></div>
+            </div>
+
+            <!-- Quick Voice Commands -->
+            <div class="quick-commands">
+                <h3>Quick Commands</h3>
+                <div class="commands-grid">
+                    <button class="command-chip" data-command="I spent 50 dollars on groceries">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>"I spent $50 on groceries"</span>
+                    </button>
+                    <button class="command-chip" data-command="Coffee at Starbucks for 8 dollars">
+                        <i class="fas fa-coffee"></i>
+                        <span>"Coffee at Starbucks $8"</span>
+                    </button>
+                    <button class="command-chip" data-command="Gas station 45 dollars">
+                        <i class="fas fa-gas-pump"></i>
+                        <span>"Gas station $45"</span>
+                    </button>
+                    <button class="command-chip" data-command="Restaurant dinner 75 dollars">
+                        <i class="fas fa-utensils"></i>
+                        <span>"Restaurant dinner $75"</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Language Selector -->
+            <div class="language-selector">
+                <label>
+                    <i class="fas fa-language"></i>
+                    Language:
+                </label>
+                <select id="languageSelect" class="language-dropdown">
+                    <option value="en-US">English (US)</option>
+                    <option value="es-ES">Español</option>
+                    <option value="fr-FR">Français</option>
+                    <option value="de-DE">Deutsch</option>
+                    <option value="it-IT">Italiano</option>
+                    <option value="pt-BR">Português (BR)</option>
+                </select>
+            </div>
+        </section>
+
+        <!-- AI Processing Section -->
+        <section class="processing-section hidden" id="processingSection">
+            <div class="processing-card">
+                <div class="processing-header">
+                    <i class="fas fa-brain"></i>
+                    <h2>AI Processing</h2>
+                </div>
+
+                <div class="processing-steps">
+                    <div class="process-step" id="step1">
+                        <div class="step-icon">
+                            <i class="fas fa-microphone"></i>
+                        </div>
+                        <div class="step-content">
+                            <h4>Speech Recognition</h4>
+                            <p>Converting voice to text...</p>
+                        </div>
+                        <div class="step-status">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                    </div>
+
+                    <div class="process-step" id="step2">
+                        <div class="step-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="step-content">
+                            <h4>AI Analysis</h4>
+                            <p>Understanding transaction details...</p>
+                        </div>
+                        <div class="step-status">
+                            <i class="fas fa-circle"></i>
+                        </div>
+                    </div>
+
+                    <div class="process-step" id="step3">
+                        <div class="step-icon">
+                            <i class="fas fa-tags"></i>
+                        </div>
+                        <div class="step-content">
+                            <h4>Smart Categorization</h4>
+                            <p>Assigning category and details...</p>
+                        </div>
+                        <div class="step-status">
+                            <i class="fas fa-circle"></i>
+                        </div>
+                    </div>
+
+                    <div class="process-step" id="step4">
+                        <div class="step-icon">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="step-content">
+                            <h4>Transaction Created</h4>
+                            <p>Ready for review...</p>
+                        </div>
+                        <div class="step-status">
+                            <i class="fas fa-circle"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="processing-animation">
+                    <div class="brain-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Extracted Transaction Section -->
+        <section class="transaction-preview hidden" id="transactionPreview">
+            <div class="preview-card">
+                <div class="preview-header">
+                    <h2>Transaction Details</h2>
+                    <span class="confidence-score" id="confidenceScore">
+                        <i class="fas fa-shield-check"></i>
+                        92% Confidence
+                    </span>
+                </div>
+
+                <form class="transaction-form" id="transactionForm">
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label>
+                                <i class="fas fa-align-left"></i>
+                                Description
+                            </label>
+                            <input type="text" id="description" class="form-input"
+                                placeholder="Transaction description">
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-dollar-sign"></i>
+                                Amount
+                            </label>
+                            <input type="number" id="amount" step="0.01" class="form-input" placeholder="0.00">
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-calendar"></i>
+                                Date
+                            </label>
+                            <input type="date" id="date" class="form-input">
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-tag"></i>
+                                Category
+                            </label>
+                            <select id="category" class="form-input">
+                                <option value="">Select category</option>
+                                <option value="food">🍔 Food & Dining</option>
+                                <option value="groceries">🛒 Groceries</option>
+                                <option value="shopping">🛍️ Shopping</option>
+                                <option value="transport">🚗 Transportation</option>
+                                <option value="entertainment">🎬 Entertainment</option>
+                                <option value="health">💊 Health</option>
+                                <option value="other">📦 Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-credit-card"></i>
+                                Account
+                            </label>
+                            <select id="account" class="form-input">
+                                <option value="main">Main Checking</option>
+                                <option value="savings">Savings</option>
+                                <option value="credit">Credit Card</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>
+                                <i class="fas fa-note-sticky"></i>
+                                Notes (Optional)
+                            </label>
+                            <textarea id="notes" class="form-input" rows="3"
+                                placeholder="Add any additional notes..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="cancelBtn">
+                            <i class="fas fa-times"></i>
+                            Cancel
+                        </button>
+                        <button type="button" class="btn-retry" id="retryBtn">
+                            <i class="fas fa-microphone"></i>
+                            Try Again
+                        </button>
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-check"></i>
+                            Save Transaction
+                        </button>
+                    </div>
+                </form>
+
+                <div class="original-transcript">
+                    <div class="transcript-header">
+                        <i class="fas fa-quote-left"></i>
+                        Original Voice Input
+                    </div>
+                    <p id="originalTranscript"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recent Voice Transactions -->
+        <section class="recent-voice-section">
+            <h2>Recent Voice Transactions</h2>
+            <div class="voice-history-grid">
+                <div class="history-card">
+                    <div class="history-icon">
+                        <i class="fas fa-microphone"></i>
+                    </div>
+                    <div class="history-content">
+                        <h4>"Coffee at Starbucks"</h4>
+                        <p class="history-details">$8.50 • Food & Dining</p>
+                        <p class="history-time">Today, 9:30 AM</p>
+                    </div>
+                    <button class="btn-replay">
+                        <i class="fas fa-play"></i>
+                    </button>
+                </div>
+
+                <div class="history-card">
+                    <div class="history-icon">
+                        <i class="fas fa-microphone"></i>
+                    </div>
+                    <div class="history-content">
+                        <h4>"Gas station forty five dollars"</h4>
+                        <p class="history-details">$45.00 • Transportation</p>
+                        <p class="history-time">Yesterday, 5:15 PM</p>
+                    </div>
+                    <button class="btn-replay">
+                        <i class="fas fa-play"></i>
+                    </button>
+                </div>
+
+                <div class="history-card">
+                    <div class="history-icon">
+                        <i class="fas fa-microphone"></i>
+                    </div>
+                    <div class="history-content">
+                        <h4>"Groceries at Whole Foods"</h4>
+                        <p class="history-details">$127.45 • Groceries</p>
+                        <p class="history-time">Dec 8, 2:30 PM</p>
+                    </div>
+                    <button class="btn-replay">
+                        <i class="fas fa-play"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="../js/i18n.js"></script>
+    <script src="../js/voice-input.js"></script>
+</body>
+
+</html>

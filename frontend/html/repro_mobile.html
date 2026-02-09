@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Repro Mobile</title>
+    <!-- Use relative paths assuming this file is in frontend/html/ -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../css/modern-theme.css">
+    <link rel="stylesheet" href="../css/unified-pages.css">
+    <link rel="stylesheet" href="../css/mobile-native.css">
+    <link rel="stylesheet" href="../css/lang-selector.css">
+    <link rel="stylesheet" href="../css/ux-improvements.css">
+    <link rel="stylesheet" href="../css/header-minimal.css">
+    <link rel="stylesheet" href="../css/bottom-navigation.css">
+    
+    <script>
+        // Mock API
+        window.api = {
+            getCurrentUser: async () => ({ email: 'test@example.com', username: 'TestUser' }),
+            getAccounts: async () => ([
+                { id: 1, name: 'Nequi', account_type: 'checking', current_balance: 334800, currency: 'COP' },
+                { id: 2, name: 'Efectivo', account_type: 'cash', current_balance: -83200, currency: 'COP' }
+            ]),
+            getTransactions: async () => ({
+                transactions: [
+                    { date: '2025-01-01', description: 'Grocery Store', amount: 50000, category_name: 'Food', account_id: 1 },
+                    { date: '2025-01-02', description: 'Netflix', amount: 30000, category_name: 'Entertainment', account_id: 1 }
+                ]
+            })
+        };
+    </script>
+</head>
+<body>
+    <!-- Copied structure from index.html -->
+    <header class="header">
+        <div class="header-left">
+            <div class="header-logo">
+                <div class="header-logo-icon">C</div>
+                <span>OrdenC</span>
+            </div>
+        </div>
+        <div class="header-right">
+             <div class="compact-selector" id="compactSelector">
+                <span class="currency-value" id="currencyValue">COP</span>
+            </div>
+            <div class="header-profile" id="userMenuToggle">
+                <div class="profile-avatar">
+                    <img id="profileAvatar" src="https://ui-avatars.com/api/?name=User" alt="User">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="dashboard-container">
+            <div class="left-section">
+                <section class="card-section">
+                    <div class="section-header">
+                        <h1 class="section-title">Mis Tarjetas Virtuales</h1>
+                        <button class="btn-add-card">Agregar Nueva Tarjeta</button>
+                    </div>
+                    <div class="card-wrapper">
+                        <div class="virtual-card" id="virtualCard">
+                            <div class="card-bg-circle"></div>
+                            <div class="card-top-row">
+                                <div class="card-chip-icon">C</div>
+                                <div class="card-currency" id="cardCurrency">COP</div>
+                            </div>
+                            <div class="card-number" id="cardNumber">**** **** **** 1234</div>
+                            <div class="card-bottom-row">
+                                <div class="card-expiry" id="cardHolder">Cuenta</div>
+                                <div class="card-brand" id="cardBrand">VISA</div>
+                            </div>
+                            <div class="card-balance-overlay" id="cardBalance">$334.800</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="actions-section">
+                    <div class="actions-grid">
+                        <button class="action-btn btn-blue">
+                            <div class="action-btn-icon"><i class="fas fa-plus"></i></div>
+                            <div class="action-btn-text">Agregar Transacción</div>
+                        </button>
+                        <button class="action-btn btn-purple">
+                            <div class="action-btn-icon"><i class="fas fa-file-upload"></i></div>
+                            <div class="action-btn-text">Subir Archivos</div>
+                        </button>
+                         <button class="action-btn btn-purple-dark">
+                            <div class="action-btn-icon"><i class="fas fa-robot"></i></div>
+                            <div class="action-btn-text">Chat IA</div>
+                        </button>
+                        <button class="action-btn btn-purple-light">
+                            <div class="action-btn-icon"><i class="fas fa-microphone-lines"></i></div>
+                            <div class="action-btn-text">Entrada de Voz</div>
+                        </button>
+                    </div>
+                </section>
+            </div>
+
+             <div class="right-section">
+                <section class="activity-section">
+                    <div class="activity-header">
+                        <h2 class="activity-title">Transacciones</h2>
+                    </div>
+                    <div class="activity-list" id="activityList">
+                        <!-- Loaded by JS -->
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    
+    <nav class="bottom-nav">
+        <a href="#" class="bottom-nav-item active"><i class="fas fa-home"></i></a>
+        <a href="#" class="bottom-nav-item"><i class="fas fa-wallet"></i></a>
+        <a href="#" class="bottom-nav-item bottom-nav-item-add"><i class="fas fa-plus"></i></a>
+        <a href="#" class="bottom-nav-item"><i class="fas fa-exchange-alt"></i></a>
+        <a href="#" class="bottom-nav-item"><i class="fas fa-chart-line"></i></a>
+    </nav>
+
+    <!-- Load dashboard.js to trigger the dynamic changes (like switcher injection) -->
+    <script src="../js/dashboard.js"></script>
+</body>
+</html>

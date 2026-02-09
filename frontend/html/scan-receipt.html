@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Scan Receipt - OrdenC</title>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Unified Theme - OrdenC UI -->
+    <link rel="stylesheet" href="../css/modern-theme.css">
+    <link rel="stylesheet" href="../css/unified-pages.css">
+    <link rel="stylesheet" href="../css/mobile-native.css">
+    <link rel="stylesheet" href="../css/lang-selector.css">
+    <link rel="stylesheet" href="../css/header-minimal.css">
+    <link rel="stylesheet" href="../css/bottom-navigation.css">
+    <link rel="stylesheet" href="../css/scan-receipt.css">
+</head>
+
+<body>
+    <!-- Navigation Header (Desktop) -->
+    <header class="header">
+        <div class="header-left">
+            <div class="header-logo" onclick="window.location.href='index.html'">
+                <div class="header-logo-icon">C</div>
+                <span>OrdenC</span>
+            </div>
+            <nav class="header-nav">
+                <a href="index.html" class="header-nav-item">Panel</a>
+                <a href="accounts.html" class="header-nav-item">Cuentas</a>
+                <a href="transactions.html" class="header-nav-item">Transacciones</a>
+                <a href="reports.html" class="header-nav-item">Reportes</a>
+            </nav>
+        </div>
+        <div class="header-right">
+            <!-- Selector Compacto de Idioma y Moneda -->
+            <div class="compact-selector" id="compactSelector">
+                <button class="lang-btn" data-lang-btn="es" title="Español">ES</button>
+                <button class="lang-btn" data-lang-btn="en" title="English">EN</button>
+                <div class="separator"></div>
+                <span class="currency-value" id="currencyValue" title="Click para cambiar moneda">COP</span>
+                <div class="currency-dropdown" id="currencyDropdown">
+                    <div class="currency-option" data-currency="COP">COP</div>
+                    <div class="currency-option" data-currency="USD">USD</div>
+                    <div class="currency-option" data-currency="EUR">EUR</div>
+                    <div class="currency-option" data-currency="MXN">MXN</div>
+                </div>
+            </div>
+
+            <div class="header-profile" id="userMenuToggle">
+                <div class="profile-avatar">
+                    <img id="profileAvatar" src="https://ui-avatars.com/api/?name=User&background=667eea" alt="User">
+                </div>
+                <i class="fas fa-chevron-down profile-dropdown-icon"></i>
+
+                <!-- Dropdown Menu -->
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="dropdown-header">
+                        <div class="dropdown-user-name" id="dropdownUserName">Usuario</div>
+                        <div class="dropdown-user-email" id="dropdownUserEmail">user@example.com</div>
+                    </div>
+                    <div class="dropdown-menu">
+                        <a href="accounts.html" class="dropdown-item">
+                            <i class="fas fa-wallet"></i>
+                            <span>Mis Cuentas</span>
+                        </a>
+                        <a href="transactions.html" class="dropdown-item">
+                            <i class="fas fa-exchange-alt"></i>
+                            <span>Transacciones</span>
+                        </a>
+                        <a href="ai-chat.html" class="dropdown-item">
+                            <i class="fas fa-robot"></i>
+                            <span>Asistente IA</span>
+                        </a>
+                        <a href="reports.html" class="dropdown-item">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Reportes</span>
+                        </a>
+                        <div class="dropdown-item logout" data-action="logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Cerrar Sesión</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="scan-container">
+        <!-- Mobile Header (Visible only on mobile) -->
+        <div class="mobile-header">
+            <button class="btn-back-mobile" onclick="window.location.href='index.html'">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <h1>Escanear Recibo</h1>
+        </div>
+
+        <div class="scan-content">
+            <!-- Left Section: Scanner -->
+            <section class="scanner-section">
+                <div class="scanner-header desktop-only">
+                    <h1><i class="fas fa-camera"></i> Scan Receipt</h1>
+                    <p>Upload or capture a photo of your receipt for automatic processing</p>
+                </div>
+
+                <!-- Upload Area -->
+                <div class="upload-container" id="uploadContainer">
+                    <input type="file" id="receiptInput" accept="image/*,.pdf" hidden>
+
+                    <div class="upload-zone" id="uploadZone">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <h3>Drop your receipt here</h3>
+                        <p>or click to browse files</p>
+                        <div class="upload-formats">
+                            <span><i class="fas fa-image"></i> JPG</span>
+                            <span><i class="fas fa-image"></i> PNG</span>
+                            <span><i class="fas fa-file-pdf"></i> PDF</span>
+                        </div>
+                        <button class="btn-browse" id="browseBtn">
+                            <i class="fas fa-folder-open"></i>
+                            Browse Files
+                        </button>
+                    </div>
+
+                    <!-- Preview Area -->
+                    <div class="preview-area hidden" id="previewArea">
+                        <div class="preview-image-container">
+                            <img id="previewImage" alt="Receipt preview">
+                            <button class="btn-remove-image" id="removeImageBtn">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="preview-actions">
+                            <button class="btn-secondary" id="rotateBtn">
+                                <i class="fas fa-rotate-right"></i>
+                                Rotate
+                            </button>
+                            <button class="btn-primary" id="processBtn">
+                                <i class="fas fa-wand-magic-sparkles"></i>
+                                Process Receipt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Processing State -->
+                    <div class="processing-state hidden" id="processingState">
+                        <div class="processing-animation">
+                            <div class="scanner-line"></div>
+                            <i class="fas fa-receipt"></i>
+                        </div>
+                        <h3>Scanning receipt...</h3>
+                        <p>Extracting information with AI</p>
+                        <div class="processing-steps">
+                            <div class="step active" id="step1">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Image uploaded</span>
+                            </div>
+                            <div class="step" id="step2">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <span>Reading text...</span>
+                            </div>
+                            <div class="step" id="step3">
+                                <i class="fas fa-circle"></i>
+                                <span>Extracting data</span>
+                            </div>
+                            <div class="step" id="step4">
+                                <i class="fas fa-circle"></i>
+                                <span>Creating transaction</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-scan-actions">
+                    <button class="quick-action-btn" id="cameraBtn">
+                        <i class="fas fa-camera"></i>
+                        <span>Use Camera</span>
+                    </button>
+                    <button class="quick-action-btn">
+                        <i class="fas fa-history"></i>
+                        <span>Recent Scans</span>
+                    </button>
+                    <button class="quick-action-btn">
+                        <i class="fas fa-folder"></i>
+                        <span>Saved Receipts</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Right Section: Extracted Data -->
+            <section class="data-section hidden" id="dataSection">
+                <div class="data-header">
+                    <h2>Extracted Information</h2>
+                    <span class="confidence-badge" id="confidenceBadge">
+                        <i class="fas fa-check-circle"></i>
+                        95% Confidence
+                    </span>
+                </div>
+
+                <form class="extracted-form" id="extractedForm">
+                    <!-- Merchant Info -->
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-store"></i>
+                            Merchant
+                        </label>
+                        <input type="text" id="merchant" placeholder="Store name" class="form-input">
+                    </div>
+
+                    <!-- Amount -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-dollar-sign"></i>
+                                Total Amount
+                            </label>
+                            <input type="number" id="amount" step="0.01" placeholder="0.00"
+                                class="form-input amount-input">
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-calendar"></i>
+                                Date
+                            </label>
+                            <input type="date" id="date" class="form-input">
+                        </div>
+                    </div>
+
+                    <!-- Category -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-tag"></i>
+                                Category
+                            </label>
+                            <select id="category" class="form-input">
+                                <option value="">Select category</option>
+                                <option value="food">🍔 Food & Dining</option>
+                                <option value="groceries">🛒 Groceries</option>
+                                <option value="shopping">🛍️ Shopping</option>
+                                <option value="transport">🚗 Transportation</option>
+                                <option value="entertainment">🎬 Entertainment</option>
+                                <option value="health">💊 Health & Wellness</option>
+                                <option value="other">📦 Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-credit-card"></i>
+                                Account
+                            </label>
+                            <select id="account" class="form-input">
+                                <option value="main">Main Checking</option>
+                                <option value="savings">Savings Account</option>
+                                <option value="credit">Credit Card</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Items List -->
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-list"></i>
+                            Items
+                            <span class="item-count" id="itemCount">0 items</span>
+                        </label>
+                        <div class="items-list" id="itemsList">
+                            <!-- Items will be added here dynamically -->
+                        </div>
+                        <button type="button" class="btn-add-item" id="addItemBtn">
+                            <i class="fas fa-plus"></i>
+                            Add Item
+                        </button>
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-note-sticky"></i>
+                            Notes
+                        </label>
+                        <textarea id="notes" rows="3" placeholder="Add any additional notes..."
+                            class="form-input"></textarea>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="cancelBtn">
+                            <i class="fas fa-times"></i>
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-check"></i>
+                            Save Transaction
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Original Receipt Preview -->
+                <div class="original-receipt">
+                    <h3>Original Receipt</h3>
+                    <img id="originalReceipt" alt="Original receipt">
+                </div>
+            </section>
+        </div>
+
+        <!-- Recent Scans -->
+        <section class="recent-scans-section">
+            <h2>Recent Scans</h2>
+            <div class="scans-grid">
+                <div class="scan-card">
+                    <div class="scan-thumbnail">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                    <div class="scan-info">
+                        <h4>Whole Foods Market</h4>
+                        <p>$127.45 • Today, 2:30 PM</p>
+                    </div>
+                    <button class="btn-scan-action">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+
+                <div class="scan-card">
+                    <div class="scan-thumbnail">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                    <div class="scan-info">
+                        <h4>Starbucks</h4>
+                        <p>$8.50 • Yesterday, 9:15 AM</p>
+                    </div>
+                    <button class="btn-scan-action">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+
+                <div class="scan-card">
+                    <div class="scan-thumbnail">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                    <div class="scan-info">
+                        <h4>Amazon</h4>
+                        <p>$45.99 • Dec 2, 4:20 PM</p>
+                    </div>
+                    <button class="btn-scan-action">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Bottom Navigation (Mobile) -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="bottom-nav-item">
+            <i class="fas fa-home"></i>
+            <span>Inicio</span>
+        </a>
+        <a href="accounts.html" class="bottom-nav-item">
+            <i class="fas fa-wallet"></i>
+            <span>Cuentas</span>
+        </a>
+        <a href="new-transaction.html" class="bottom-nav-item bottom-nav-item-add">
+            <i class="fas fa-plus"></i>
+        </a>
+        <a href="transactions.html" class="bottom-nav-item">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Movimientos</span>
+        </a>
+        <a href="reports.html" class="bottom-nav-item">
+            <i class="fas fa-chart-line"></i>
+            <span>Reportes</span>
+        </a>
+    </nav>
+
+    <!-- Scripts -->
+    <script src="../js/i18n.js"></script>
+    <script src="../js/api.js?v=27"></script>
+    <script src="../js/auth-handler.js?v=19"></script>
+    <script src="../js/scan-receipt.js"></script>
+    <script>
+        // Currency selector functionality
+        const currencyValue = document.getElementById('currencyValue');
+        const currencyDropdown = document.getElementById('currencyDropdown');
+
+        if (currencyValue && currencyDropdown) {
+            currencyValue.addEventListener('click', (e) => {
+                e.stopPropagation();
+                currencyDropdown.classList.toggle('show');
+            });
+
+            document.querySelectorAll('.currency-option').forEach(option => {
+                option.addEventListener('click', (e) => {
+                    const currency = e.target.dataset.currency;
+                    currencyValue.textContent = currency;
+                    currencyDropdown.classList.remove('show');
+                });
+            });
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', () => {
+            if (currencyDropdown) currencyDropdown.classList.remove('show');
+            const userDropdown = document.getElementById('userDropdown');
+            if (userDropdown) userDropdown.classList.remove('show');
+        });
+
+        // User menu toggle
+        const userMenuToggle = document.getElementById('userMenuToggle');
+        const userDropdown = document.getElementById('userDropdown');
+        if (userMenuToggle && userDropdown) {
+            userMenuToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                userDropdown.classList.toggle('show');
+            });
+        }
+    </script>
+</body>
+
+</html>
