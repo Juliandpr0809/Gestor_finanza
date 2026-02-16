@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Test Dropdown</title>
+    <style>
+        body {
+            background: #0a0a0a;
+            color: white;
+            font-family: Arial, sans-serif;
+            padding: 50px;
+        }
+        
+        .test-container {
+            display: flex;
+            gap: 50px;
+        }
+        
+        .compact-selector {
+            position: relative;
+            z-index: 100;
+            background: rgba(255,255,255,0.05);
+            padding: 10px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+        
+        .currency-value {
+            cursor: pointer;
+            padding: 5px 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+        
+        .currency-dropdown {
+            position: absolute !important;
+            top: 100% !important;
+            right: 0 !important;
+            margin-top: 4px !important;
+            background: #1a1a1a !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            border-radius: 6px !important;
+            padding: 4px !important;
+            min-width: 70px !important;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-4px);
+            transition: all 0.2s ease;
+            z-index: 999999 !important;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.9) !important;
+        }
+        
+        .currency-dropdown.show {
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: translateY(0) !important;
+            display: block !important;
+        }
+        
+        .currency-option {
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        
+        .currency-option:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .header-profile {
+            position: relative;
+            z-index: 100;
+            background: rgba(255,255,255,0.05);
+            padding: 10px;
+            border-radius: 6px;
+            display: inline-block;
+            cursor: pointer;
+        }
+        
+        .user-dropdown {
+            position: absolute !important;
+            top: 100% !important;
+            right: 0 !important;
+            margin-top: 8px !important;
+            background: #1a1a1a !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            border-radius: 6px !important;
+            padding: 10px !important;
+            min-width: 200px !important;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 999999 !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.9) !important;
+        }
+        
+        .user-dropdown.show {
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: translateY(0) !important;
+            display: block !important;
+        }
+        
+        .dropdown-item {
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin: 4px 0;
+        }
+        
+        .dropdown-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Dropdowns</h1>
+    
+    <div class="test-container">
+        <!-- Test Currency Dropdown -->
+        <div class="compact-selector">
+            <span class="currency-value" id="currencyValue">COP ▼</span>
+            <div class="currency-dropdown" id="currencyDropdown">
+                <div class="currency-option">COP</div>
+                <div class="currency-option">USD</div>
+                <div class="currency-option">EUR</div>
+                <div class="currency-option">MXN</div>
+            </div>
+        </div>
+        
+        <!-- Test User Dropdown -->
+        <div class="header-profile" id="userMenuToggle">
+            <span>👤 Usuario ▼</span>
+            <div class="user-dropdown" id="userDropdown">
+                <div class="dropdown-item">Mi Perfil</div>
+                <div class="dropdown-item">Configuración</div>
+                <div class="dropdown-item">Cerrar Sesión</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Test Currency Dropdown
+        const currencyValue = document.getElementById('currencyValue');
+        const currencyDropdown = document.getElementById('currencyDropdown');
+        
+        currencyValue.addEventListener('click', (e) => {
+            e.stopPropagation();
+            currencyDropdown.classList.toggle('show');
+            console.log('Currency clicked, classes:', currencyDropdown.className);
+        });
+        
+        // Test User Dropdown
+        const userMenuToggle = document.getElementById('userMenuToggle');
+        const userDropdown = document.getElementById('userDropdown');
+        
+        userMenuToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userDropdown.classList.toggle('show');
+            console.log('User menu clicked, classes:', userDropdown.className);
+        });
+        
+        // Close on outside click
+        document.addEventListener('click', () => {
+            currencyDropdown.classList.remove('show');
+            userDropdown.classList.remove('show');
+        });
+        
+        console.log('Test script loaded');
+        console.log('Currency dropdown z-index:', getComputedStyle(currencyDropdown).zIndex);
+        console.log('User dropdown z-index:', getComputedStyle(userDropdown).zIndex);
+    </script>
+</body>
+</html>

@@ -17,12 +17,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- Modern Theme - OrdenC UI -->
-    <link rel="stylesheet" href="../css/modern-theme.css">
+    <link rel="stylesheet" href="../css/modern-theme.css?v=5">
     <link rel="stylesheet" href="../css/unified-pages.css">
     <link rel="stylesheet" href="../css/mobile-native.css">
     <link rel="stylesheet" href="../css/lang-selector.css">
     <link rel="stylesheet" href="../css/ux-improvements.css">
-    <link rel="stylesheet" href="../css/header-minimal.css">
+    <link rel="stylesheet" href="../css/header-minimal.css?v=5">
     <link rel="stylesheet" href="../css/bottom-navigation.css">
 </head>
 
@@ -220,7 +220,73 @@
     <script src="../js/i18n.js"></script>
     <script src="../js/api.js?v=26"></script>
     <script src="../js/auth-handler.js?v=19"></script>
-    <script src="../js/dashboard.js?v=8"></script>
+    <script src="../js/dashboard.js?v=11"></script>
+    
+    <!-- Estilos de máxima prioridad para dropdowns - DEBEN IR AL FINAL -->
+    <style>
+        /* CRÍTICO: Remover overflow-x hidden de html y body */
+        html,
+        body {
+            overflow-x: visible !important;
+        }
+        
+        /* Forzar visibilidad de dropdowns */
+        #currencyDropdown,
+        #userDropdown {
+            position: absolute !important;
+            z-index: 2147483647 !important; /* Máximo z-index posible */
+            pointer-events: auto !important;
+        }
+        
+        #currencyDropdown.show {
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: block !important;
+            transform: translateY(0) !important;
+            pointer-events: auto !important;
+        }
+        
+        #userDropdown.show {
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: block !important;
+            transform: translateY(0) !important;
+            pointer-events: auto !important;
+        }
+        
+        /* Asegurar que contenedores no corten */
+        .header,
+        .header-right,
+        .compact-selector,
+        .header-profile {
+            overflow: visible !important;
+            position: relative !important;
+        }
+        
+        /* Estilos específicos de cada dropdown */
+        #currencyDropdown {
+            top: 100% !important;
+            right: 0 !important;
+            margin-top: 4px !important;
+            background: #0a0a0a !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            border-radius: 6px !important;
+            padding: 4px !important;
+            min-width: 70px !important;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.95) !important;
+        }
+        
+        #userDropdown {
+            top: 100% !important;
+            right: 0 !important;
+            margin-top: 8px !important;
+            background: #1a1a1a !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            border-radius: 12px !important;
+            min-width: 280px !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.95) !important;
+        }
+    </style>
     <script>
         // Toggle FAB menu
         document.getElementById('fabToggle').addEventListener('click', () => {

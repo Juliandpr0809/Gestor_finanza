@@ -15,8 +15,11 @@ const getAPIBaseURL = () => {
     ) {
         return `${window.location.protocol}//${window.location.host}/api`;
     }
-    // En desarrollo local, usar localhost:5000
-    return 'http://localhost:5000/api';
+    // En desarrollo local, usar el mismo host que la página actual (localhost o 127.0.0.1)
+    // Esto evita problemas de CORS entre localhost y 127.0.0.1
+    const currentHost = window.location.hostname;
+    const currentPort = window.location.port || '5000';
+    return `${window.location.protocol}//${currentHost}:${currentPort}/api`;
 };
 
 const API_BASE_URL = getAPIBaseURL();

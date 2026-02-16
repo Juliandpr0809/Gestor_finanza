@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Diagnóstico de Dropdowns</title>
+    <style>
+        body {
+            background: #0a0a0a;
+            color: #fff;
+            font-family: monospace;
+            padding: 20px;
+        }
+        .section {
+            background: #1a1a1a;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+        .error { color: #ff4444; }
+        .success { color: #44ff44; }
+        .warning { color: #ffaa44; }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        pre {
+            background: #000;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Diagnóstico de Dropdowns</h1>
+    
+    <div class="section">
+        <h2>Instrucciones:</h2>
+        <ol>
+            <li>Abre la página principal (index.html) en otra pestaña</li>
+            <li>Presiona F12 y ve a la pestaña "Console"</li>
+            <li>Copia TODO el siguiente código 👇</li>
+            <li>Pégalo en la consola y presiona Enter</li>
+            <li>Copia el resultado y pégalo aquí para que lo analice</li>
+        </ol>
+    </div>
+    
+    <div class="section">
+        <h2>📋 Código para copiar:</h2>
+        <button onclick="copyDiagnostic()">Copiar Código</button>
+        <pre id="diagnosticCode">
+// ========================================
+// SCRIPT DE DIAGNÓSTICO DE DROPDOWNS
+// ========================================
+
+console.clear();
+console.log('🔍 INICIANDO DIAGNÓSTICO...\n');
+
+const report = {
+    timestamp: new Date().toISOString(),
+    elements: {},
+    styles: {},
+    stackingContext: {},
+    issues: []
+};
+
+// 1. Verificar elementos
+console.log('📌 1. VERIFICANDO ELEMENTOS:\n');
+
+const elements = {
+    currencyValue: document.getElementById('currencyValue'),
+    currencyDropdown: document.getElementById('currencyDropdown'),
+    userMenuToggle: document.getElementById('userMenuToggle'),
+    userDropdown: document.getElementById('userDropdown'),
+    header: document.querySelector('.header'),
+    headerRight: document.querySelector('.header-right'),
+    compactSelector: document.getElementById('compactSelector'),
+    cardSection: document.querySelector('.card-section'),
+    main: document.querySelector('main')
+};
+
+Object.entries(elements).forEach(([name, el]) => {
+    const exists = !!el;
+    console.log(`   ${exists ? '✅' : '❌'} ${name}: ${exists ? 'EXISTE' : 'NO EXISTE'}`);
+    report.elements[name] = {
+        exists,
+        tag: el?.tagName,
+        classes: el?.className,
+        hasParent: !!el?.parentElement
+    };
+});
+
+// 2. Estilos computados de dropdowns
+console.log('\n📊 2. ESTILOS DE DROPDOWNS:\n');
+
+['currencyDropdown', 'userDropdown'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+        const computed = getComputedStyle(el);
+        const styles = {
+            display: computed.display,
+            visibility: computed.visibility,
+            opacity: computed.opacity,
+            zIndex: computed.zIndex,
+            position: computed.position,
+            top: computed.top,
+            right: computed.right,
+            transform: computed.transform
+        };
+        
+        console.log(`   ${id}:`);
+        Object.entries(styles).forEach(([prop, val]) => {
+            console.log(`      ${prop}: ${val}`);
+        });
+        console.log('');
+        
+        report.styles[id] = styles;
+    }
+});
+
+// 3. Stacking Context - elementos con z-index alto
+console.log('\n🏗️  3. STACKING CONTEXT (elementos con z-index):\n');
+
+const allElements = document.querySelectorAll('*');
+const elementsWithZIndex = [];
+
+allElements.forEach(el => {
+    const computed = getComputedStyle(el);
+    const zIndex = computed.zIndex;
+    
+    if (zIndex !== 'auto' && parseInt(zIndex) > 0) {
+        const info = {
+            tag: el.tagName,
+            id: el.id,
+            classes: el.className,
+            zIndex: parseInt(zIndex),
+            position: computed.position
+        };
+        elementsWithZIndex.push(info);
+    }
+});
+
+// Ordenar por z-index descendente
+elementsWithZIndex.sort((a, b) => b.zIndex - a.zIndex);
+
+console.log('   Top 10 elementos con mayor z-index:');
+elementsWithZIndex.slice(0, 10).forEach((el, i) => {
+    console.log(`   ${i+1}. z-index: ${el.zIndex} - ${el.tag}${el.id ? '#'+el.id : ''}.${el.classes}`);
+});
+
+report.stackingContext = elementsWithZIndex.slice(0, 20);
+
+// 4. Verificar padres con overflow hidden
+console.log('\n🚫 4. PADRES CON OVERFLOW HIDDEN:\n');
+
+const checkOverflow = (element, name) => {
+    if (!element) return;
+    
+    let current = element;
+    let level = 0;
+    const overflowParents = [];
+    
+    while (current && level < 10) {
+        const computed = getComputedStyle(current);
+        const overflow = computed.overflow;
+        const overflowX = computed.overflowX;
+        const overflowY = computed.overflowY;
+        
+        if (overflow === 'hidden' || overflowX === 'hidden' || overflowY === 'hidden') {
+            const info = {
+                tag: current.tagName,
+                id: current.id,
+                classes: current.className,
+                overflow,
+                overflowX,
+                overflowY,
+                level
+            };
+            overflowParents.push(info);
+            console.log(`   ⚠️  ${name} - Nivel ${level}: ${current.tagName}${current.id ? '#'+current.id : ''} tiene overflow=${overflow}`);
+        }
+        
+        current = current.parentElement;
+        level++;
+    }
+    
+    return overflowParents;
+};
+
+const currencyOverflow = checkOverflow(elements.currencyDropdown, 'currencyDropdown');
+const userOverflow = checkOverflow(elements.userDropdown, 'userDropdown');
+
+report.overflowIssues = {
+    currencyDropdown: currencyOverflow,
+    userDropdown: userOverflow
+};
+
+// 5. Detectar issues
+console.log('\n❗ 5. PROBLEMAS DETECTADOS:\n');
+
+// Issue 1: Dropdowns no existen
+if (!elements.currencyDropdown) {
+    report.issues.push('❌ currencyDropdown no existe en el DOM');
+    console.log('   ❌ currencyDropdown no existe en el DOM');
+}
+if (!elements.userDropdown) {
+    report.issues.push('❌ userDropdown no existe en el DOM');
+    console.log('   ❌ userDropdown no existe en el DOM');
+}
+
+// Issue 2: z-index menor que otros elementos
+const currencyZ = elements.currencyDropdown ? parseInt(getComputedStyle(elements.currencyDropdown).zIndex) : 0;
+const userZ = elements.userDropdown ? parseInt(getComputedStyle(elements.userDropdown).zIndex) : 0;
+
+const maxOtherZ = Math.max(...elementsWithZIndex
+    .filter(el => el.id !== 'currencyDropdown' && el.id !== 'userDropdown')
+    .map(el => el.zIndex));
+
+if (currencyZ < maxOtherZ) {
+    report.issues.push(`⚠️  currencyDropdown z-index (${currencyZ}) < max otros elementos (${maxOtherZ})`);
+    console.log(`   ⚠️  currencyDropdown z-index (${currencyZ}) es menor que otros elementos (${maxOtherZ})`);
+}
+if (userZ < maxOtherZ) {
+    report.issues.push(`⚠️  userDropdown z-index (${userZ}) < max otros elementos (${maxOtherZ})`);
+    console.log(`   ⚠️  userDropdown z-index (${userZ}) es menor que otros elementos (${maxOtherZ})`);
+}
+
+// Issue 3: Overflow hidden en padres
+if (currencyOverflow && currencyOverflow.length > 0) {
+    report.issues.push(`⚠️  currencyDropdown tiene ${currencyOverflow.length} padres con overflow hidden`);
+    console.log(`   ⚠️  currencyDropdown tiene ${currencyOverflow.length} padres con overflow hidden`);
+}
+if (userOverflow && userOverflow.length > 0) {
+    report.issues.push(`⚠️  userDropdown tiene ${userOverflow.length} padres con overflow hidden`);
+    console.log(`   ⚠️  userDropdown tiene ${userOverflow.length} padres con overflow hidden`);
+}
+
+// 6. Resultado final
+console.log('\n📋 6. REPORTE COMPLETO:\n');
+console.log(JSON.stringify(report, null, 2));
+
+console.log('\n✅ DIAGNÓSTICO COMPLETO');
+console.log('📋 Copia TODO el texto de arriba y envíaselo al desarrollador\n');
+
+// Retornar el reporte
+report;
+        </pre>
+    </div>
+    
+    <div class="section">
+        <h2>💡 O usa este método más simple:</h2>
+        <p>En la página principal (index.html), presiona F12 y ejecuta:</p>
+        <button onclick="copySimple()">Copiar Método Simple</button>
+        <pre id="simpleCode">
+// Haz click en el menú de moneda
+document.getElementById('currencyValue').click();
+
+// Luego ejecuta esto:
+const dropdown = document.getElementById('currencyDropdown');
+console.log('Dropdown element:', dropdown);
+console.log('Classes:', dropdown.className);
+console.log('Computed styles:', {
+    display: getComputedStyle(dropdown).display,
+    visibility: getComputedStyle(dropdown).visibility,
+    opacity: getComputedStyle(dropdown).opacity,
+    zIndex: getComputedStyle(dropdown).zIndex,
+    position: getComputedStyle(dropdown).position,
+    top: getComputedStyle(dropdown).top,
+    right: getComputedStyle(dropdown).right
+});
+
+// Ver elementos que lo tapan
+const rect = dropdown.getBoundingClientRect();
+const centerX = rect.left + rect.width / 2;
+const centerY = rect.top + rect.height / 2;
+const topElement = document.elementFromPoint(centerX, centerY);
+console.log('Elemento en el centro del dropdown:', topElement);
+console.log('Z-index del elemento que tapa:', getComputedStyle(topElement).zIndex);
+        </pre>
+    </div>
+
+    <script>
+        function copyDiagnostic() {
+            const code = document.getElementById('diagnosticCode').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('✅ Código copiado! Ahora pégalo en la consola de index.html');
+            });
+        }
+        
+        function copySimple() {
+            const code = document.getElementById('simpleCode').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('✅ Código copiado! Ahora pégalo en la consola de index.html');
+            });
+        }
+    </script>
+</body>
+</html>

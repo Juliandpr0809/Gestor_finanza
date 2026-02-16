@@ -35,15 +35,27 @@ def create_app(config_name=None):
     db.init_app(app)
     Migrate(app, db)
     
-    # CORS - Ahora con orígenes específicos desde config
-    CORS(app, resources={
-        r"/api/*": {
-            "origins": app.config['CORS_ORIGINS'],
-            "allow_headers": ["Content-Type", "Authorization"],
-            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            "supports_credentials": True
-        }
-    })
+    # CORS - Configuración según ambiente
+    if config_name == 'development' or app.debug:
+        # En desarrollo: CORS completamente abierto
+        CORS(app, resources={
+            r"/*": {
+                "origins": "*",
+                "allow_headers": ["Content-Type", "Authorization"],
+                "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+                "supports_credentials": False
+            }
+        })
+    else:
+        # En producción: CORS con orígenes específicos
+        CORS(app, resources={
+            r"/api/*": {
+                "origins": app.config['CORS_ORIGINS'],
+                "allow_headers": ["Content-Type", "Authorization"],
+                "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+                "supports_credentials": True
+            }
+        })
     # Rate Limiting - Protección contra abuso
     limiter = Limiter(
         app=app,
@@ -65,11 +77,12 @@ def create_app(config_name=None):
         response.headers['X-XSS-Protection'] = '1; mode=block'
         
         # CSP más permisivo para desarrollo
-        if app.config['ENV'] == 'development':
+        if config_name == 'development' or app.debug:
             # En desarrollo: permitir estilos inline, CDNs, y fetch a cualquier origen HTTPS (necesario para tunnels)
             response.headers['Content-Security-Policy'] = (
                 "default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'; "
                 "connect-src 'self' https: http: wss: ws:; "
+                "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com; "
             )
         else:
             # En producción: más estricto

@@ -308,11 +308,60 @@ document.addEventListener('DOMContentLoaded', () => {
     const userMenuToggle = document.getElementById('userMenuToggle');
     const userDropdown = document.getElementById('userDropdown');
 
+    console.log('🔍 User Menu Elements:', {
+        userMenuToggle: !!userMenuToggle,
+        userDropdown: !!userDropdown,
+        userDropdownElement: userDropdown
+    });
+
     if (userMenuToggle && userDropdown) {
+        console.log('✅ User menu elements found, adding event listener');
+        
+        // Agregar indicador visual de estado
+        userMenuToggle.style.transition = 'all 0.3s ease';
+        
         userMenuToggle.addEventListener('click', (e) => {
+            e.preventDefault();
             e.stopPropagation();
-            userDropdown.classList.toggle('show');
-            userMenuToggle.classList.toggle('active');
+            console.log('👤 User menu clicked');
+            
+            const wasShowing = userDropdown.classList.contains('show');
+            
+            // Toggle clase show
+            if (wasShowing) {
+                userDropdown.classList.remove('show');
+                userMenuToggle.classList.remove('active');
+                userMenuToggle.style.background = '';
+            } else {
+                userDropdown.classList.add('show');
+                userMenuToggle.classList.add('active');
+                userMenuToggle.style.background = 'rgba(102, 126, 234, 0.2)';
+            }
+            
+            // Log detallado
+            console.log('📋 Dropdown classes:', userDropdown.className);
+            const computedStyles = getComputedStyle(userDropdown);
+            console.log('🎨 Computed styles:', {
+                display: computedStyles.display,
+                opacity: computedStyles.opacity,
+                visibility: computedStyles.visibility,
+                zIndex: computedStyles.zIndex,
+                position: computedStyles.position,
+                top: computedStyles.top,
+                right: computedStyles.right,
+                transform: computedStyles.transform
+            });
+            console.log('📊 Show state:', !wasShowing ? 'SHOWING' : 'HIDING');
+            
+            // Mostrar alerta visual si no se está mostrando
+            if (!wasShowing) {
+                setTimeout(() => {
+                    const stillVisible = getComputedStyle(userDropdown).visibility === 'visible';
+                    if (!stillVisible) {
+                        alert('⚠️ El menú debería estar visible pero no lo está. Revisa la consola.');
+                    }
+                }, 100);
+            }
         });
 
         document.addEventListener('click', (e) => {
@@ -339,6 +388,11 @@ function initCurrencySelector() {
     const currencyValue = document.getElementById('currencyValue');
     const currencyDropdown = document.getElementById('currencyDropdown');
 
+    console.log('💰 Currency Selector Elements:', {
+        currencyValue: !!currencyValue,
+        currencyDropdown: !!currencyDropdown
+    });
+
     if (!currencyValue || !currencyDropdown) return;
 
     // Mostrar moneda actual
@@ -354,8 +408,22 @@ function initCurrencySelector() {
 
     // Toggle dropdown
     currencyValue.addEventListener('click', (e) => {
+        e.preventDefault();
         e.stopPropagation();
+        console.log('💱 Currency selector clicked');
+        
+        const wasShowing = currencyDropdown.classList.contains('show');
         currencyDropdown.classList.toggle('show');
+        
+        console.log('📋 Currency dropdown classes:', currencyDropdown.className);
+        console.log('🎨 Currency computed styles:', {
+            display: getComputedStyle(currencyDropdown).display,
+            opacity: getComputedStyle(currencyDropdown).opacity,
+            visibility: getComputedStyle(currencyDropdown).visibility,
+            zIndex: getComputedStyle(currencyDropdown).zIndex,
+            position: getComputedStyle(currencyDropdown).position
+        });
+        console.log('📊 Show state:', !wasShowing ? 'SHOWING' : 'HIDING');
     });
 
     // Cambiar moneda

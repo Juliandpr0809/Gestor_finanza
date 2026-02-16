@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test User Menu</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+
+        .header-profile {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 8px 12px;
+            background: #1a1a1a;
+            border-radius: 8px;
+        }
+
+        .profile-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: #1a1a1a;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            min-width: 280px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.95);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 999999;
+        }
+
+        .user-dropdown.show {
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: translateY(0) !important;
+            display: block !important;
+        }
+
+        .dropdown-header {
+            padding: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dropdown-user-name {
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .dropdown-user-email {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .dropdown-menu {
+            padding: 8px;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .dropdown-item i {
+            width: 20px;
+        }
+
+        .logout {
+            color: #ff4444;
+            cursor: pointer;
+        }
+
+        #log {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 16px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        .log-entry {
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test User Menu Dropdown</h1>
+    <p>Haz clic en el avatar para abrir el menú:</p>
+
+    <div class="header-profile" id="userMenuToggle">
+        <div class="profile-avatar">
+            <img id="profileAvatar" src="https://ui-avatars.com/api/?name=JU&background=667eea" alt="User">
+        </div>
+        <i class="fas fa-chevron-down"></i>
+
+        <div class="user-dropdown" id="userDropdown">
+            <div class="dropdown-header">
+                <div class="dropdown-user-name">Usuario Test</div>
+                <div class="dropdown-user-email">test@example.com</div>
+            </div>
+            <div class="dropdown-menu">
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-wallet"></i>
+                    <span>Mis Cuentas</span>
+                </a>
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Transacciones</span>
+                </a>
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-robot"></i>
+                    <span>Asistente IA</span>
+                </a>
+                <div class="dropdown-item logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Cerrar Sesión</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="log"></div>
+
+    <script>
+        const logDiv = document.getElementById('log');
+        function log(message, data = null) {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = message + (data ? ': ' + JSON.stringify(data, null, 2) : '');
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(message, data);
+        }
+
+        const userMenuToggle = document.getElementById('userMenuToggle');
+        const userDropdown = document.getElementById('userDropdown');
+
+        log('Elementos encontrados', {
+            toggle: !!userMenuToggle,
+            dropdown: !!userDropdown
+        });
+
+        if (userMenuToggle && userDropdown) {
+            userMenuToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const wasShowing = userDropdown.classList.contains('show');
+                userDropdown.classList.toggle('show');
+                
+                log('Click en menú', {
+                    estado: wasShowing ? 'cerrando' : 'abriendo',
+                    clases: userDropdown.className,
+                    display: getComputedStyle(userDropdown).display,
+                    opacity: getComputedStyle(userDropdown).opacity,
+                    visibility: getComputedStyle(userDropdown).visibility,
+                    zIndex: getComputedStyle(userDropdown).zIndex
+                });
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!userMenuToggle.contains(e.target) && !userDropdown.contains(e.target)) {
+                    if (userDropdown.classList.contains('show')) {
+                        log('Cerrando menú por click fuera');
+                        userDropdown.classList.remove('show');
+                    }
+                }
+            });
+
+            log('Event listeners agregados');
+        }
+    </script>
+</body>
+</html>
