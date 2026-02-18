@@ -83,36 +83,43 @@ def register():
 @auth_bp.route('/login', methods=['POST'])
 def login():
     """Iniciar sesión y devolver JWT"""
-    # Validar y sanitizar datos de entrada
     try:
-        schema = UserLoginSchema()
-        validated_data = validate_and_sanitize(schema, request.get_json() or {})
-    except ValidationError as err:
-        return jsonify({'error': 'Datos inválidos', 'details': err.messages}), 400
-    
-    identifier = validated_data['identifier'].lower().strip()
-    password = validated_data['password']
+        # Validar y sanitizar datos de entrada
+        try:
+            schema = UserLoginSchema()
+            validated_data = validate_and_sanitize(schema, request.get_json() or {})
+        except ValidationError as err:
+            return jsonify({'error': 'Datos inválidos', 'details': err.messages}), 400
+        
+        identifier = validated_data['identifier'].lower().strip()
+        password = validated_data['password']
 
-    # Buscar usuario por username o email
-    user = User.query.filter(or_(User.username == identifier, User.email == identifier)).first()
-    
-    if not user:
-        return jsonify({'error': 'Usuario o contraseña incorrectos'}), 401
-    
-    if not check_password_hash(user.password_hash, password):
-        return jsonify({'error': 'Usuario o contraseña incorrectos'}), 401
+        # Buscar usuario por username o email
+        user = User.query.filter(or_(User.username == identifier, User.email == identifier)).first()
+        
+        if not user:
+            return jsonify({'error': 'Usuario o contraseña incorrectos'}), 401
+        
+        if not check_password_hash(user.password_hash, password):
+            return jsonify({'error': 'Usuario o contraseña incorrectos'}), 401
 
-    token = generate_access_token(user.id, user.email)
+        token = generate_access_token(user.id, user.email)
 
-    return jsonify({
-        'message': 'Sesión iniciada',
-        'access_token': token,
-        'user': {
-            'id': user.id,
-            'username': user.username,
-            'email': user.email
-        }
-    }), 200
+        return jsonify({
+            'message': 'Sesión iniciada',
+            'access_token': token,
+            'user': {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email
+            }
+        }), 200
+    except Exception as e:
+        current_app.logger.error(f"Login error: {str(e)}", exc_info=True)
+        return jsonify({
+            'error': 'Error interno del servidor',
+            'message': str(e)
+        }), 500
 
 
 @auth_bp.route('/logout', methods=['POST'])
