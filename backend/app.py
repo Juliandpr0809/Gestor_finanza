@@ -152,13 +152,32 @@ def create_app(config_name=None):
     
     # Rutas de prueba
     @app.route('/', methods=['GET'])
-    @app.route('/html/<path:filename>')
-    def welcome(filename=None):
-        """Redirigir a login del frontend o servir archivos HTML"""
-        if filename:
-            frontend_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'frontend')
-            return send_from_directory(frontend_path, f'html/{filename}')
+    def welcome():
+        """Redirigir a login del frontend"""
         return redirect('/html/login.html')
+    
+    # Ruta para servir archivos estáticos del frontend (manifest.json, service-worker.js, etc)
+    @app.route('/manifest.json')
+    @app.route('/service-worker.js')
+    @app.route('/<path:filename>')
+    def serve_static_files(filename=None):
+        """Servir archivos estáticos del frontend"""
+        frontend_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'frontend')
+        
+        # Caso especial para manifest.json y service-worker.js en raíz
+        if filename in ['manifest.json', 'service-worker.js']:
+            return send_from_directory(frontend_path, filename)
+        
+        # Para archivos en subcarpetas (html, css, js, etc)
+        if filename and ('html/' in filename or 'css/' in filename or 'js/' in filename):
+            return send_from_directory(frontend_path, filename)
+        
+        # Por defecto, servir desde html si no especifica ruta
+        if filename and not filename.startswith(('api/', 'health', 'info', 'favicon')):
+            try:
+                return send_from_directory(frontend_path, filename)
+            except:
+                return send_from_directory(frontend_path, f'html/{filename}')
     
     @app.route('/api', methods=['GET'])
     def api_info():
@@ -209,13 +228,6 @@ def create_app(config_name=None):
     def favicon():
         """Favicon placeholder"""
         return '', 204
-    
-    # Servir archivos estáticos del frontend
-    @app.route('/frontend/<path:filename>')
-    def serve_frontend(filename):
-        """Servir archivos del frontend"""
-        frontend_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'frontend')
-        return send_from_directory(frontend_path, filename)
     
     return app
 
