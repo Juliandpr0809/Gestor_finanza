@@ -118,37 +118,6 @@ def create_app(config_name=None):
         app.register_blueprint(transactions_bp, url_prefix='/api/transactions')
         app.register_blueprint(categories_bp, url_prefix='/api/categories')
         app.register_blueprint(chat_bp, url_prefix='/api/chat')
-
-    @app.cli.command('seed')
-    def seed_data():
-        """Insertar datos de prueba: usuario demo, cuentas, categorías y transacciones."""
-        with app.app_context():
-            existing = User.query.filter_by(email='demo@demo.com').first()
-            if existing:
-                click.echo('Seed ya aplicado: usuario demo@demo.com existe.')
-                return
-
-            user = User(
-                username='demo',
-                email='demo@demo.com',
-                password_hash=generate_password_hash('demo1234')
-            )
-            db.session.add(user)
-            db.session.commit()
-
-            # No crear categorías por defecto - el usuario las crea según necesite
-
-            # Cuentas demo
-            accounts = [
-                Account(user_id=user.id, name='Main Checking', account_type='checking', currency='USD', initial_balance=5000, current_balance=5000),
-                Account(user_id=user.id, name='Savings', account_type='savings', currency='USD', initial_balance=12000, current_balance=12000),
-            ]
-            db.session.add_all(accounts)
-            db.session.commit()
-
-            # No crear transacciones de prueba - el usuario las crea según necesite
-
-            click.echo('Seed aplicado. Usuario: demo@demo.com / demo1234')
     
     # Rutas de prueba
     @app.route('/', methods=['GET'])
@@ -156,28 +125,69 @@ def create_app(config_name=None):
         """Redirigir a login del frontend"""
         return redirect('/html/login.html')
     
-    # Ruta para servir archivos estáticos del frontend (manifest.json, service-worker.js, etc)
+    # Rutas específicas para archivos estáticos del frontend
     @app.route('/manifest.json')
+    def serve_manifest():
+        """Servir manifest.json"""
+        frontend_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'frontend')
+        return send_from_directory(frontend_path, 'manifest.json')
+    
     @app.route('/service-worker.js')
+    def serve_service_worker():
+        """Servir service-worker.js"""
+        frontend_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'frontend')
+        return send_from_directory(frontend_path, 'service-worker.js')
+    
+    @app.route('/html/<path:filename>')
     @app.route('/<path:filename>')
     def serve_static_files(filename=None):
         """Servir archivos estáticos del frontend"""
+        # Evitar servir rutas de API con esta función
+        if filename.startswith(('api/', 'health', 'info')):
+            return '', 404
+        
         frontend_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'frontend')
         
-        # Caso especial para manifest.json y service-worker.js en raíz
-        if filename in ['manifest.json', 'service-worker.js']:
-            return send_from_directory(frontend_path, filename)
-        
         # Para archivos en subcarpetas (html, css, js, etc)
-        if filename and ('html/' in filename or 'css/' in filename or 'js/' in filename):
+        if filename and ('html/' in filename or 'css/' in filename or 'js/' in filename or 'images/' in filename):
             return send_from_directory(frontend_path, filename)
         
-        # Por defecto, servir desde html si no especifica ruta
-        if filename and not filename.startswith(('api/', 'health', 'info', 'favicon')):
-            try:
-                return send_from_directory(frontend_path, filename)
-            except:
-                return send_from_directory(frontend_path, f'html/{filename}')
+        # Por defecto, buscar en frontend
+        try:
+            return send_from_directory(frontend_path, filename)
+        except:
+            # Si no existe, devolver 404 para que Flask busque otras rutas
+            return '', 404
+    
+    @app.cli.command('seed')
+    def seed_data():
+        """Insertar datos de prueba: usuario demo, cuentas, categorías y transacciones."""
+        existing = User.query.filter_by(email='demo@demo.com').first()
+        if existing:
+            click.echo('Seed ya aplicado: usuario demo@demo.com existe.')
+            return
+
+        user = User(
+            username='demo',
+            email='demo@demo.com',
+            password_hash=generate_password_hash('demo1234')
+        )
+        db.session.add(user)
+        db.session.commit()
+
+        # No crear categorías por defecto - el usuario las crea según necesite
+
+        # Cuentas demo
+        accounts = [
+            Account(user_id=user.id, name='Main Checking', account_type='checking', currency='USD', initial_balance=5000, current_balance=5000),
+            Account(user_id=user.id, name='Savings', account_type='savings', currency='USD', initial_balance=12000, current_balance=12000),
+        ]
+        db.session.add_all(accounts)
+        db.session.commit()
+
+        # No crear transacciones de prueba - el usuario las crea según necesite
+
+        click.echo('Seed aplicado. Usuario: demo@demo.com / demo1234')
     
     @app.route('/api', methods=['GET'])
     def api_info():
