@@ -12,7 +12,7 @@ if sys.platform == 'win32':
 # Cargar variables de entorno desde .env
 load_dotenv()
 
-from flask import Flask, jsonify, session, redirect, send_from_directory
+from flask import Flask, jsonify, session, redirect, request, send_from_directory
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -123,7 +123,7 @@ def create_app(config_name=None):
     @app.route('/', methods=['GET'])
     def welcome():
         """Redirigir a login del frontend"""
-        return redirect('/html/login.html')
+        return redirect('/frontend/html/login.html')
     
     @app.route('/manifest.json', methods=['GET', 'HEAD'])
     def serve_manifest():
@@ -152,6 +152,10 @@ def create_app(config_name=None):
         # Validar que filename no sea None
         if not filename:
             return '', 404
+
+        # Compatibilidad: mapear /html/* a frontend/html/*
+        if request.path.startswith('/html/') and not filename.startswith('html/'):
+            filename = f'html/{filename}'
         
         # Evitar servir rutas de API con esta función
         if filename.startswith(('api/', 'health', 'info')):

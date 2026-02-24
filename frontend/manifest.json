@@ -2,7 +2,7 @@
   "name": "OrdenC - Financial Manager",
   "short_name": "OrdenC",
   "description": "Gestor financiero inteligente con IA. Controla tus ingresos, gastos y cuentas de forma fácil.",
-  "start_url": "/html/login.html",
+  "start_url": "/frontend/html/login.html",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
@@ -38,7 +38,7 @@
       "name": "Nueva Transacción",
       "short_name": "Transacción",
       "description": "Registra una nueva transacción",
-      "url": "/html/new-transaction.html",
+      "url": "/frontend/html/new-transaction.html",
       "icons": [
         {
           "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><rect fill='%23667eea' width='96' height='96'/><text x='48' y='60' font-size='40' font-weight='800' text-anchor='middle' fill='%23ffffff'>+</text></svg>",
@@ -51,7 +51,7 @@
       "name": "Chat con IA",
       "short_name": "Chat IA",
       "description": "Asistente financiero inteligente",
-      "url": "/html/ai-chat.html",
+      "url": "/frontend/html/ai-chat.html",
       "icons": [
         {
           "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><rect fill='%2300d4aa' width='96' height='96'/><text x='48' y='60' font-size='40' font-weight='800' text-anchor='middle' fill='%23ffffff'>💬</text></svg>",
@@ -64,7 +64,7 @@
       "name": "Mis Cuentas",
       "short_name": "Cuentas",
       "description": "Ver balance y cuentas",
-      "url": "/html/accounts.html",
+      "url": "/frontend/html/accounts.html",
       "icons": [
         {
           "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><rect fill='%23667eea' width='96' height='96'/><text x='48' y='60' font-size='40' font-weight='800' text-anchor='middle' fill='%23ffffff'>$</text></svg>",
