@@ -83,7 +83,7 @@ def create_app(config_name=None):
                 "default-src 'self' https: data:; "
                 "connect-src 'self' https: http: wss: ws:; "
                 "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com; "
-                "font-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com data:; "
+                "font-src 'self' data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com fonts.googleapis.com fonts.gstatic.com; "
                 "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com; "
                 "img-src 'self' data: https: blob:; "
                 "worker-src 'self';"
@@ -94,7 +94,7 @@ def create_app(config_name=None):
                 "default-src 'self' https:; "
                 "connect-src 'self' https: http:; "
                 "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com; "
-                "font-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com data:; "
+                "font-src 'self' data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com fonts.googleapis.com fonts.gstatic.com; "
                 "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com; "
                 "img-src 'self' data: https: blob:; "
                 "worker-src 'self';"
@@ -152,10 +152,13 @@ def create_app(config_name=None):
     
     # Rutas de prueba
     @app.route('/', methods=['GET'])
-    def welcome():
-        """Redirigir a login del frontend"""
-        from flask import redirect
-        return redirect('/frontend/html/login.html')
+    @app.route('/html/<path:filename>')
+    def welcome(filename=None):
+        """Redirigir a login del frontend o servir archivos HTML"""
+        if filename:
+            frontend_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'frontend')
+            return send_from_directory(frontend_path, f'html/{filename}')
+        return redirect('/html/login.html')
     
     @app.route('/api', methods=['GET'])
     def api_info():

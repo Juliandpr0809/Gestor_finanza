@@ -2,7 +2,7 @@
   "name": "OrdenC - Financial Manager",
   "short_name": "OrdenC",
   "description": "Gestor financiero inteligente con IA. Controla tus ingresos, gastos y cuentas de forma fácil.",
-  "start_url": "/html/index.html",
+  "start_url": "/html/login.html",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
@@ -74,5 +74,7 @@
       ]
     }
   ],
-  "prefer_related_applications": false
+  "prefer_related_applications": false,
+  "lang": "es",
+  "dir": "auto"
 }

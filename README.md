@@ -111,7 +111,45 @@ python tests/test_all_endpoints.py
 pytest --cov=. --cov-report=html
 ```
 
-## 🛠️ Tecnologías
+## � PWA - Instalar como App Nativa
+
+FinanceFlow es una **Progressive Web App (PWA)** - funcionará como una app nativa en tu teléfono sin necesidad de APK:
+
+### Instalación Rápida
+
+1. **Abre en tu teléfono**: `https://tu-dominio.com`
+2. **Espera 3-5 segundos** a que aparezca el banner
+3. **Toca "Instalar"** (Android) o **Compartir → Agregar a pantalla de inicio** (iPhone)
+4. ¡La app estará en tu pantalla de inicio!
+
+### Requisitos
+- Dominio con **HTTPS** (obligatorio)
+- Chrome, Edge o Safari
+- Internet para primera instalación
+
+### Características de PWA
+- ✅ Funciona como app nativa
+- ✅ Funcionamiento offline parcial
+- ✅ Sin necesidad de Play Store
+- ✅ Actualizaciones automáticas
+- ✅ Acceso a notificaciones
+
+### Documentación Detallada
+- [Guía Rápida PWA](docs/QUICK_START_PWA.md)
+- [Instalación Completa](docs/PWA_INSTALACION.md)
+- [Despliegue con HTTPS](docs/HTTPS_DEPLOYMENT.md)
+
+### Testing Local
+
+Para probar la PWA localmente antes de desplegar:
+
+```bash
+# Usar ngrok para crear URL HTTPS temporal
+ngrok http 5000
+# Accede en teléfono a: https://abc123.ngrok.io
+```
+
+## �🛠️ Tecnologías
 
 ### Backend
 - **Flask** - Framework web
