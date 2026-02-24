@@ -13,8 +13,10 @@
     <link rel="manifest" href="../manifest.json">
     <title>Dashboard - OrdenC</title>
 
-    <!-- Font Awesome Icons -->
+    <!-- Font Awesome Icons - Primary CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Fallback CDN if primary fails -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
 
     <!-- Modern Theme - OrdenC UI -->
     <link rel="stylesheet" href="../css/modern-theme.css?v=5">
@@ -133,19 +135,19 @@
                 <!-- Actions Section -->
                 <section class="actions-section">
                     <div class="actions-grid">
-                        <button class="action-btn btn-blue" onclick="window.location.href='new-transaction.html'">
+                        <button class="action-btn btn-blue" onclick="window.location.href='/frontend/html/new-transaction.html'">
                             <div class="action-btn-icon"><i class="fas fa-plus"></i></div>
                             <div class="action-btn-text" data-i18n="dashboard.add.transaction">Agregar Transacción</div>
                         </button>
-                        <button class="action-btn btn-purple" onclick="window.location.href='scan-receipt.html'">
+                        <button class="action-btn btn-purple" onclick="window.location.href='/frontend/html/scan-receipt.html'">
                             <div class="action-btn-icon"><i class="fas fa-file-upload"></i></div>
                             <div class="action-btn-text" data-i18n="dashboard.upload.files">Subir Archivos</div>
                         </button>
-                        <button class="action-btn btn-purple-dark" onclick="window.location.href='ai-chat.html'">
+                        <button class="action-btn btn-purple-dark" onclick="window.location.href='/frontend/html/ai-chat.html'">
                             <div class="action-btn-icon"><i class="fas fa-robot"></i></div>
                             <div class="action-btn-text" data-i18n="AI Chat">Chat IA</div>
                         </button>
-                        <button class="action-btn btn-purple-light" onclick="window.location.href='voice-input.html'">
+                        <button class="action-btn btn-purple-light" onclick="window.location.href='/frontend/html/voice-input.html'">
                             <div class="action-btn-icon"><i class="fas fa-microphone-lines"></i></div>
                             <div class="action-btn-text" data-i18n="dashboard.voice.input">Entrada de Voz</div>
                         </button>

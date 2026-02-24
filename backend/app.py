@@ -80,18 +80,22 @@ def create_app(config_name=None):
         if config_name == 'development' or app.debug:
             # En desarrollo: permitir estilos inline, CDNs, y fetch a cualquier origen HTTPS (necesario para tunnels)
             response.headers['Content-Security-Policy'] = (
-                "default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'; "
+                "default-src 'self' https: data:; "
                 "connect-src 'self' https: http: wss: ws:; "
                 "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com; "
+                "font-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com data:; "
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com; "
+                "img-src 'self' data: https:;"
             )
         else:
-            # En producción: más estricto
+            # En producción: más permisivo para CDNs de iconos
             response.headers['Content-Security-Policy'] = (
-                "default-src 'self'; "
-                "style-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com; "
-                "font-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com; "
-                "connect-src 'self'; "
-                "img-src 'self' data:;"
+                "default-src 'self' https:; "
+                "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com; "
+                "font-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com data:; "
+                "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com; "
+                "connect-src 'self' https: http:; "
+                "img-src 'self' data: https:;"
             )
         
         # Referrer policy
