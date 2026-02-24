@@ -85,17 +85,19 @@ def create_app(config_name=None):
                 "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com; "
                 "font-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com data:; "
                 "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com; "
-                "img-src 'self' data: https:;"
+                "img-src 'self' data: https: blob:; "
+                "worker-src 'self';"
             )
         else:
-            # En producción: más permisivo para CDNs de iconos
+            # En producción: más permisivo para CDNs de iconos y avatares
             response.headers['Content-Security-Policy'] = (
                 "default-src 'self' https:; "
+                "connect-src 'self' https: http:; "
                 "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com; "
                 "font-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com data:; "
                 "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com; "
-                "connect-src 'self' https: http:; "
-                "img-src 'self' data: https:;"
+                "img-src 'self' data: https: blob:; "
+                "worker-src 'self';"
             )
         
         # Referrer policy

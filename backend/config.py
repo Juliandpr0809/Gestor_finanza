@@ -57,8 +57,8 @@ class ProductionConfig(Config):
     TESTING = False
     # En producción, forzar cookies seguras
     SESSION_COOKIE_SECURE = True
-    # Rate limiting más estricto
-    RATELIMIT_DEFAULT = "60 per minute"
+    # Rate limiting: aumentado para desarrollo en PythonAnywhere
+    RATELIMIT_DEFAULT = "500 per minute"
 
 config = {
     'development': DevelopmentConfig,

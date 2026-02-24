@@ -224,6 +224,14 @@
     <script src="../js/auth-handler.js?v=19"></script>
     <script src="../js/dashboard.js?v=11"></script>
     
+    <!-- Service Worker DESHABILITADO - Usar PWA sin SW por ahora -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            // navigator.serviceWorker.register('../service-worker.js').catch(err => console.log('SW registration failed:', err));
+            console.log('Service Worker deshabilitado temporalmente');
+        }
+    </script>
+    
     <!-- Estilos de máxima prioridad para dropdowns - DEBEN IR AL FINAL -->
     <style>
         /* CRÍTICO: Remover overflow-x hidden de html y body */
