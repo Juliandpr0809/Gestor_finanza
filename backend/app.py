@@ -125,7 +125,6 @@ def create_app(config_name=None):
         """Redirigir a login del frontend"""
         return redirect('/html/login.html')
     
-    # Rutas específicas para archivos estáticos del frontend
     @app.route('/manifest.json')
     def serve_manifest():
         """Servir manifest.json"""
@@ -143,7 +142,7 @@ def create_app(config_name=None):
     def serve_static_files(filename=None):
         """Servir archivos estáticos del frontend"""
         # Evitar servir rutas de API con esta función
-        if filename.startswith(('api/', 'health', 'info')):
+        if filename and filename.startswith(('api/', 'health', 'info')):
             return '', 404
         
         frontend_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'frontend')
