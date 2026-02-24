@@ -125,37 +125,56 @@ def create_app(config_name=None):
         """Redirigir a login del frontend"""
         return redirect('/html/login.html')
     
-    @app.route('/manifest.json')
+    @app.route('/manifest.json', methods=['GET', 'HEAD'])
     def serve_manifest():
-        """Servir manifest.json"""
-        frontend_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'frontend')
-        return send_from_directory(frontend_path, 'manifest.json')
+        """Servir manifest.json - Importante para PWA"""
+        try:
+            frontend_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'frontend')
+            return send_from_directory(frontend_path, 'manifest.json', mimetype='application/json')
+        except Exception as e:
+            app.logger.error(f"Error serving manifest.json: {e}")
+            return '', 404
     
-    @app.route('/service-worker.js')
+    @app.route('/service-worker.js', methods=['GET', 'HEAD'])
     def serve_service_worker():
-        """Servir service-worker.js"""
-        frontend_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'frontend')
-        return send_from_directory(frontend_path, 'service-worker.js')
+        """Servir service-worker.js - Importante para PWA"""
+        try:
+            frontend_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'frontend')
+            return send_from_directory(frontend_path, 'service-worker.js', mimetype='application/javascript')
+        except Exception as e:
+            app.logger.error(f"Error serving service-worker.js: {e}")
+            return '', 404
     
     @app.route('/html/<path:filename>')
     @app.route('/<path:filename>')
     def serve_static_files(filename=None):
         """Servir archivos estáticos del frontend"""
+        # Validar que filename no sea None
+        if not filename:
+            return '', 404
+        
         # Evitar servir rutas de API con esta función
-        if filename and filename.startswith(('api/', 'health', 'info')):
+        if filename.startswith(('api/', 'health', 'info')):
+            return '', 404
+        
+        # Evitar servir manifest.json y service-worker.js desde aqui
+        if filename in ('manifest.json', 'service-worker.js'):
             return '', 404
         
         frontend_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'frontend')
         
         # Para archivos en subcarpetas (html, css, js, etc)
-        if filename and ('html/' in filename or 'css/' in filename or 'js/' in filename or 'images/' in filename):
-            return send_from_directory(frontend_path, filename)
+        if 'html/' in filename or 'css/' in filename or 'js/' in filename or 'images/' in filename:
+            try:
+                return send_from_directory(frontend_path, filename)
+            except Exception:
+                return '', 404
         
-        # Por defecto, buscar en frontend
+        # Por defecto, intentar buscar en frontend
         try:
             return send_from_directory(frontend_path, filename)
-        except:
-            # Si no existe, devolver 404 para que Flask busque otras rutas
+        except Exception:
+            # Si no existe, devolver 404
             return '', 404
     
     @app.cli.command('seed')
