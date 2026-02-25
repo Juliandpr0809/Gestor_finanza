@@ -180,6 +180,7 @@
     .header {
         height: 60px !important;
         padding: 0 12px !important;
+        justify-content: space-between;
     }
     
     .compact-selector {
@@ -205,5 +206,18 @@
     .currency-option {
         padding: 4px 6px;
         font-size: 9px;
+    }
+
+    .header-right {
+        margin-left: auto;
+        flex-shrink: 0;
+    }
+
+    .compact-selector {
+        display: flex;
+    }
+
+    .header-profile {
+        display: none !important;
     }
 }

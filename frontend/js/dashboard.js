@@ -15,7 +15,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let accounts = [];
     let selectedAccountId = null;
-    let selectedCurrency = localStorage.getItem('preferredCurrency') || 'USD';
+    let selectedCurrency = localStorage.getItem('preferredCurrency');
+    if (!selectedCurrency) {
+        selectedCurrency = 'USD';
+    }
     let selectedLanguage = localStorage.getItem('preferredLanguage') || 'es';
     const fallbackRates = { USD: 1, EUR: 0.92, COP: 4000, MXN: 17, GBP: 0.78 };
     let rates = { ...fallbackRates };
@@ -200,6 +203,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const current = accounts.find(a => a.id === selectedAccountId) || accounts[0];
             selectedAccountId = current.id;
+            if (!localStorage.getItem('preferredCurrency') && current?.currency) {
+                selectedCurrency = current.currency;
+                localStorage.setItem('preferredCurrency', selectedCurrency);
+            }
             renderAccountCard(current);
             renderAccountSwitcher(accounts);
             return current;

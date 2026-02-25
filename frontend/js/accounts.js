@@ -18,6 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // HELPERS
     // ==========================================
 
+    let preferredCurrency = localStorage.getItem('preferredCurrency');
+
     const formatMoney = (amount, currency = 'USD') => {
         try {
             return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(amount);
@@ -83,6 +85,10 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const data = await api.getAccounts();
             accountsCache = data;
+            if (!preferredCurrency && accountsCache.length && accountsCache[0].currency) {
+                preferredCurrency = accountsCache[0].currency;
+                localStorage.setItem('preferredCurrency', preferredCurrency);
+            }
             renderAccounts(data);
             updateFilters(data);
             updateSummary(data);
@@ -174,6 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateSummary(accounts) {
         const totalBalance = accounts.reduce((sum, a) => sum + (a.current_balance || 0), 0);
+        const displayCurrency = preferredCurrency || accounts[0]?.currency || 'USD';
         const checkingCount = accounts.filter(a => a.account_type === 'checking').length;
         const savingsCount = accounts.filter(a => a.account_type === 'savings').length;
         const creditCount = accounts.filter(a => a.account_type === 'credit').length;
@@ -184,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const summaryCards = document.querySelectorAll('.summary-card');
         if (summaryCards[0]) {
             const val = summaryCards[0].querySelector('.summary-value');
-            if (val) val.textContent = formatMoney(totalBalance);
+            if (val) val.textContent = formatMoney(totalBalance, displayCurrency);
         }
         if (summaryCards[1]) {
             const val = summaryCards[1].querySelector('.summary-value');
@@ -198,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (summaryCards[3]) {
             const val = summaryCards[3].querySelector('.summary-value');
-            if (val) val.textContent = formatMoney(0);
+                if (val) val.textContent = formatMoney(0, displayCurrency);
         }
     }
 
