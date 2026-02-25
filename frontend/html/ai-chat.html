@@ -13,12 +13,8 @@
     <link rel="manifest" href="../manifest.json">
     <title>AI Financial Assistant - OrdenC</title>
 
-    <!-- Font Awesome Icons (+ fallbacks) -->
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-    <link rel="preconnect" href="https://unpkg.com" crossorigin>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" crossorigin="anonymous">
+    <!-- Font Awesome Icons - Primary CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- Modern Theme -->
     <link rel="stylesheet" href="../css/modern-theme.css">
@@ -270,6 +266,27 @@
     <script src="../js/ai-chat.js?v=24"></script>
 
     <!-- Bottom Navigation (Mobile) -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="bottom-nav-item">
+            <i class="fas fa-home"></i>
+            <span data-i18n="Dashboard">Panel</span>
+        </a>
+        <a href="accounts.html" class="bottom-nav-item">
+            <i class="fas fa-wallet"></i>
+            <span data-i18n="Accounts">Cuentas</span>
+        </a>
+        <a href="new-transaction.html" class="bottom-nav-item bottom-nav-item-add">
+            <i class="fas fa-plus"></i>
+        </a>
+        <a href="transactions.html" class="bottom-nav-item">
+            <i class="fas fa-exchange-alt"></i>
+            <span data-i18n="Transactions">Transacciones</span>
+        </a>
+        <a href="ai-chat.html" class="bottom-nav-item active">
+            <i class="fas fa-robot"></i>
+            <span data-i18n="AI Assistant">IA</span>
+        </a>
+    </nav>
 
 </body>
 
