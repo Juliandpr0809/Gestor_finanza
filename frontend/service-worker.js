@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ordenc-v2';
+const CACHE_NAME = 'ordenc-v3';
 const urlsToCache = [
   '/frontend/html/index.html',
   '/frontend/html/login.html',
@@ -9,6 +9,11 @@ const urlsToCache = [
   '/frontend/html/new-transaction.html',
   '/frontend/css/modern-theme.css',
   '/frontend/css/unified-pages.css',
+  '/frontend/css/mobile-native.css',
+  '/frontend/css/lang-selector.css',
+  '/frontend/css/ux-improvements.css',
+  '/frontend/css/header-minimal.css',
+  '/frontend/css/bottom-navigation.css',
   '/frontend/css/accounts.css',
   '/frontend/css/transactions.css',
   '/frontend/css/ai-chat.css',

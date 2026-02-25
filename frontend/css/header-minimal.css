@@ -211,6 +211,8 @@
     .header-right {
         margin-left: auto;
         flex-shrink: 0;
+        display: flex !important;
+        align-items: center;
     }
 
     .compact-selector {
