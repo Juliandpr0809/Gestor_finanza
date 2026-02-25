@@ -24,49 +24,38 @@ body {
   box-sizing: border-box;
 }
 
-/* Content wrapper con scroll */
+/* Content wrapper (avoid fixed layout on mobile) */
 main,
 .chat-container,
 .new-transaction-container,
 .accounts-container,
-/* Content wrapper con scroll */
-main,
 .container,
-.new-transaction-container,
-.accounts-container,
 .transactions-container {
-  position: fixed;
-  top: 70px;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  overflow-y: auto;
+  position: relative;
+  width: 100%;
   overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 100px;
-  /* Space for Bottom Nav */
 }
 
 /* iOS Safe Area */
-main,
-.container,
-.new-transaction-container,
-.accounts-container,
-.transactions-container {
-  padding-left: max(16px, env(safe-area-inset-left));
-  padding-right: max(16px, env(safe-area-inset-right));
-  padding-bottom: max(100px, env(safe-area-inset-bottom));
-  /* Force consistent top padding to avoid header overlap */
-  padding-top: 20px;
-}
-
 .header {
   padding-left: max(16px, env(safe-area-inset-left));
   padding-right: max(16px, env(safe-area-inset-right));
   padding-top: env(safe-area-inset-top);
 }
+
+@media (max-width: 768px) {
+  main,
+  .chat-container,
+  .new-transaction-container,
+  .accounts-container,
+  .container,
+  .transactions-container {
+    min-height: calc(100vh - 60px);
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+    padding-top: 16px;
+    padding-bottom: max(100px, env(safe-area-inset-bottom));
+  }
 }
 
 /* Force standardization on all containers */
