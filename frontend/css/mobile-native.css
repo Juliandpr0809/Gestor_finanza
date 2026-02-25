@@ -58,6 +58,94 @@ main,
   }
 }
 
+@media (max-width: 768px) {
+  body {
+    background: radial-gradient(120% 120% at 100% 0%, rgba(59, 130, 246, 0.12) 0%, rgba(6, 7, 12, 0) 45%),
+      radial-gradient(120% 120% at 0% 100%, rgba(14, 165, 233, 0.08) 0%, rgba(6, 7, 12, 0) 55%),
+      var(--bg-dark);
+  }
+
+  .dashboard-container {
+    gap: 16px;
+  }
+
+  .section-title {
+    font-size: 20px;
+    letter-spacing: 0.2px;
+  }
+
+  .btn-add-card {
+    border-radius: 12px;
+    padding: 8px 12px;
+    font-size: 12px;
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .virtual-card {
+    min-height: 180px;
+    padding: 16px;
+    background: linear-gradient(135deg, #111827 0%, #0b1220 100%);
+    border: 1px solid rgba(99, 102, 241, 0.35);
+    box-shadow: 0 12px 28px rgba(14, 165, 233, 0.18);
+  }
+
+  .card-bg-circle {
+    opacity: 0.15;
+  }
+
+  .card-number {
+    font-size: 18px;
+  }
+
+  .card-balance-overlay {
+    font-size: 24px;
+  }
+
+  .actions-grid {
+    gap: 10px;
+  }
+
+  .action-btn {
+    min-height: 96px;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    box-shadow: 0 10px 24px rgba(2, 6, 23, 0.45);
+  }
+
+  .action-btn-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    font-size: 13px;
+  }
+
+  .action-btn-text {
+    font-size: 13px;
+  }
+
+  .btn-blue {
+    background: linear-gradient(135deg, #0f172a 0%, #111827 100%);
+    border-color: rgba(59, 130, 246, 0.28);
+  }
+
+  .btn-purple,
+  .btn-purple-dark,
+  .btn-purple-light {
+    background: linear-gradient(135deg, #0b1020 0%, #111827 100%);
+    border-color: rgba(99, 102, 241, 0.28);
+  }
+
+  .activity-title {
+    font-size: 20px;
+  }
+
+  .activity-list {
+    gap: 10px;
+    max-height: 420px;
+  }
+}
+
 /* Force standardization on all containers */
 @media (max-width: 768px) {
 

@@ -9,17 +9,17 @@
     bottom: 0;
     left: 0;
     right: 0;
-    height: 78px;
-    background: rgba(6, 7, 12, 0.92);
+    height: 64px;
+    background: rgba(6, 7, 12, 0.88);
     border-top: 1px solid var(--border-color);
     display: none;
     /* Hidden by default, shown in mobile */
     justify-content: space-around;
     align-items: center;
     z-index: 1000;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
-    padding: 0 8px;
-    backdrop-filter: blur(12px);
+    box-shadow: 0 -3px 14px rgba(0, 0, 0, 0.45);
+    padding: 0 6px;
+    backdrop-filter: blur(8px);
 }
 
 /* Bottom Navigation Item */
@@ -31,36 +31,36 @@
     justify-content: center;
     color: var(--text-secondary);
     text-decoration: none;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 500;
-    gap: 4px;
+    gap: 3px;
     transition: all 0.2s ease;
-    min-height: 60px;
+    min-height: 52px;
     cursor: pointer;
     -webkit-appearance: none;
     appearance: none;
     background: none;
     border: none;
-    padding: 8px 4px;
-    border-radius: 12px;
+    padding: 6px 4px;
+    border-radius: 10px;
     position: relative;
 }
 
 .bottom-nav-item i {
-    font-size: 22px;
+    font-size: 20px;
     transition: transform 0.2s ease;
 }
 
 .bottom-nav-item span {
-    font-size: 11px;
-    margin-top: 2px;
+    font-size: 10px;
+    margin-top: 1px;
     white-space: nowrap;
 }
 
 /* Active State */
 .bottom-nav-item.active {
     color: var(--text-primary);
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.06);
 }
 
 .bottom-nav-item.active i {
@@ -75,18 +75,19 @@
 
 /* Central Add Button (Special) */
 .bottom-nav-item-add {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #2b3350 0%, #3a2f63 100%);
     color: white;
     border-radius: 50%;
-    width: 56px;
-    height: 56px;
-    margin: 0 8px;
-    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
-    flex: 0 0 56px;
+    width: 50px;
+    height: 50px;
+    margin: 0 6px;
+    box-shadow: 0 6px 16px rgba(17, 24, 39, 0.55);
+    flex: 0 0 50px;
+    border: 1px solid rgba(99, 102, 241, 0.35);
 }
 
 .bottom-nav-item-add i {
-    font-size: 24px;
+    font-size: 22px;
     margin: 0;
 }
 
@@ -106,8 +107,8 @@
 /* iOS Safe Area Support */
 @supports (padding: max(0px)) {
     .bottom-nav {
-        padding-bottom: max(8px, env(safe-area-inset-bottom));
-        height: calc(78px + env(safe-area-inset-bottom));
+        padding-bottom: max(6px, env(safe-area-inset-bottom));
+        height: calc(64px + env(safe-area-inset-bottom));
     }
 }
 
@@ -122,13 +123,13 @@
 
     /* Add padding to body to prevent content from being hidden */
     body {
-        padding-bottom: 78px;
+        padding-bottom: 64px;
     }
 
     /* Adjust safe area padding */
     @supports (padding: max(0px)) {
         body {
-            padding-bottom: calc(78px + env(safe-area-inset-bottom));
+            padding-bottom: calc(64px + env(safe-area-inset-bottom));
         }
     }
 
@@ -139,7 +140,7 @@
 
     /* Adjust FAB position if it exists */
     .quick-actions-fab {
-        bottom: 90px;
+        bottom: 78px;
     }
 }
 
@@ -148,16 +149,16 @@
    ======================================== */
 @media (min-width: 481px) and (max-width: 768px) {
     .bottom-nav-item {
-        font-size: 12px;
+        font-size: 11px;
     }
 
     .bottom-nav-item i {
-        font-size: 24px;
+        font-size: 22px;
     }
 
     .bottom-nav-item-add {
-        width: 60px;
-        height: 60px;
+        width: 54px;
+        height: 54px;
     }
 }
 
@@ -176,30 +177,30 @@
    ======================================== */
 @media (max-width: 768px) and (orientation: landscape) {
     .bottom-nav {
-        height: 60px;
+        height: 56px;
     }
 
     .bottom-nav-item {
-        min-height: 50px;
-        font-size: 10px;
+        min-height: 46px;
+        font-size: 9px;
     }
 
     .bottom-nav-item i {
-        font-size: 20px;
+        font-size: 18px;
     }
 
     .bottom-nav-item-add {
-        width: 48px;
-        height: 48px;
+        width: 44px;
+        height: 44px;
     }
 
     @supports (padding: max(0px)) {
         .bottom-nav {
-            height: calc(60px + env(safe-area-inset-bottom));
+            height: calc(56px + env(safe-area-inset-bottom));
         }
 
         body {
-            padding-bottom: calc(60px + env(safe-area-inset-bottom));
+            padding-bottom: calc(56px + env(safe-area-inset-bottom));
         }
     }
 }
