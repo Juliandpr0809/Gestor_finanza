@@ -192,26 +192,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const identifier = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const rememberMe = document.getElementById('remember').checked;
-            const termsAccepted = document.getElementById('loginTerms') ? document.getElementById('loginTerms').checked : false;
-
-            // Validar que se acepten los términos
-            if (!termsAccepted) {
-                showAuthMessage('warning', 'Términos requeridos', 'Debes aceptar los términos de servicio para continuar');
-                setLoginFeedback('error', 'Por favor acepta los términos y condiciones');
-                return;
-            }
-            const acceptedTerms = loginTermsCheckbox ? loginTermsCheckbox.checked : false;
 
             const submitBtn = loginForm.querySelector('button[type="submit"]');
             const resetLoading = setButtonLoading(submitBtn, 'Signing in...');
             setLoginFeedback(null, '');
-
-            if (!acceptedTerms) {
-                resetLoading();
-                setLoginFeedback('error', 'Debes aceptar los Términos y la Política de Privacidad.');
-                showAuthMessage('error', 'Términos requeridos', 'Por favor acepta los Términos y la Política para continuar.');
-                return;
-            }
 
             api.login(identifier, password)
                 .then((data) => {
