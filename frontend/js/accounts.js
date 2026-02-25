@@ -184,29 +184,43 @@ document.addEventListener('DOMContentLoaded', () => {
         const checkingCount = accounts.filter(a => a.account_type === 'checking').length;
         const savingsCount = accounts.filter(a => a.account_type === 'savings').length;
         const creditCount = accounts.filter(a => a.account_type === 'credit').length;
+        const bankCount = checkingCount + savingsCount;
 
-        const headerBalanceEl = document.querySelector('.header-balance-amount');
-        if (headerBalanceEl) headerBalanceEl.textContent = formatMoney(totalBalance);
+        // Card 1: Balance Total (ID dinámico)
+        const totalBalEl = document.getElementById('summaryTotalBalance');
+        if (totalBalEl) totalBalEl.textContent = formatMoney(totalBalance, displayCurrency);
+        const loadingInd = document.getElementById('summaryLoadingIndicator');
+        if (loadingInd) loadingInd.style.display = 'none';
 
-        const summaryCards = document.querySelectorAll('.summary-card');
-        if (summaryCards[0]) {
-            const val = summaryCards[0].querySelector('.summary-value');
-            if (val) val.textContent = formatMoney(totalBalance, displayCurrency);
+        // Card 2: Cuentas Bancarias
+        const bankCountEl = document.getElementById('summaryBankCount');
+        if (bankCountEl) bankCountEl.textContent = String(bankCount);
+        const bankDetailEl = document.getElementById('summaryBankDetail');
+        if (bankDetailEl) bankDetailEl.textContent = `${checkingCount} corriente, ${savingsCount} ahorros`;
+
+        // Card 3: Tarjetas de Credito
+        const creditCountEl = document.getElementById('summaryCreditCount');
+        if (creditCountEl) creditCountEl.textContent = String(creditCount);
+        const creditDetailEl = document.getElementById('summaryCreditDetail');
+        if (creditDetailEl) {
+            const totalCredit = accounts.filter(a => a.account_type === 'credit')
+                .reduce((s, a) => s + Math.abs(a.current_balance || 0), 0);
+            creditDetailEl.textContent = creditCount > 0
+                ? `${formatMoney(totalCredit, displayCurrency)} usado`
+                : 'Sin tarjetas de crédito';
         }
-        if (summaryCards[1]) {
-            const val = summaryCards[1].querySelector('.summary-value');
-            const subtitle = summaryCards[1].querySelector('.summary-subtitle');
-            if (val) val.textContent = String(checkingCount + savingsCount);
-            if (subtitle) subtitle.textContent = `${checkingCount} checking, ${savingsCount} savings`;
-        }
-        if (summaryCards[2]) {
-            const val = summaryCards[2].querySelector('.summary-value');
-            if (val) val.textContent = String(creditCount);
-        }
-        if (summaryCards[3]) {
-            const val = summaryCards[3].querySelector('.summary-value');
-                if (val) val.textContent = formatMoney(0, displayCurrency);
-        }
+
+        // Card 4: Ahorros
+        const savingsEl = document.getElementById('summarySavings');
+        const savingsTotal = accounts.filter(a => a.account_type === 'savings')
+            .reduce((s, a) => s + (a.current_balance || 0), 0);
+        if (savingsEl) savingsEl.textContent = savingsCount > 0
+            ? formatMoney(savingsTotal, displayCurrency)
+            : formatMoney(0, displayCurrency);
+        const savingsDetailEl = document.getElementById('summarySavingsDetail');
+        if (savingsDetailEl) savingsDetailEl.textContent = savingsCount > 0
+            ? `${savingsCount} cuenta(s) de ahorro`
+            : 'Sin cuentas de ahorro';
     }
 
     // ==========================================

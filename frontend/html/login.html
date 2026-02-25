@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
@@ -10,8 +10,6 @@
 
     <!-- Font Awesome Icons - Primary CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Fallback CDN if primary fails -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
 
     <!-- Modern Theme -->
     <link rel="stylesheet" href="../css/modern-theme.css?v=2">
@@ -33,7 +31,7 @@
 
                 <div class="features-list">
                     <div class="feature-item">
-                        <i class="fas fa-shield-check"></i>
+                        <i class="fas fa-shield-halved"></i>
                         <div>
                             <h3 data-i18n="Bank-level Security">Seguridad Bancaria</h3>
                             <p data-i18n="login.security.desc">Encriptación de extremo a extremo</p>
@@ -55,20 +53,6 @@
                     </div>
                 </div>
 
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="stat-number">10K+</div>
-                        <div class="stat-label" data-i18n="Active Users">Usuarios Activos</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">$2M+</div>
-                        <div class="stat-label" data-i18n="Managed">Gestionado</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">4.9★</div>
-                        <div class="stat-label" data-i18n="Rating">Calificación</div>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -125,42 +109,17 @@
                                     style="font-size: 12px; opacity: 0.5; margin-left: 4px;"></i>
                             </span>
                         </label>
-                        <a href="#" class="link-forgot" data-i18n="Forgot password?">¿Olvidaste tu contraseña?</a>
+                        <span class="link-forgot" style="opacity:0.5; font-size:13px; cursor:default;"
+                            title="Recuperación de contraseña próximamente" data-i18n="Forgot password?">¿Olvidaste tu
+                            contraseña?</span>
                     </div>
 
-                    <!-- Aceptación de términos para login -->
-                    <div class="form-group">
-                        <label class="checkbox-container" title="Debes aceptar los términos para continuar">
-                            <input type="checkbox" id="loginTerms">
-                            <span class="checkbox-custom"></span>
-                            <span class="checkbox-label">
-                                <span>Acepto los </span>
-                                <a href="#" class="link-primary">Términos de Servicio</a>
-                                <span> y la </span>
-                                <a href="#" class="link-primary">Política de Privacidad</a>
-                            </span>
-                        </label>
-                    </div>
 
                     <button type="submit" class="btn-primary btn-large">
                         <span data-i18n="Sign In">Iniciar Sesión</span>
                         <i class="fas fa-arrow-right"></i>
                     </button>
 
-                    <div class="divider">
-                        <span data-i18n="or continue with">o continúa con</span>
-                    </div>
-
-                    <div class="social-login">
-                        <button type="button" class="btn-social">
-                            <i class="fab fa-google"></i>
-                            <span>Google</span>
-                        </button>
-                        <button type="button" class="btn-social">
-                            <i class="fab fa-apple"></i>
-                            <span>Apple</span>
-                        </button>
-                    </div>
 
                     <div class="form-footer">
                         <p><span data-i18n="Don't have an account?">¿No tienes cuenta?</span> <a href="register.html"

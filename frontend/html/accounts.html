@@ -15,9 +15,6 @@
 
     <!-- Font Awesome Icons - Primary CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Fallback CDN if primary fails -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
-
     <!-- Modern Theme -->
     <link rel="stylesheet" href="../css/modern-theme.css">
     <link rel="stylesheet" href="../css/unified-pages.css?v=2">
@@ -126,10 +123,10 @@
                 </div>
                 <div class="summary-content">
                     <div class="summary-label" data-i18n="Total Balance">Balance Total</div>
-                    <div class="summary-value">$4,856.00</div>
+                    <div class="summary-value" id="summaryTotalBalance">—</div>
                     <div class="summary-change positive">
-                        <i class="fas fa-arrow-up"></i>
-                        <span data-i18n="accounts.change.lastmonth">+12.5% desde el mes pasado</span>
+                        <i class="fas fa-spinner fa-spin" id="summaryLoadingIndicator"></i>
+                        <span id="summaryChangeText"></span>
                     </div>
                 </div>
             </div>
@@ -140,8 +137,8 @@
                 </div>
                 <div class="summary-content">
                     <div class="summary-label" data-i18n="Bank Accounts">Cuentas Bancarias</div>
-                    <div class="summary-value">3</div>
-                    <div class="summary-subtitle" data-i18n="accounts.checking.savings">2 corriente, 1 ahorros</div>
+                    <div class="summary-value" id="summaryBankCount">—</div>
+                    <div class="summary-subtitle" id="summaryBankDetail"></div>
                 </div>
             </div>
 
@@ -151,8 +148,8 @@
                 </div>
                 <div class="summary-content">
                     <div class="summary-label" data-i18n="Credit Cards">Tarjetas de Crédito</div>
-                    <div class="summary-value">2</div>
-                    <div class="summary-subtitle" data-i18n="accounts.available.credit">$2,340 crédito disponible</div>
+                    <div class="summary-value" id="summaryCreditCount">—</div>
+                    <div class="summary-subtitle" id="summaryCreditDetail"></div>
                 </div>
             </div>
 
@@ -162,10 +159,10 @@
                 </div>
                 <div class="summary-content">
                     <div class="summary-label" data-i18n="Savings Goals">Metas de Ahorro</div>
-                    <div class="summary-value">$1,200</div>
+                    <div class="summary-value" id="summarySavings">—</div>
                     <div class="summary-change">
                         <i class="fas fa-bullseye"></i>
-                        60% <span data-i18n="of target">of target</span>
+                        <span id="summarySavingsDetail"></span>
                     </div>
                 </div>
             </div>
@@ -317,7 +314,6 @@
     <script src="../js/i18n.js"></script>
     <script src="../js/api.js?v=16"></script>
     <script src="../js/auth-handler.js?v=19"></script>
-    <script src="../js/accounts.js?v=4"></script>
     <script src="../js/accounts.js?v=4"></script>
 
     <!-- Bottom Navigation (Mobile) -->

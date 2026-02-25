@@ -179,15 +179,65 @@ function populateFilterDropdowns() {
     const accountSelect = document.getElementById('filterAccount');
 
     if (categorySelect) {
-        const cats = [...new Set(transactions.map(t => t.categoryName))].filter(Boolean);
-        categorySelect.innerHTML = '<option value="">All Categories</option>' +
-            cats.map(c => `<option value="${c}">${c}</option>`).join('');
+        const firstOpt = categorySelect.options[0];
+        categorySelect.innerHTML = '';
+        categorySelect.appendChild(firstOpt);
+        const cats = [...new Set(transactions.map(t => t.categoryName))].filter(Boolean).sort();
+        cats.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c;
+            opt.textContent = c;
+            categorySelect.appendChild(opt);
+        });
     }
 
     if (accountSelect) {
-        const accs = [...new Set(transactions.map(t => t.accountName))].filter(Boolean);
-        accountSelect.innerHTML = '<option value="">All Accounts</option>' +
-            accs.map(a => `<option value="${a}">${a}</option>`).join('');
+        const firstOpt = accountSelect.options[0];
+        accountSelect.innerHTML = '';
+        accountSelect.appendChild(firstOpt);
+        Object.entries(accountsMap).forEach(([id, name]) => {
+            const opt = document.createElement('option');
+            opt.value = name;
+            opt.textContent = name;
+            accountSelect.appendChild(opt);
+        });
+    }
+
+    populateEditModalDropdowns();
+}
+
+function populateEditModalDropdowns() {
+    const editAccountSel = document.getElementById('editAccount');
+    if (editAccountSel) {
+        editAccountSel.innerHTML = '';
+        Object.entries(accountsMap).forEach(([id, name]) => {
+            const opt = document.createElement('option');
+            opt.value = id;
+            opt.textContent = name;
+            editAccountSel.appendChild(opt);
+        });
+    }
+    const editCategorySel = document.getElementById('editCategory');
+    if (editCategorySel) {
+        editCategorySel.innerHTML = '';
+        Object.entries(categoriesMap).forEach(([id, cat]) => {
+            const opt = document.createElement('option');
+            opt.value = id;
+            opt.textContent = cat.name;
+            editCategorySel.appendChild(opt);
+        });
+        if (editCategorySel.options.length === 0) {
+            const defaults = [
+                ['food', 'Comida'], ['transport', 'Transporte'], ['entertainment', 'Entretenimiento'],
+                ['shopping', 'Compras'], ['bills', 'Facturas'], ['health', 'Salud'],
+                ['salary', 'Salario'], ['freelance', 'Freelance'], ['other', 'Otro']
+            ];
+            defaults.forEach(([val, label]) => {
+                const opt = document.createElement('option');
+                opt.value = val; opt.textContent = label;
+                editCategorySel.appendChild(opt);
+            });
+        }
     }
 }
 
@@ -485,8 +535,75 @@ function prevPage() {
 // ==========================================
 
 window.editTransaction = async function (id) {
-    alert('Editar transacción no implementado aún');
+    const tx = transactions.find(t => t.id === id);
+    if (!tx) { alert('Transacción no encontrada'); return; }
+
+    editingTransactionId = id;
+
+    const editType = document.getElementById('editType');
+    const editAmount = document.getElementById('editAmount');
+    const editDate = document.getElementById('editDate');
+    const editCategory = document.getElementById('editCategory');
+    const editDescription = document.getElementById('editDescription');
+    const editAccount = document.getElementById('editAccount');
+
+    if (editType) editType.value = tx.type || 'expense';
+    if (editAmount) editAmount.value = Math.abs(tx.amount || 0);
+    if (editDate) editDate.value = tx.date ? tx.date.substring(0, 10) : '';
+    if (editDescription) editDescription.value = tx.description || tx.name || '';
+
+    if (editCategory) {
+        const byId = editCategory.querySelector(`option[value="${tx.category}"]`);
+        if (byId) editCategory.value = tx.category;
+        else {
+            const byName = [...editCategory.options].find(o => o.textContent === tx.categoryName);
+            if (byName) editCategory.value = byName.value;
+        }
+    }
+    if (editAccount && tx.account) editAccount.value = String(tx.account);
+
+    const modal = document.getElementById('editModal');
+    if (modal) modal.classList.remove('hidden');
+
+    const editForm = document.getElementById('editForm');
+    if (editForm) editForm.onsubmit = async (e) => { e.preventDefault(); await saveEditTransaction(); };
 };
+
+async function saveEditTransaction() {
+    if (!editingTransactionId) return;
+    const payload = {
+        type: document.getElementById('editType')?.value,
+        amount: parseFloat(document.getElementById('editAmount')?.value) || 0,
+        date: document.getElementById('editDate')?.value,
+        category_id: parseInt(document.getElementById('editCategory')?.value) || null,
+        description: document.getElementById('editDescription')?.value?.trim(),
+        account_id: parseInt(document.getElementById('editAccount')?.value) || null,
+    };
+    if (!payload.type || !payload.amount || !payload.date) { alert('Completa tipo, monto y fecha'); return; }
+
+    const submitBtn = document.querySelector('#editForm button[type="submit"]');
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...'; }
+
+    try {
+        await api.updateTransaction(editingTransactionId, payload);
+        closeEditModal();
+        await loadInitialData();
+    } catch (err) {
+        console.error('Error guardando transacción:', err);
+        if (ensureAuth(err)) return;
+        alert('No se pudo guardar: ' + err.message);
+    } finally {
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<i class="fas fa-save"></i> <span>Guardar Cambios</span>'; }
+    }
+}
+
+window.closeEditModal = function () {
+    const modal = document.getElementById('editModal');
+    if (modal) modal.classList.add('hidden');
+    editingTransactionId = null;
+};
+
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') window.closeEditModal?.(); });
 
 window.deleteTransaction = async function (id) {
     if (!confirm('¿Eliminar esta transacción?')) return;

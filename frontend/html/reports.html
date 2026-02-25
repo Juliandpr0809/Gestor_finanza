@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
@@ -8,8 +8,6 @@
 
     <!-- Font Awesome Icons - Primary CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Fallback CDN if primary fails -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
 
     <!-- Modern Theme -->
     <link rel="stylesheet" href="../css/modern-theme.css">
@@ -111,24 +109,49 @@
             </nav>
         </div>
         <div class="header-right">
-            <div class="lang-selector">
-                <button class="lang-btn" data-lang-btn="es">ES</button>
-                <button class="lang-btn" data-lang-btn="en">EN</button>
+            <div class="compact-selector" id="compactSelector">
+                <button class="lang-btn" data-lang-btn="es" title="Español">ES</button>
+                <button class="lang-btn" data-lang-btn="en" title="English">EN</button>
             </div>
-            <div class="header-balance">
-                <span class="header-balance-label">TOTAL BALANCE</span>
-                <span class="header-balance-amount">$1,456.00</span>
+            <div class="header-profile" id="userMenuToggle">
+                <div class="profile-avatar">
+                    <img id="profileAvatar" src="https://ui-avatars.com/api/?name=User&background=667eea" alt="User">
+                </div>
+                <i class="fas fa-chevron-down profile-dropdown-icon"></i>
+                <!-- Dropdown Menu -->
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="dropdown-header">
+                        <div class="dropdown-user-name" id="dropdownUserName">Usuario</div>
+                        <div class="dropdown-user-email" id="dropdownUserEmail">user@example.com</div>
+                    </div>
+                    <div class="dropdown-menu">
+                        <a href="accounts.html" class="dropdown-item">
+                            <i class="fas fa-wallet"></i>
+                            <span data-i18n="My Accounts">Mis Cuentas</span>
+                        </a>
+                        <a href="transactions.html" class="dropdown-item">
+                            <i class="fas fa-exchange-alt"></i>
+                            <span data-i18n="Transactions">Transacciones</span>
+                        </a>
+                        <a href="ai-chat.html" class="dropdown-item">
+                            <i class="fas fa-robot"></i>
+                            <span data-i18n="AI Assistant">Asistente IA</span>
+                        </a>
+                        <a href="reports.html" class="dropdown-item">
+                            <i class="fas fa-chart-line"></i>
+                            <span data-i18n="Reports">Reportes</span>
+                        </a>
+                        <a href="welcome.html" class="dropdown-item">
+                            <i class="fas fa-lightbulb"></i>
+                            <span data-i18n="User Guide">Guía de uso</span>
+                        </a>
+                        <div class="dropdown-item logout" data-action="logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span data-i18n="Logout">Cerrar Sesión</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <button class="header-icon-btn">
-                <i class="fas fa-bell"></i>
-            </button>
-            <button class="header-icon-btn">
-                <i class="fas fa-cog"></i>
-            </button>
-            <div class="header-avatar">
-                <span>KW</span>
-            </div>
-            <span class="header-username">Kristin Watson</span>
         </div>
     </header>
 
@@ -156,7 +179,8 @@
     </main>
 
     <script src="../js/i18n.js"></script>
-    <script src="../js/i18n.js"></script>
+    <script src="../js/api.js?v=26"></script>
+    <script src="../js/auth-handler.js?v=19"></script>
 
     <!-- Bottom Navigation (Mobile) -->
     <nav class="bottom-nav">

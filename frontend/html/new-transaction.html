@@ -1,15 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Transaction - OrdenC</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#06070c">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="OrdenC">
+    <link rel="manifest" href="../manifest.json">
+    <title>Nueva Transacción - OrdenC</title>
 
-    <!-- Font Awesome Icons - Primary CDN -->
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Fallback CDN if primary fails -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
 
     <!-- Modern Theme -->
     <link rel="stylesheet" href="../css/modern-theme.css">
@@ -18,6 +21,7 @@
     <link rel="stylesheet" href="../css/lang-selector.css">
     <link rel="stylesheet" href="../css/header-minimal.css">
     <link rel="stylesheet" href="../css/bottom-navigation.css">
+    <link rel="stylesheet" href="../css/mobile-native.css?v=2">
 </head>
 
 <body>
@@ -35,18 +39,39 @@
             </nav>
         </div>
         <div class="header-right">
-            <div class="lang-selector">
-                <button class="lang-btn" data-lang-btn="es">ES</button>
-                <button class="lang-btn" data-lang-btn="en">EN</button>
+            <div class="compact-selector" id="compactSelector">
+                <button class="lang-btn" data-lang-btn="es" title="Español">ES</button>
+                <button class="lang-btn" data-lang-btn="en" title="English">EN</button>
             </div>
-            <div class="header-actions">
-                <button class="header-icon-btn" title="Notifications">
-                    <i class="fas fa-bell"></i>
-                </button>
-            </div>
-            <div class="header-profile">
-                <div class="profile-avatar">KW</div>
-                <span class="profile-name">Kristin Watson</span>
+            <div class="header-profile" id="userMenuToggle">
+                <div class="profile-avatar">
+                    <img id="profileAvatar" src="https://ui-avatars.com/api/?name=User&background=667eea" alt="User">
+                </div>
+                <i class="fas fa-chevron-down profile-dropdown-icon"></i>
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="dropdown-header">
+                        <div class="dropdown-user-name" id="dropdownUserName">Usuario</div>
+                        <div class="dropdown-user-email" id="dropdownUserEmail">user@example.com</div>
+                    </div>
+                    <div class="dropdown-menu">
+                        <a href="accounts.html" class="dropdown-item">
+                            <i class="fas fa-wallet"></i>
+                            <span data-i18n="My Accounts">Mis Cuentas</span>
+                        </a>
+                        <a href="transactions.html" class="dropdown-item">
+                            <i class="fas fa-exchange-alt"></i>
+                            <span data-i18n="Transactions">Transacciones</span>
+                        </a>
+                        <a href="ai-chat.html" class="dropdown-item">
+                            <i class="fas fa-robot"></i>
+                            <span data-i18n="AI Assistant">Asistente IA</span>
+                        </a>
+                        <div class="dropdown-item logout" data-action="logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span data-i18n="Logout">Cerrar Sesión</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </header>
@@ -61,25 +86,27 @@
 
         <form id="transaction-form" class="transaction-form-mobile">
             <div class="form-column-left">
-                <div class="section-label"><i class="fas fa-random"></i> <span>Transaction Type</span></div>
+                <div class="section-label"><i class="fas fa-shuffle"></i> <span data-i18n="Transaction Type">Tipo de
+                        Transacción</span></div>
                 <div class="type-tabs">
                     <div class="type-tab active" data-type="expense">
                         <i class="fas fa-arrow-down"></i>
-                        <span>Expense</span>
+                        <span data-i18n="Expense">Gasto</span>
                     </div>
                     <div class="type-tab" data-type="income">
                         <i class="fas fa-arrow-up"></i>
-                        <span>Income</span>
+                        <span data-i18n="Income">Ingreso</span>
                     </div>
                     <div class="type-tab" data-type="transfer">
                         <i class="fas fa-exchange-alt"></i>
-                        <span>Transfer</span>
+                        <span data-i18n="Transfer">Transferencia</span>
                     </div>
                 </div>
 
                 <div class="amount-section" style="display: flex; gap: 10px; align-items: flex-end;">
                     <div style="flex: 1;">
-                        <div class="currency-symbol" style="display:none">$</div>
+                        <div class="currency-symbol" id="currencySymbolDisplay"
+                            style="font-size:18px;font-weight:600;color:rgba(255,255,255,0.6);margin-bottom:4px">$</div>
                         <input type="number" id="amount" class="amount-input" placeholder="0" step="0.01" required>
                         <div class="amount-underline"></div>
                     </div>
@@ -108,7 +135,7 @@
                     </div>
                 </div>
 
-                <div class="section-label"><i class="fas fa-wallet"></i> <span>Account</span></div>
+                <div class="section-label"><i class="fas fa-wallet"></i> <span data-i18n="Account">Cuenta</span></div>
                 <div id="accountChips" class="account-chips"></div>
                 <select id="account" class="select-dark" required aria-label="Account" style="display:none"></select>
 
