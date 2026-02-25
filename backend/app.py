@@ -126,6 +126,7 @@ def create_app(config_name=None):
         return redirect('/frontend/html/login.html')
     
     @app.route('/manifest.json', methods=['GET', 'HEAD'])
+    @app.route('/frontend/manifest.json', methods=['GET', 'HEAD'])
     def serve_manifest():
         """Servir manifest.json - Importante para PWA"""
         try:
@@ -136,6 +137,7 @@ def create_app(config_name=None):
             return '', 404
     
     @app.route('/service-worker.js', methods=['GET', 'HEAD'])
+    @app.route('/frontend/service-worker.js', methods=['GET', 'HEAD'])
     def serve_service_worker():
         """Servir service-worker.js - Importante para PWA"""
         try:
@@ -146,12 +148,17 @@ def create_app(config_name=None):
             return '', 404
     
     @app.route('/html/<path:filename>')
+    @app.route('/frontend/<path:filename>')
     @app.route('/<path:filename>')
     def serve_static_files(filename=None):
         """Servir archivos estáticos del frontend"""
         # Validar que filename no sea None
         if not filename:
             return '', 404
+
+        # Compatibilidad: mapear /frontend/* a frontend/*
+        if filename.startswith('frontend/'):
+            filename = filename[len('frontend/'):]
 
         # Compatibilidad: mapear /html/* a frontend/html/*
         if request.path.startswith('/html/') and not filename.startswith('html/'):
