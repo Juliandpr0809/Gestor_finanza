@@ -107,9 +107,14 @@
 /* iOS Safe Area Support */
 @supports (padding: max(0px)) {
     .bottom-nav {
-        padding-bottom: max(6px, env(safe-area-inset-bottom));
+        padding-bottom: max(8px, env(safe-area-inset-bottom));
         height: calc(64px + env(safe-area-inset-bottom));
     }
+}
+
+/* Fix para asegurar visibilidad completa */
+.bottom-nav {
+    contain: layout style;
 }
 
 /* ========================================
@@ -119,17 +124,24 @@
 @media (max-width: 768px) {
     .bottom-nav {
         display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
     }
 
     /* Add padding to body to prevent content from being hidden */
     body {
-        padding-bottom: 64px;
+        padding-bottom: 70px;
     }
 
     /* Adjust safe area padding */
     @supports (padding: max(0px)) {
         body {
-            padding-bottom: calc(64px + env(safe-area-inset-bottom));
+            padding-bottom: calc(70px + env(safe-area-inset-bottom));
         }
     }
 
