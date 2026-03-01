@@ -767,6 +767,11 @@
         padding-top: 0;
     }
 
+    .chat-messages {
+        padding-bottom: 60px;
+        /* Mayor espacio para bajar el input */
+    }
+
     .chat-header {
         flex-direction: row;
         /* Keep row on mobile for space */
