@@ -1,0 +1,133 @@
+/* ========================================
+   LOGO DROPDOWN MENU
+   Menú desplegable del logo con idioma, moneda y cerrar sesión
+   ======================================== */
+
+.header-logo {
+  position: relative;
+}
+
+/* Logo Dropdown Menu */
+.logo-dropdown {
+  position: absolute !important;
+  top: 100% !important;
+  left: 0 !important;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 12px !important;
+  margin-top: 12px !important;
+  min-width: 240px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.9) !important;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  z-index: 99999 !important;
+  pointer-events: none;
+  padding: 12px;
+}
+
+.header-logo.active .logo-dropdown,
+.logo-dropdown.show {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0) !important;
+  pointer-events: auto !important;
+}
+
+.logo-dropdown-section {
+  padding: 8px 0;
+}
+
+.logo-dropdown-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0 8px 6px 8px;
+}
+
+.logo-dropdown-options {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.logo-lang-btn,
+.logo-currency-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  font-size: 14px;
+  width: 100%;
+  text-align: left;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.logo-lang-btn:hover,
+.logo-currency-option:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+}
+
+.logo-lang-btn.active,
+.logo-currency-option.active {
+  background: rgba(99, 102, 241, 0.15);
+  color: #8b9bff;
+  font-weight: 600;
+}
+
+.logo-dropdown-separator {
+  height: 1px;
+  background: var(--border-color);
+  margin: 8px 0;
+}
+
+.logo-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  color: var(--danger);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.logo-dropdown-item:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ff6b6b;
+}
+
+.logo-dropdown-item i {
+  font-size: 16px;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+  .logo-dropdown {
+    min-width: 200px !important;
+    font-size: 13px;
+  }
+
+  .logo-lang-btn,
+  .logo-currency-option {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .logo-dropdown-item {
+    padding: 10px;
+    font-size: 13px;
+  }
+}
