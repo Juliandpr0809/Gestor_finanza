@@ -184,18 +184,27 @@
     }
     
     .compact-selector {
-        display: none !important;
+        padding: 2px 4px !important;
+        height: 22px !important;
+        gap: 0 !important;
+        border-width: 0.5px !important;
+        display: flex !important;
     }
     
     .lang-btn {
-        padding: 3px 6px !important;
-        min-width: 20px !important;
-        font-size: 9px !important;
+        padding: 2px 5px !important;
+        min-width: 18px !important;
+        font-size: 8px !important;
     }
     
     .currency-value {
-        font-size: 9px !important;
-        padding: 0 6px;
+        font-size: 8px !important;
+        padding: 0 5px !important;
+    }
+    
+    .compact-selector .separator {
+        height: 10px !important;
+        margin: 0 2px !important;
     }
     
     .currency-dropdown {
@@ -212,10 +221,7 @@
         flex-shrink: 0;
         display: flex !important;
         align-items: center;
-    }
-
-    .compact-selector {
-        display: flex;
+        gap: 6px !important;
     }
 
     .header-profile {

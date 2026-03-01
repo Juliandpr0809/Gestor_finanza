@@ -768,8 +768,8 @@
     }
 
     .chat-messages {
-        padding-bottom: 120px;
-        /* Mayor espacio para bajar el input y aprovechar toda la pantalla */
+        padding-bottom: 200px;
+        /* Espacio amplio para bajar el input hasta casi el final de la pantalla */
     }
 
     .chat-header {
