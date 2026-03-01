@@ -184,8 +184,7 @@
     }
     
     .compact-selector {
-        padding: 3px 5px;
-        height: 24px;
+        display: none !important;
     }
     
     .lang-btn {
