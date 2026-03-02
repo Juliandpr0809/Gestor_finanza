@@ -691,6 +691,9 @@ Sé conciso y práctico."""
             'invertí', 'invert', 'inversión', 'invertida',
             'aboné', 'abone', 'abonado',
             'perdí', 'pierdo', 'perdida',
+            'pasé', 'pase', 'paso', 'pasó',  # "Le pasé dinero"
+            'di', 'dí', 'dio', 'dado',  # "Le di dinero"
+            'presté', 'preste', 'prestado',  # "Le presté dinero"
             # Expresiones comunes
             'se fue', 'salió', 'salio', 'salida',
             'me cobraron', 'me cobro', 'me cobr',
@@ -746,12 +749,25 @@ Sé conciso y práctico."""
                 return None  # Es una pregunta/comando vago, no una transacción
         
         # Si menciona "cambiar nombre", "renombrar", "modificar nombre" NO es transacción
-        if any(word in message_lower for word in ['cambiar nombre', 'renombrar', 'modificar nombre', 'editar nombre', 'cambia el nombre', 'cambiar cuenta', 'mover a']):
+        if any(word in message_lower for word in ['cambiar nombre', 'renombrar', 'modificar nombre', 'editar nombre', 'cambia el nombre', 'cambiar cuenta']):
             return None
         
-        # Si es un comando de edición/movimiento (no transacción nueva)
-        if any(word in message_lower for word in ['cambia', 'mueve', 'pasa', 'traslada']) and not any(w in message_lower for w in ['gastaré', 'gastará', 'pagaré', 'regalaré']):
-            return None
+        # MEJORADO: Detectar si "pasa" es GASTO (transferencia de dinero) o EDICIÓN (mover transacción)
+        # "Le pasé 200k" = GASTO (transferencia)
+        # "Pasa esta transacción a otra cuenta" = EDICIÓN
+        has_pasa_word = any(word in message_lower for word in ['cambia', 'mueve', 'pasa', 'traslada'])
+        
+        if has_pasa_word:
+            # Si dice "le pasé", "di", "presté" con monto = es GASTO (transferencia/pago)
+            is_money_transfer = any(phrase in message_lower for phrase in [
+                'le pas', 'le di', 'le prest', 'le envi', 'le transfer',
+                'a mi ', 'para el ', 'para la ', 'para pagar',
+                'arriendo', 'alquiler', 'renta',  # Contexto de pago
+            ]) and bool(re.search(r'\d+', message_lower))
+            
+            # Si NO es transferencia de dinero Y NO tiene palabras de futuro = es comando de edición
+            if not is_money_transfer and not any(w in message_lower for w in ['gastaré', 'gastará', 'pagaré', 'regalaré']):
+                return None
         
         # Verificar si hay intención de crear
         has_create_intent = any(keyword in message_lower for keyword in keywords_create)
@@ -823,7 +839,7 @@ Sé conciso y práctico."""
         tx_type = 'expense'  # Default a gasto
         
         # Buscar palabras claras de GASTO
-        clear_expense_words = ['compr', 'gast', 'saque', 'retire', 'pagué', 'pague', 'pagado', 'debit', 'cancelé', 'cancel', 'me cobr']
+        clear_expense_words = ['compr', 'gast', 'saque', 'retire', 'pagué', 'pague', 'pagado', 'debit', 'cancelé', 'cancel', 'me cobr', 'pasé', 'pase', 'di', 'dí', 'presté']
         clear_income_words = ['recibí', 'recibe', 'cobré', 'cobre', 'ingres', 'ganancia', 'salario', 'sueldo', 'depósito', 'deposito', 'devolución', 'vendí', 'vendi']
         
         clear_expense = any(word in message_lower for word in clear_expense_words)

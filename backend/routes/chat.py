@@ -1388,6 +1388,12 @@ Ejemplo: *"USD"*"""
 
     print(f"DEBUG CHAT: Intent detected = {intent}, wants_simulation = {wants_simulation}")
     
+    # ⚠️ LOGGING: Si NO se detectó intención, informar al usuario POR QUÉ
+    if not intent or not intent.get('has_intent'):
+        print(f"DEBUG CHAT: ❌ NO transaction intent detected for message: '{data['content']}'")
+        print(f"DEBUG CHAT: Reason: Missing transaction keywords or numbers")
+        # Continuar con la IA normal (consultas, análisis, etc.)
+    
     if intent and intent.get('has_intent') and not wants_simulation:
         # El usuario quiere crear transacciones REALES (pueden ser múltiples)
         print(f"DEBUG CHAT: Intent detected, processing transactions...")
@@ -1412,7 +1418,11 @@ Ejemplo: *"USD"*"""
             print(f"DEBUG CHAT: Extracted data: {transaction_data}")
             
             if not transaction_data:
-                failed_transactions.append({'text': part, 'reason': 'No se pudo extraer información'})
+                print(f"DEBUG CHAT: ❌ Could not extract transaction data from: {part}")
+                failed_transactions.append({
+                    'text': part, 
+                    'reason': f'❌ **No pude interpretar esta transacción**\n\n🤔 El texto "{part[:50]}..." no contiene información clara de:\n• 💵 Monto\n• 🎯 Tipo (gasto/ingreso)\n• 📝 Descripción'
+                })
                 continue
             
             # ⚠️ VALIDACIÓN CRÍTICA: Verificar campos mínimos ANTES de continuar
@@ -1423,12 +1433,19 @@ Ejemplo: *"USD"*"""
             
             if not amount or not tx_type or not description:
                 print(f"DEBUG CHAT: ❌ Skipping incomplete transaction: amount={amount}, type={tx_type}, desc={description}")
+                
+                # Mensaje MUY específico sobre qué falta
+                missing_parts = []
+                if not amount:
+                    missing_parts.append('💵 **Monto** (ej: 200000, 50k, 1500)')
+                if not tx_type:
+                    missing_parts.append('🎯 **Tipo de transacción** (usa palabras como: "gasté", "compré", "me llegaron", "ingresó")')
+                if not description:
+                    missing_parts.append('📝 **Descripción** (para qué fue: arriendo, mercado, salario, etc.)')
+                
                 failed_transactions.append({
                     'text': part, 
-                    'reason': f'Información incompleta. Por favor especifica: ' + 
-                             ('' if amount else 'monto, ') + 
-                             ('' if tx_type else 'si es gasto o ingreso, ') + 
-                             ('' if description else 'descripción')
+                    'reason': f'Falta información:\n' + '\n'.join(missing_parts)
                 })
                 continue
             
@@ -1463,11 +1480,19 @@ Ejemplo: *"USD"*"""
             
                 # Si aún no tiene cuenta o categoría, usar los primeros disponibles
             if not transaction_data.get('account'):
-                failed_transactions.append({'text': part, 'reason': 'No tienes cuentas configuradas'})
+                print(f"DEBUG CHAT: ❌ No account found for user {user_id}")
+                failed_transactions.append({
+                    'text': part, 
+                    'reason': '⚠️ **No tienes cuentas configuradas**\n\n👉 Ve a la página de "Cuentas" y crea una primero.\nEjemplo: "Nequi", "Efectivo", "Banco", etc.'
+                })
                 continue
             
             if not transaction_data.get('category'):
-                failed_transactions.append({'text': part, 'reason': 'No tienes categorías configuradas'})
+                print(f"DEBUG CHAT: ❌ No category found for user {user_id}, type {tx_type}")
+                failed_transactions.append({
+                    'text': part, 
+                    'reason': f'⚠️ **No tienes categorías de {"gastos" if tx_type == "expense" else "ingresos"}**\n\n👉 Ve a la página de "Transacciones" y crea una categoría primero.'
+                })
                 continue
             
                 # Crear la transacción
@@ -1484,11 +1509,23 @@ Ejemplo: *"USD"*"""
                 ).first()
                 
                 if not account:
-                    failed_transactions.append({'text': part, 'reason': f"Cuenta '{transaction_data['account']}' no encontrada"})
+                    print(f"DEBUG CHAT: ❌ Account '{transaction_data['account']}' not found")
+                    all_accounts = Account.query.filter_by(user_id=user_id, is_active=True).all()
+                    available = ', '.join([acc.name for acc in all_accounts[:3]])
+                    failed_transactions.append({
+                        'text': part, 
+                        'reason': f"❌ **Cuenta '{transaction_data['account']}' no encontrada**\n\n💳 Tus cuentas disponibles: {available or 'Ninguna'}"
+                    })
                     continue
                 
                 if not category:
-                    failed_transactions.append({'text': part, 'reason': f"Categoría '{transaction_data['category']}' no encontrada"})
+                    print(f"DEBUG CHAT: ❌ Category '{transaction_data['category']}' not found")
+                    all_categories = Category.query.filter_by(user_id=user_id, category_type=tx_type).all()
+                    available = ', '.join([cat.name for cat in all_categories[:3]])
+                    failed_transactions.append({
+                        'text': part, 
+                        'reason': f"❌ **Categoría '{transaction_data['category']}' no encontrada**\n\n📊 Categorías disponibles: {available or 'Ninguna'}"
+                    })
                     continue
                 
                 # Amount siempre positivo en DB, balance se ajusta según tipo
@@ -1519,7 +1556,12 @@ Ejemplo: *"USD"*"""
                 
             except Exception as e:
                 print(f"Error creating transaction: {e}")
-                failed_transactions.append({'text': part, 'reason': str(e)})
+                import traceback
+                traceback.print_exc()
+                failed_transactions.append({
+                    'text': part, 
+                    'reason': f'❌ **Error técnico al crear transacción:**\n{str(e)[:100]}'
+                })
         
             # Commit todas las transacciones creadas
         if created_transactions:
@@ -1560,20 +1602,52 @@ Ejemplo: *"USD"*"""
 🔄 **Balance actualizado:** {currency_symbol} {tx['account'].current_balance:,.2f}"""
         
         elif failed_transactions:
-            # Generar mensaje específico con las razones de fallo
-            reasons = [f"• {f['text']}: {f['reason']}" for f in failed_transactions[:3]]  # Máximo 3 ejemplos
-            ai_response = f"""⚠️ No se pudieron procesar las transacciones:
+            # Generar mensaje MUY específico con las razones de fallo
+            print(f"DEBUG CHAT: ❌ {len(failed_transactions)} transactions failed")
+            
+            ai_response = f"""❌ **No se pudo crear la transacción**
 
-{chr(10).join(reasons)}
+🔍 **Razones:**\n"""
+            
+            for f in failed_transactions[:2]:  # Máximo 2 ejemplos
+                ai_response += f"\n{f['reason']}\n"
+            
+            ai_response += f"""\n✅ **Para registrar correctamente:**
 
-Para registrar una transacción necesito:
-• **Monto** (ej: 50, 25000, etc.)
-• **Tipo** (gasto o ingreso)
-• **Descripción** (ej: mercado, agua, salario)
+💵 Usa frases como:
+• *"Gasté 25000 en mercado"*
+• *"Le pasé 200k a mi mamá para el arriendo"*
+• *"Me llegaron 50000 de salario"*
+• *"Compré una pizza por 35000"*
 
-Ejemplo: *"Gasté 25000 en mercado"* o *"Ingreso de 50000 por salario"*"""
+📄 **Componentes necesarios:**
+1️⃣ Monto (200000, 50k, etc.)
+2️⃣ Acción (gasté, compré, me llegaron)
+3️⃣ Descripción (mercado, arriendo, salario)
+
+🔗 Si aún falla, asegúrate de tener cuentas y categorías creadas primero.
+"""
         else:
-            ai_response = "⚠️ No se pudo procesar ninguna transacción."
+            # No se detectó intención clara ni se crearon transacciones
+            print(f"DEBUG CHAT: ⚠️ No transactions created, no clear reason")
+            ai_response = """⚠️ **No entendí qué transacción querrías crear**
+
+👉 **¿Qué quisiste decir?**
+
+Si querías registrar un gasto o ingreso, intenta con frases claras:
+
+💸 **Gastos:**
+• "Gasté [monto] en [descripción]"
+• "Compré [cosa] por [monto]"
+• "Le pasé [monto] para [motivo]"
+
+💰 **Ingresos:**
+• "Me llegaron [monto] de [motivo]"
+• "Recibí [monto] por [descripción]"
+• "Ingresó mi salario de [monto]"
+
+🤔 Si querías hacer otra cosa (consultar, analizar, etc.), ¡inténtalo de nuevo!
+"""
         
         # Guardar respuesta del asistente
         assistant_message = ChatMessage(
@@ -1602,7 +1676,13 @@ Ejemplo: *"Gasté 25000 en mercado"* o *"Ingreso de 50000 por salario"*"""
     else:
         # No hay intención de crear transacción, responder normalmente con la IA
         # La IA maneja: consultas, análisis, consejos, gestión de cuentas, etc.
+        print(f"DEBUG CHAT: No transaction intent, using AI for response (Groq)")
         ai_response = ai_service.chat(user_id, data['content'], conversation_history)
+        
+        # ⚠️ ADVERTENCIA: Si la IA menciona "transacción registrada" pero NO creó nada
+        if any(keyword in ai_response.lower() for keyword in ['transacción registrada', 'balance actualizado', 'gasto registrado']):
+            print(f"DEBUG CHAT: ⚠️️ AI simulated transaction without creating it!")
+            ai_response += "\n\n⚠️ **Nota:** Esta es solo una simulación. Para crear transacciones reales, usa frases como:\n• *'Gasté 25000 en mercado'*\n• *'Le pasé 200k para arriendo'*"
     
     # Guardar respuesta del asistente en la base de datos
     response_metadata = {'ai_service': 'groq', 'processed': True}
