@@ -283,9 +283,104 @@ const formatDate = (iso) => {
     }
 };
 
+// Filtrar por categoría
+function filterByCategory(categoryName) {
+    const filterEl = document.getElementById('filterCategory');
+    if (filterEl) {
+        filterEl.value = categoryName;
+        applyFilters();
+        // Scroll a la tabla
+        setTimeout(() => {
+            document.querySelector('.content-panel')?.scrollIntoView({ behavior: 'smooth' });
+        }, 300);
+    }
+}
+
 // ==========================================
 // RENDERING
 // ==========================================
+
+// Renderizar resumen por categorías
+function renderCategorySummary() {
+    const container = document.getElementById('categorySummaryGrid');
+    if (!container) return;
+
+    // Agrupar transacciones por categoría
+    const categoryMap = {};
+    filteredTransactions.forEach(t => {
+        const catId = t.category;
+        const catName = t.categoryName || 'Sin categoría';
+        const catIcon = t.categoryIcon || '📌';
+        const catType = t.type || 'expense';
+
+        if (!categoryMap[catId]) {
+            categoryMap[catId] = {
+                id: catId,
+                name: catName,
+                icon: catIcon,
+                type: catType,
+                total: 0,
+                count: 0,
+                transactions: []
+            };
+        }
+        categoryMap[catId].total += Math.abs(t.amount || 0);
+        categoryMap[catId].count += 1;
+        categoryMap[catId].transactions.push(t);
+    });
+
+    const categories = Object.values(categoryMap).sort((a, b) => b.total - a.total);
+
+    if (categories.length === 0) {
+        container.innerHTML = `
+            <div class="category-empty">
+                <div class="category-empty-icon">📊</div>
+                <div class="category-empty-text">No hay transacciones para mostrar</div>
+                <div style="font-size: 12px; color: #666;">Crea tu primera transacción para verla aquí</div>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = categories.map(cat => {
+        const currency = (filteredTransactions.find(t => t.category === cat.id)?.accountCurrency) || 'USD'; 
+        const isExpense = cat.type === 'expense';
+        const typeLabel = isExpense ? 'Gastos' : 'Ingresos';
+        
+        return `
+            <div class="category-card ${cat.type}">
+                <div class="category-card-header">
+                    <div class="category-icon">${cat.icon}</div>
+                    <div class="category-name">
+                        <span class="category-title">${cat.name}</span>
+                        <span class="category-type">${typeLabel}</span>
+                    </div>
+                    <span class="category-count">${cat.count}</span>
+                </div>
+                
+                <div class="category-card-body">
+                    <div class="category-total">
+                        ${isExpense ? '−' : '+'} ${formatCurrencyTx(cat.total, currency)}
+                    </div>
+                    <div class="category-trend ${isExpense ? 'negative' : ''}">
+                        ${isExpense ? '↓' : '↑'} ${cat.count} transacción${cat.count !== 1 ? 'es' : ''}
+                    </div>
+                </div>
+                
+                <div class="category-card-footer">
+                    <div class="category-actions">
+                        <button class="category-btn-small" onclick="filterByCategory('${cat.name}')">
+                            <i class="fas fa-filter"></i> Filtrar
+                        </button>
+                    </div>
+                    <div class="category-view-all">
+                        Ver detalles →
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
 
 function renderTransactions() {
     console.log('=== RENDERIZANDO TRANSACCIONES ===');
@@ -465,6 +560,7 @@ function applyFilters() {
 
     currentPage = 1;
     applySorting();
+    renderCategorySummary();
     renderTransactions();
 }
 
