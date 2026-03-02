@@ -61,6 +61,32 @@ docs/
 
 ---
 
+## 🎙️ Documentación de Chat de Voz
+
+### Nueva Funcionalidad: Chat de Voz Bidireccional
+
+| Documento | Descripción | Audiencia | Tiempo Lectura |
+|-----------|-------------|-----------|----------------|
+| [📋 Resumen Ejecutivo](VOICE_CHAT_EXECUTIVE_SUMMARY.md) | Decisión de negocio, costos, ROI, timeline | Gerencia, Product Managers | 5 min |
+| [📖 Especificación Técnica Completa](VOICE_CHAT_REDESIGN_SPEC.md) | Arquitectura detallada, stack, implementación | Desarrolladores, Arquitectos | 30 min |
+| [🚀 Guía de Inicio Rápido](VOICE_CHAT_QUICK_START.md) | Implementación en 30 minutos, código listo | Desarrolladores | 10 min |
+
+**Estado**: Propuesta técnica completa ✅  
+**Próximo paso**: Revisión y aprobación para implementación
+
+#### Resumen Rápido
+
+El rediseño del chat de voz propone:
+- ✅ **Voz bidireccional** (usuario habla → sistema responde en voz)
+- ✅ **100% funcionalidades accesibles** por comandos de voz naturales
+- ✅ **Costo mínimo**: $0-10/mes (soluciones gratuitas/open source)
+- ✅ **Stack**: Whisper (STT) + Groq Llama 3.3 (NLU) + gTTS/pyttsx3 (TTS)
+- ✅ **Timeline**: 4-8 semanas hasta producción
+
+**Leer primero**: [Resumen Ejecutivo](VOICE_CHAT_EXECUTIVE_SUMMARY.md) (5 min)
+
+---
+
 ## 📊 Stack Tecnológico
 
 ### Backend

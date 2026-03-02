@@ -417,6 +417,41 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Clean chat button (trash icon)
+    const cleanChatBtn = document.getElementById('btnCleanChat');
+    if (cleanChatBtn) {
+        cleanChatBtn.addEventListener('click', async () => {
+            if (confirm('¿Limpiar todo el historial de chat? Esta acción no se puede deshacer.')) {
+                try {
+                    await api.clearChatHistory();
+
+                    // Limpiar historial de navegación
+                    messageHistory = [];
+                    historyIndex = -1;
+                    currentDraft = '';
+
+                    chatMessages.innerHTML = `
+                        <div class="message-group ai-message">
+                            <div class="message-avatar">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="message-content">
+                                <div class="message-bubble">
+                                    <p>✨ Historial limpiado. Podemos empezar de nuevo.</p>
+                                    <p>Solo háblame naturalmente, por ejemplo: <em>"Gasté 50.000 en supermercado"</em> o <em>"¿Cuánto llevo gastado este mes?"</em></p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                } catch (err) {
+                    console.error('Error clearing chat:', err);
+                    alert('No se pudo limpiar el historial');
+                }
+            }
+        });
+    }
+
     // Initial setup
     sendBtn.disabled = true;
 });

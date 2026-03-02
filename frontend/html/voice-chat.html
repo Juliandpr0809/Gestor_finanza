@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎙️ Chat de Voz - OrdenC</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .voice-button-container {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        
+        #voiceButton {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 60px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #voiceButton:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.6);
+        }
+        
+        #voiceButton:active {
+            transform: scale(0.95);
+        }
+        
+        #voiceButton.recording {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+        
+        #status {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 18px;
+            color: #555;
+            min-height: 25px;
+        }
+        
+        #status.listening {
+            color: #f5576c;
+            font-weight: bold;
+        }
+        
+        #status.processing {
+            color: #764ba2;
+            font-weight: bold;
+        }
+        
+        #status.ready {
+            color: #4caf50;
+            font-weight: bold;
+        }
+        
+        .result-box {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            display: none;
+        }
+        
+        .result-box.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .result-label {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .result-content {
+            color: #333;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+        
+        .examples {
+            margin-top: 30px;
+            padding: 20px;
+            background: #e8eaf6;
+            border-radius: 12px;
+        }
+        
+        .examples h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .example-item {
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .example-item:hover {
+            background: #667eea;
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .example-item i {
+            width: 20px;
+        }
+        
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(102, 126, 234, 0.3);
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .error.show {
+            display: block;
+        }
+        
+        .info-box {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .info-box strong {
+            color: #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎙️ Chat de Voz</h1>
+        <p class="subtitle">Habla con tu asistente financiero</p>
+        
+        <div class="info-box">
+            <strong>💡 Cómo usar:</strong><br>
+            1. Presiona el botón del micrófono<br>
+            2. Di tu comando (ej: "¿Cuál es mi balance?")<br>
+            3. Presiona de nuevo para detener<br>
+            4. Escucha la respuesta en voz
+        </div>
+        
+        <div class="voice-button-container">
+            <button id="voiceButton">
+                <i class="fas fa-microphone"></i>
+            </button>
+        </div>
+        
+        <div id="status">Presiona el botón para hablar</div>
+        
+        <div id="transcriptionBox" class="result-box">
+            <div class="result-label">
+                <i class="fas fa-comment"></i>
+                Tú dijiste:
+            </div>
+            <div id="transcriptionText" class="result-content"></div>
+        </div>
+        
+        <div id="responseBox" class="result-box">
+            <div class="result-label">
+                <i class="fas fa-robot"></i>
+                Respuesta:
+            </div>
+            <div id="responseText" class="result-content"></div>
+        </div>
+        
+        <div id="errorBox" class="error"></div>
+        
+        <div class="examples">
+            <h3>💬 Ejemplos de comandos:</h3>
+            <div class="example-item" data-text="Hola, ¿cuál es mi balance?">
+                <i class="fas fa-wallet"></i>
+                "¿Cuál es mi balance?"
+            </div>
+            <div class="example-item" data-text="Gasté cincuenta dólares en supermercado">
+                <i class="fas fa-shopping-cart"></i>
+                "Gasté 50 dólares en supermercado"
+            </div>
+            <div class="example-item" data-text="¿Cuánto gasté este mes?">
+                <i class="fas fa-chart-line"></i>
+                "¿Cuánto gasté este mes?"
+            </div>
+            <div class="example-item" data-text="Dame consejos para ahorrar">
+                <i class="fas fa-lightbulb"></i>
+                "Dame consejos para ahorrar"
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Elementos del DOM
+        const voiceButton = document.getElementById('voiceButton');
+        const status = document.getElementById('status');
+        const transcriptionBox = document.getElementById('transcriptionBox');
+        const transcriptionText = document.getElementById('transcriptionText');
+        const responseBox = document.getElementById('responseBox');
+        const responseText = document.getElementById('responseText');
+        const errorBox = document.getElementById('errorBox');
+        const exampleItems = document.querySelectorAll('.example-item');
+        
+        // Estado
+        let isRecording = false;
+        let mediaRecorder = null;
+        let audioChunks = [];
+        const API_URL = 'http://localhost:5000/api/chat/voice/process';
+        
+        // Obtener token del localStorage
+        function getToken() {
+            return localStorage.getItem('token');
+        }
+        
+        // Botón de voz
+        voiceButton.addEventListener('click', () => {
+            if (isRecording) {
+                stopRecording();
+            } else {
+                startRecording();
+            }
+        });
+        
+        // Iniciar grabación
+        async function startRecording() {
+            try {
+                // Ocultar resultados anteriores
+                transcriptionBox.classList.remove('show');
+                responseBox.classList.remove('show');
+                errorBox.classList.remove('show');
+                
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true,
+                        sampleRate: 16000
+                    }
+                });
+                
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                
+                mediaRecorder.ondataavailable = (event) => {
+                    audioChunks.push(event.data);
+                };
+                
+                mediaRecorder.onstop = () => {
+                    stream.getTracks().forEach(track => track.stop());
+                    processAudio();
+                };
+                
+                mediaRecorder.start();
+                isRecording = true;
+                
+                voiceButton.classList.add('recording');
+                voiceButton.innerHTML = '<i class="fas fa-stop"></i>';
+                status.textContent = '🎙️ Grabando... Presiona para detener';
+                status.className = 'listening';
+                
+            } catch (error) {
+                console.error('Error accessing microphone:', error);
+                showError('No se pudo acceder al micrófono. Por favor, permite el acceso.');
+            }
+        }
+        
+        // Detener grabación
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+            }
+            isRecording = false;
+            voiceButton.classList.remove('recording');
+            voiceButton.innerHTML = '<i class="fas fa-microphone"></i>';
+            status.textContent = '⏳ Procesando...';
+            status.className = 'processing';
+        }
+        
+        // Procesar audio
+        async function processAudio() {
+            try {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                
+                // Convertir a base64
+                const reader = new FileReader();
+                reader.readAsDataURL(audioBlob);
+                reader.onloadend = async () => {
+                    const base64Audio = reader.result.split(',')[1];
+                    
+                    // Enviar al backend
+                    const token = getToken();
+                    if (!token) {
+                        showError('No hay sesión activa. Por favor, inicia sesión primero.');
+                        resetStatus();
+                        return;
+                    }
+                    
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            audio: base64Audio
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        let errorMsg = errorData.error || 'Error procesando audio';
+                        let suggestion = '';
+                        
+                        if (response.status === 400) {
+                            // Audio inválido - sugerir re-grabar
+                            errorMsg = '🎤 ' + errorMsg;
+                            suggestion = ' Intenta hablar más fuerte, claro y en español.';
+                        } else if (response.status === 503) {
+                            // Servicio no disponible - sugerir esperar
+                            errorMsg = '⚠️ ' + errorMsg;
+                            suggestion = ' Intenta nuevamente en unos segundos.';
+                        }
+                        
+                        const details = errorData.details ? `\n${errorData.details}` : '';
+                        const hint = errorData.hint ? `\n\n💡 ${errorData.hint}` : suggestion;
+                        throw new Error(errorMsg + details + hint);
+                    }
+                    
+                    const result = await response.json();
+                    
+                    // Mostrar transcripción
+                    transcriptionText.textContent = result.transcription;
+                    transcriptionBox.classList.add('show');
+                    
+                    // Mostrar respuesta
+                    responseText.textContent = result.response_text;
+                    responseBox.classList.add('show');
+                    
+                    // Reproducir audio de respuesta (si disponible)
+                    if (result.response_audio) {
+                        try {
+                            const audioResponse = new Audio(`data:audio/mp3;base64,${result.response_audio}`);
+                            audioResponse.play().catch(err => {
+                                console.warn('Audio playback failed:', err);
+                                console.log('Response was received but audio could not be played');
+                            });
+                        } catch (audioErr) {
+                            console.warn('Audio creation failed:', audioErr);
+                        }
+                    } else if (result.tts_warning) {
+                        console.info('TTS warning:', result.tts_warning);
+                    }
+                    
+                    status.textContent = '✅ Listo - Presiona para hablar de nuevo';
+                    status.className = 'ready';
+                    
+                    console.log('✅ Voice processing successful:', result);
+                };
+                
+            } catch (error) {
+                console.error('Error processing voice:', error);
+                showError('Error: ' + error.message);
+                resetStatus();
+            }
+        }
+        
+        // Mostrar error
+        function showError(message) {
+            errorBox.textContent = '❌ ' + message;
+            errorBox.classList.add('show');
+        }
+        
+        // Resetear estado
+        function resetStatus() {
+            status.textContent = 'Presiona el botón para hablar';
+            status.className = '';
+        }
+        
+        // Ejemplos clickeables
+        exampleItems.forEach(item => {
+            item.addEventListener('click', async () => {
+                const text = item.dataset.text;
+                
+                // Ocultar resultados anteriores
+                transcriptionBox.classList.remove('show');
+                responseBox.classList.remove('show');
+                errorBox.classList.remove('show');
+                
+                status.textContent = '⏳ Procesando...';
+                status.className = 'processing';
+                
+                try {
+                    const token = getToken();
+                    if (!token) {
+                        showError('No hay sesión activa. Por favor, inicia sesión primero.');
+                        resetStatus();
+                        return;
+                    }
+                    
+                    // Enviar transcripción directa (sin audio)
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            transcription: text
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        let errorMsg = errorData.error || 'Error procesando comando';
+                        
+                        if (response.status === 503) {
+                            errorMsg = '⚠️ ' + errorMsg + '\nIntenta nuevamente en unos segundos.';
+                        }
+                        
+                        const details = errorData.details ? `\n${errorData.details}` : '';
+                        const hint = errorData.hint ? `\n\n💡 ${errorData.hint}` : '';
+                        throw new Error(errorMsg + details + hint);
+                    }
+                    
+                    const result = await response.json();
+                    
+                    // Mostrar resultados
+                    transcriptionText.textContent = result.transcription;
+                    transcriptionBox.classList.add('show');
+                    
+                    responseText.textContent = result.response_text;
+                    responseBox.classList.add('show');
+                    
+                    // Reproducir audio (si disponible)
+                    if (result.response_audio) {
+                        try {
+                            const audioResponse = new Audio(`data:audio/mp3;base64,${result.response_audio}`);
+                            audioResponse.play().catch(err => {
+                                console.warn('Audio playback failed:', err);
+                            });
+                        } catch (audioErr) {
+                            console.warn('Audio creation failed:', audioErr);
+                        }
+                    }
+                    
+                    status.textContent = '✅ Listo - Presiona para hablar de nuevo';
+                    status.className = 'ready';
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    showError('Error: ' + error.message);
+                    resetStatus();
+                }
+            });
+        });
+        
+        // Verificar conexión al cargar
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch('http://localhost:5000/api/chat/voice/test');
+                const data = await response.json();
+                console.log('✅ Voice service status:', data);
+            } catch (error) {
+                console.warn('⚠️ Could not check voice service status:', error);
+            }
+        });
+    </script>
+</body>
+</html>

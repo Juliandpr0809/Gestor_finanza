@@ -2,7 +2,15 @@
 Rutas para gestión del chat con IA
 """
 from flask import Blueprint, request, jsonify
-from rapidfuzz import process, fuzz
+
+# rapidfuzz es opcional (pesado para PythonAnywhere)
+try:
+    from rapidfuzz import process, fuzz
+    HAS_RAPIDFUZZ = True
+except ImportError:
+    HAS_RAPIDFUZZ = False
+    print("[WARNING] rapidfuzz no está instalado - Funcionalidad de búsqueda difusa deshabilitada")
+
 from models import db, User, ChatMessage, Transaction, Account, Category
 from datetime import datetime
 from utils.jwt_utils import get_user_id_from_header, AuthError
@@ -11,6 +19,52 @@ from utils.backup_utils import create_balance_backup, restore_balance_backup, ge
 from decimal import Decimal
 
 chat_bp = Blueprint('chat', __name__)
+
+def simple_fuzzy_match(query, choices):
+    """
+    Búsqueda difusa simple cuando rapidfuzz no está disponible
+    Retorna: (mejor_match, score) o (None, 0)
+    """
+    if not choices:
+        return (None, 0)
+    
+    query_lower = query.lower()
+    best_match = None
+    best_score = 0
+    
+    for choice in choices:
+        choice_lower = choice.lower()
+        
+        # Coincidencia exacta
+        if choice_lower == query_lower:
+            return (choice, 100)
+        
+        # Contiene la query
+        if query_lower in choice_lower:
+            score = 80
+            if best_score < score:
+                best_score = score
+                best_match = choice
+        
+        # Query contiene el choice
+        elif choice_lower in query_lower:
+            score = 70
+            if best_score < score:
+                best_score = score
+                best_match = choice
+    
+    return (best_match, best_score)
+
+def find_best_match(query, choices):
+    """
+    Encuentra la mejor coincidencia usando rapidfuzz si está disponible,
+    o fallback simple si no lo está
+    """
+    if HAS_RAPIDFUZZ:
+        match = process.extractOne(query, choices, scorer=fuzz.WRatio)
+        return match if match else (None, 0)
+    else:
+        return simple_fuzzy_match(query, choices)
 
 def get_user_id():
     """Obtener ID del usuario actual desde JWT"""
@@ -638,7 +692,7 @@ Estás a punto de eliminar **{tx_count} transacciones**.
             account_names = [a.name for a in accounts]
             
             # Buscar cuenta (fuzzy match)
-            match = process.extractOne(account_name, account_names, scorer=fuzz.WRatio)
+            match = find_best_match(account_name, account_names)
             
             target_account = None
             if match and match[1] >= 70:
@@ -679,7 +733,7 @@ def process_confirmation(user, user_id, last_control_action, confirmation_messag
             # Re-buscar cuenta (para seguridad)
             accounts = Account.query.filter_by(user_id=user_id, is_active=True).all()
             account_names = [a.name for a in accounts]
-            match = process.extractOne(account_name, account_names, scorer=fuzz.WRatio)
+            match = find_best_match(account_name, account_names)
             
             target_account = None
             if match and match[1] >= 70:
@@ -1579,3 +1633,205 @@ Ejemplo: *"Gasté 25000 en mercado"* o *"Ingreso de 50000 por salario"*"""
         'created_at': assistant_message.created_at.isoformat()
         }
     }), 201
+
+
+# ==========================================
+# VOICE CHAT ENDPOINTS
+# ==========================================
+
+@chat_bp.route('/voice/process', methods=['POST'])
+def voice_process():
+    """
+    Procesa comando de voz del usuario
+    Acepta: audio en base64 o transcripción ya hecha
+    Retorna: respuesta en texto y audio
+    """
+    user, error = get_user()
+    if error:
+        return error
+    
+    try:
+        import base64
+        from pathlib import Path
+        import uuid
+        
+        data = request.get_json(silent=True) or {}
+        
+        # Opción 1: Transcripción ya hecha (Web Speech API desde frontend)
+        if 'transcription' in data and isinstance(data['transcription'], str):
+            transcription = data['transcription'].strip()
+            if not transcription:
+                return jsonify({'error': 'La transcripción está vacía'}), 400
+            print("[VOICE] ✅ Using frontend transcription (Web Speech API)")
+        
+        # Opción 2: Audio para transcribir en backend (Deepgram)
+        elif 'audio' in data:
+            from services.voice_service import voice_service
+            if not voice_service.enabled:
+                return jsonify({
+                    'error': 'Transcripción de audio no disponible en el servidor',
+                    'details': 'Deepgram no está configurado o no está disponible',
+                    'hint': 'Usa el envío por transcripción de texto desde frontend'
+                }), 503
+
+            # Decodificar audio de base64
+            try:
+                audio_base64 = data['audio']
+                if isinstance(audio_base64, str) and audio_base64.startswith('data:'):
+                    # Formato data: URL
+                    audio_base64 = audio_base64.split(',')[1]
+                audio_data = base64.b64decode(audio_base64)
+            except Exception as e:
+                print(f"[VOICE] ❌ Error decodificando audio: {e}")
+                return jsonify({
+                    'error': 'El audio está corrupto o mal formateado',
+                    'details': str(e)
+                }), 400
+            
+            # Transcribir directamente con los datos binarios (más eficiente)
+            try:
+                transcription = voice_service.transcribe(audio_data)
+            except Exception as e:
+                error_msg = str(e)
+                
+                # Clasificar tipo de error
+                if '401' in error_msg or 'Invalid API Key' in error_msg:
+                    print(f"[VOICE] ❌ Auth error: {error_msg}")
+                    return jsonify({
+                        'error': 'Error de autenticación con Deepgram',
+                        'details': 'API Key inválido o expirado',
+                        'hint': 'Verifica que DEEPGRAM_API_KEY sea correcto en .env'
+                    }), 503
+                
+                # Errores del cliente (audio inválido, silencio, etc)
+                elif any(keyword in error_msg for keyword in ['silencio', 'sin resultados', 'muy corto', 'sin canales', 'lenguaje no detectado', 'confidence']):
+                    print(f"[VOICE] ⚠️ Invalid audio: {error_msg}")
+                    return jsonify({
+                        'error': 'No se pudo reconocer el audio',
+                        'details': error_msg,
+                        'hint': 'Asegúrate de hablar claramente y en español. El audio puede estar muy bajo, cortado o ser solo ruido.'
+                    }), 400
+                
+                # Otros errores (rate limit, timeout, etc)
+                else:
+                    print(f"[VOICE] ❌ Deepgram error: {error_msg}")
+                    return jsonify({
+                        'error': 'Error transcribiendo audio',
+                        'details': error_msg,
+                        'hint': 'Intenta nuevamente en unos segundos'
+                    }), 503
+            
+            print("[VOICE] ✅ Using backend transcription (Deepgram)")
+        
+        else:
+            return jsonify({
+                'error': 'Se requiere "transcription" o "audio"'
+            }), 400
+        
+        # Guardar mensaje del usuario
+        user_message = ChatMessage(
+            user_id=user.id,
+            role='user',
+            content=transcription,
+            message_metadata={'input_type': 'voice'}
+        )
+        db.session.add(user_message)
+        db.session.commit()
+        
+        # Procesar con IA (Groq)
+        response_text = ai_service.chat(user.id, transcription)
+        
+        # Guardar respuesta
+        assistant_message = ChatMessage(
+            user_id=user.id,
+            role='assistant',
+            content=response_text,
+            message_metadata={'input_type': 'voice', 'output_type': 'voice'}
+        )
+        db.session.add(assistant_message)
+        db.session.commit()
+        
+        # Generar audio de respuesta
+        audio_response_data = None
+        audio_format = None
+        tts_warning = None
+        
+        try:
+            from services.tts_service import tts_service
+            
+            try:
+                audio_path = tts_service.synthesize(response_text)
+                
+                # Validar que el archivo existe y tiene contenido
+                if not audio_path.exists():
+                    raise Exception(f"Audio file not created: {audio_path}")
+                
+                if audio_path.stat().st_size == 0:
+                    raise Exception(f"Audio file is empty: {audio_path}")
+                
+                # Leer audio generado y convertir a base64
+                with open(audio_path, 'rb') as f:
+                    audio_data = f.read()
+                    if len(audio_data) > 0:
+                        audio_response_data = base64.b64encode(audio_data).decode('utf-8')
+                        audio_format = 'mp3'
+                        print(f"[VOICE] ✅ Audio generated: {len(audio_data)} bytes")
+                    else:
+                        raise Exception("Audio file contains no data")
+                        
+            except Exception as tts_error:
+                tts_error_msg = str(tts_error)
+                print(f"[VOICE] ⚠️ TTS error: {tts_error_msg}")
+                
+                # No fallar completamente, solo advertir
+                tts_warning = f"Audio generation failed: {tts_error_msg}"
+                # El usuario recibirá la respuesta de texto aunque no tenga audio
+                
+        except Exception as e:
+            print(f"[VOICE] ⚠️ Unexpected TTS error: {e}")
+            tts_warning = f"TTS system error: {str(e)}"
+        
+        print(f"[VOICE] ✅ Response generated for user {user.id}")
+        
+        # Devolver siempre 200 con respuesta de texto (audio es optional)
+        return jsonify({
+            'transcription': transcription,
+            'response_text': response_text,
+            'response_audio': audio_response_data,
+            'audio_format': audio_format,
+            'tts_warning': tts_warning,
+            'user_message_id': user_message.id,
+            'assistant_message_id': assistant_message.id
+        }), 200
+        
+    except Exception as e:
+        print(f"[VOICE] ❌ Error: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'error': 'Error procesando comando de voz',
+            'details': str(e)
+        }), 500
+
+
+@chat_bp.route('/voice/test', methods=['GET'])
+def voice_test():
+    """
+    Endpoint de prueba para verificar que los servicios de voz funcionan
+    """
+    try:
+        from services.voice_service import voice_service
+        from services.tts_service import tts_service
+        
+        return jsonify({
+            'voice_enabled': voice_service.enabled,
+            'tts_enabled': True,
+            'message': '✅ Servicios de voz configurados correctamente' if voice_service.enabled else '⚠️ Deepgram no configurado'
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            'voice_enabled': False,
+            'tts_enabled': False,
+            'error': str(e)
+        }), 500
