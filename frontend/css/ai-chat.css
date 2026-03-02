@@ -2,7 +2,9 @@
    AI CHAT - MODERN INTERFACE
    ========================================== */
 
-
+* {
+    box-sizing: border-box;
+}
 
 /* ==========================================
     CHAT HEADER
@@ -22,6 +24,7 @@
     /* Remove padding, handle in children */
     background: #06070c;
     position: relative;
+    width: 100%;
 }
 
 /* Fix para móviles: restar espacio de la barra de navegación */
@@ -425,9 +428,10 @@
 
 .chat-messages {
     flex: 1;
+    min-height: 0;  /* CRUCIAL para que flex: 1 funcione en FF y Chrome */
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 20px 0 12px 0;
+    padding: 20px 20px 8px 20px;  /* Padding horizontal igual, vertical mínimo */
     display: flex;
     flex-direction: column;
     gap: 24px;
@@ -466,6 +470,15 @@
     /* ✅ PERMITIR SELECCIÓN DE TEXTO */
     -webkit-user-select: text;
     user-select: text;
+    margin: 0;
+    padding: 0 20px;
+    flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    .message-group {
+        padding: 0 16px;
+    }
 }
 
 @keyframes messageSlide {
@@ -534,13 +547,17 @@
 }
 
 .message-bubble p {
-    margin: 0 0 8px 0;
+    margin: 0;
     /* ✅ Asegurar que el texto sea seleccionable */
     -webkit-user-select: text;
     user-select: text;
 }
 
 .message-bubble p:last-child {
+    margin: 0;
+}
+
+.message-group:last-child {
     margin-bottom: 0;
 }
 
@@ -622,23 +639,28 @@
    ========================================== */
 
 .chat-input-container {
-    padding: 12px 20px 16px 20px;
+    padding: 8px 20px 16px 20px;
     /* More bottom padding for safe area */
     border-top: 1px solid rgba(255, 255, 255, 0.06);
     background: #06070c;
     /* Ensure background handles transparency */
     flex-shrink: 0;
-    z-index: 100;
     overflow-y: hidden;
     overflow-x: hidden;
     position: relative;
+    z-index: 100;
+    margin: 0;
 }
 
 /* Asegurar que el input siempre sea visible y accesible */
 @media (max-width: 768px) {
+    .chat-messages {
+        padding: 16px 16px 4px 16px;
+    }
+    
     .chat-input-container {
-        padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
-        margin-bottom: 0;
+        padding: 6px 16px calc(8px + env(safe-area-inset-bottom));
+        margin: 0;
     }
 }
 
@@ -903,13 +925,19 @@
         max-width: 95%;
     }
 
+    .chat-messages {
+        padding: 16px 16px 4px 16px;
+        flex: 1 1 auto;  /* Asegurar flex máximo */
+        min-height: 0;   /* Permitir que se contraiga */
+    }
+
     .chat-input-container {
         position: static;
         /* Flex item */
         flex-shrink: 0;
         border-top: 1px solid rgba(255, 255, 255, 0.06);
         background: #06070c;
-        padding: 10px 16px calc(10px + env(safe-area-inset-bottom)) !important;
+        padding: 6px 16px calc(8px + env(safe-area-inset-bottom)) !important;
     }
 }
 
@@ -1001,4 +1029,39 @@
         transform: translateY(-2px);
         background: rgba(255, 255, 255, 0.03);
     }
+}
+
+/* ==========================================
+   UNIVERSAL FIX - Cualquier zoom y tamaño
+   ========================================== */
+@supports (min-height: 0) {
+    .chat-messages {
+        min-height: 0;
+        flex: 1 1 auto;
+    }
+}
+
+/* Prevenir espacios con line-height */
+body {
+    line-height: 1;
+}
+
+.chat-container {
+    line-height: normal;
+}
+
+.chat-messages {
+    line-height: normal;
+}
+
+.message-group {
+    line-height: normal;
+}
+
+/* Asegurar que no hay espacios de rendering por defecto */
+.chat-input-form,
+.chat-messages::-webkit-scrollbar,
+.chat-messages::-webkit-scrollbar-track,
+.chat-messages::-webkit-scrollbar-thumb {
+    background-clip: padding-box;
 }
