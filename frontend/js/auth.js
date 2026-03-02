@@ -118,10 +118,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     // LOGIN FORM SUBMISSION
     // ==========================================
+    // LOGIN FORM SUBMISSION
+    // ==========================================
 
     if (loginForm) {
-        // Cargar datos guardados si existe "Remember Me"
-        const savedEmail = localStorage.getItem('rememberedEmail');
+        // Cargar credenciales guardadas si existen
         const rememberCheckbox = document.getElementById('remember');
         const loginTermsCheckbox = document.getElementById('loginTerms');
         const emailInput = document.getElementById('email');
@@ -137,46 +138,59 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
-        if (savedEmail) {
-            emailInput.value = savedEmail;
-            if (rememberCheckbox) {
-                rememberCheckbox.checked = true;
+        // Restaurar credenciales si están guardadas
+        if (typeof CredentialStore !== 'undefined' && CredentialStore.hasCredentials()) {
+            const credentials = CredentialStore.loadCredentials();
+            
+            if (credentials) {
+                emailInput.value = credentials.email;
+                passwordInput.value = credentials.password;
+                
+                if (rememberCheckbox) {
+                    rememberCheckbox.checked = true;
+                }
+
+                // Mostrar indicador de credenciales guardadas
+                if (savedIndicator) {
+                    savedIndicator.style.display = 'block';
+                }
+
+                emailInput.style.borderColor = 'rgba(102, 126, 234, 0.3)';
+                passwordInput.style.borderColor = 'rgba(102, 126, 234, 0.3)';
+                emailInput.style.paddingRight = '40px';
+
+                setTimeout(() => {
+                    showAuthMessage('success', '¡Bienvenido de nuevo!', `Tus credenciales están listas`);
+                }, 500);
+                
+                console.log('✅ Credenciales restauradas automáticamente');
             }
-
-            // Pre-chequear términos si el usuario ya los aceptó
-            try {
-                const accepted = localStorage.getItem('accepted_login_terms') === 'true';
-                if (loginTermsCheckbox) loginTermsCheckbox.checked = !!accepted;
-            } catch (_) {}
-
-            // Mostrar indicador de email guardado
-            if (savedIndicator) {
-                savedIndicator.style.display = 'block';
-            }
-
-            // Agregar indicador visual de que el email está guardado
-            emailInput.style.borderColor = 'rgba(0, 212, 106, 0.3)';
-            emailInput.style.paddingRight = '40px'; // Espacio para el ícono
-
-            // Mostrar mensaje de bienvenida si existe showToast
-            setTimeout(() => {
-                showAuthMessage('info', '¡Bienvenido de nuevo!', `Hemos recordado tu email: ${savedEmail}`);
-            }, 500);
         }
 
-        // Actualizar borde del email cuando cambie el checkbox
+        // Pre-chequear términos si el usuario ya los aceptó
+        try {
+            const accepted = localStorage.getItem('accepted_login_terms') === 'true';
+            if (loginTermsCheckbox) loginTermsCheckbox.checked = !!accepted;
+        } catch (_) {}
+
+        // Limpiar credenciales cuando se desmarca el checkbox
         if (rememberCheckbox) {
             rememberCheckbox.addEventListener('change', (e) => {
-                if (e.target.checked) {
-                    emailInput.style.borderColor = 'rgba(107, 159, 255, 0.3)';
-                } else {
+                if (!e.target.checked && typeof CredentialStore !== 'undefined') {
+                    CredentialStore.clearCredentials();
+                    passwordInput.value = '';
                     emailInput.style.borderColor = '';
+                    passwordInput.style.borderColor = '';
+                    showAuthMessage('info', 'Credenciales borradas', 'Tendrás que ingresarlas la próxima vez');
                 }
             });
         }
 
         // Ocultar indicador cuando el usuario edite el email
         emailInput.addEventListener('input', () => {
+            const savedCreds = CredentialStore && CredentialStore.hasCredentials() ? CredentialStore.loadCredentials() : null;
+            const savedEmail = savedCreds ? savedCreds.email : null;
+            
             if (savedIndicator && emailInput.value !== savedEmail) {
                 savedIndicator.style.display = 'none';
                 emailInput.style.paddingRight = '16px';
@@ -205,16 +219,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.log('Token guardado en localStorage:', localStorage.getItem('token'));
 
                     // Manejar "Remember Me"
-                    if (rememberMe) {
-                        // Guardar email para la próxima vez
-                        localStorage.setItem('rememberedEmail', identifier);
-                        // Marcar que debe recordar la sesión
+                    if (rememberMe && typeof CredentialStore !== 'undefined') {
+                        // Guardar credenciales de forma segura
+                        CredentialStore.saveCredentials(identifier, password);
                         localStorage.setItem('rememberSession', 'true');
-                        console.log('✅ Sesión guardada - Remember Me activado');
+                        console.log('✅ Sesión y credenciales guardadas - Remember Me activado');
                     } else {
-                        // Limpiar email guardado
-                        localStorage.removeItem('rememberedEmail');
-                        // Marcar que NO debe recordar (usar sessionStorage para el token)
+                        // Limpiar credenciales guardadas
+                        if (typeof CredentialStore !== 'undefined') {
+                            CredentialStore.clearCredentials();
+                        }
                         localStorage.removeItem('rememberSession');
                         console.log('✅ Sesión temporal - Remember Me desactivado');
                     }
@@ -301,6 +315,14 @@ document.addEventListener('DOMContentLoaded', () => {
             api.register(email, password, username)
                 .then((data) => {
                     console.log('Register successful:', data);
+                    
+                    // Guardar credenciales automáticamente después del registro
+                    if (typeof CredentialStore !== 'undefined') {
+                        CredentialStore.saveCredentials(email, password);
+                        localStorage.setItem('rememberSession', 'true');
+                        console.log('✅ Credenciales guardadas automáticamente después del registro');
+                    }
+                    
                     window.location.href = '/frontend/html/index.html';
                 })
                 .catch((err) => {
