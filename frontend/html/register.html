@@ -80,14 +80,16 @@
                     <p data-i18n="register.subtitle">Únete a miles de usuarios gestionando mejor sus finanzas</p>
                 </div>
 
-                <form class="auth-form" id="registerForm">
+                <form class="auth-form" id="registerForm" autocomplete="on">
                     <div class="form-row">
                         <div class="form-group">
                             <label for="firstName">
                                 <i class="fas fa-user"></i>
                                 <span data-i18n="First Name">Nombre</span>
                             </label>
-                            <input type="text" id="firstName" class="form-input" data-i18n-placeholder="First Name" placeholder="Juan" required>
+                            <input type="text" id="firstName" name="given-name" class="form-input" 
+                                autocomplete="given-name" 
+                                data-i18n-placeholder="First Name" placeholder="Juan" required>
                         </div>
 
                         <div class="form-group">
@@ -95,7 +97,9 @@
                                 <i class="fas fa-user"></i>
                                 <span data-i18n="Last Name">Apellido</span>
                             </label>
-                            <input type="text" id="lastName" class="form-input" data-i18n-placeholder="Last Name" placeholder="Pérez" required>
+                            <input type="text" id="lastName" name="family-name" class="form-input" 
+                                autocomplete="family-name" 
+                                data-i18n-placeholder="Last Name" placeholder="Pérez" required>
                         </div>
                     </div>
 
@@ -104,7 +108,9 @@
                             <i class="fas fa-envelope"></i>
                             <span data-i18n="Email Address">Correo Electrónico</span>
                         </label>
-                        <input type="email" id="emailRegister" class="form-input" placeholder="tu@correo.com" required>
+                        <input type="email" id="emailRegister" name="email" class="form-input" 
+                            autocomplete="email" 
+                            placeholder="tu@correo.com" required>
                     </div>
 
                     <div class="form-group">
@@ -113,7 +119,9 @@
                             <span data-i18n="Password">Contraseña</span>
                         </label>
                         <div class="password-input-wrapper">
-                            <input type="password" id="passwordRegister" class="form-input"
+                            <input type="password" id="passwordRegister" name="new-password" class="form-input"
+                                autocomplete="new-password" 
+                                placeholder="Crea una contraseña segura"
                                 data-i18n-placeholder="Create a strong password" required>
                             <button type="button" class="btn-toggle-password" id="togglePasswordRegister">
                                 <i class="fas fa-eye"></i>
@@ -133,7 +141,9 @@
                             <span data-i18n="Confirm Password">Confirmar Contraseña</span>
                         </label>
                         <div class="password-input-wrapper">
-                            <input type="password" id="confirmPassword" class="form-input"
+                            <input type="password" id="confirmPassword" name="new-password-confirm" class="form-input"
+                                autocomplete="new-password" 
+                                placeholder="Repite tu contraseña"
                                 data-i18n-placeholder="Confirm your password" required>
                             <button type="button" class="btn-toggle-password" id="toggleConfirmPassword">
                                 <i class="fas fa-eye"></i>

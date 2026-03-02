@@ -1,6 +1,6 @@
 // Service Worker para OrdenC - PWA
-// Versión 4.5 - Arreglar scroll en chat IA con zoom completo
-const CACHE_NAME = 'ordenc-v4.5';
+// Versión 4.6 - Autocompletado de contraseñas + Recuperación de contraseña
+const CACHE_NAME = 'ordenc-v4.6';
 const urlsToCache = [
   '/frontend/html/index.html',
   '/frontend/html/login.html',
@@ -8,6 +8,8 @@ const urlsToCache = [
   '/frontend/html/accounts.html',
   '/frontend/html/transactions.html',
   '/frontend/html/ai-chat.html',
+  '/frontend/html/forgot-password.html',
+  '/frontend/html/reset-password.html',
   '/frontend/html/new-transaction.html',
   '/frontend/css/modern-theme.css',
   '/frontend/css/unified-pages.css',

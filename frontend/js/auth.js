@@ -125,6 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const rememberCheckbox = document.getElementById('remember');
         const loginTermsCheckbox = document.getElementById('loginTerms');
         const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
         const savedIndicator = document.getElementById('savedEmailIndicator');
         const setLoginFeedback = (type, message) => {
             if (!loginFeedback) return;
