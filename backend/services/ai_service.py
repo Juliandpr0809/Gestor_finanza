@@ -682,6 +682,7 @@ Sé conciso y práctico."""
         keywords_expense = [
             # Verbos directos
             'gast', 'compré', 'compre', 'compr', 'compra', 'comprado',
+            'comí', 'comi', 'me comí', 'me comi',
             'pagué', 'pague', 'pagado', 'pago', 'pagar',
             'retiré', 'retire', 'retiro', 'saqué', 'saque', 'saco',
             'transferí', 'transferencia', 'enviado', 'envié', 'envio',
@@ -710,6 +711,7 @@ Sé conciso y práctico."""
             'ingres', 'ingresa', 'ingresó',
             'recibí', 'recibe', 'recibido', 'recib',
             'cobré', 'cobre', 'cobrado', 'cobr',
+            'pagó', 'pago', 'consignó', 'consigno', 'transferido',
             'ganancia', 'gané', 'gano', 'ganador',
             'depositaron', 'depósito', 'deposito', 'depos',
             'acreditaron', 'acreditada', 'crédito', 'acredit',
@@ -724,7 +726,7 @@ Sé conciso y práctico."""
             'me llegó', 'me llego', 'me llegaron',
             'me depositaron', 'me depos',
             'me acreditaron', 'me acredit',
-            'me pagaron', 'me pagar',
+            'me pagaron', 'me pagó', 'me pago', 'me pagar',
             'me dieron', 'me regalo',
             # Sustantivos de ingreso
             'salario', 'sueldo', 'nómina', 'propina',
@@ -777,7 +779,9 @@ Sé conciso y práctico."""
         # También detectar frases comunes sin palabra clave explícita
         implicit_patterns = [
             r'\d+[.,\d]*\s+(en|de|para|por)\s+\w+',  # "25000 en mercado"
+            r'\d+[.,\d]*\s+a\s+\d+[.,\d]*\s+cada',  # "3 fritos a 5k cada"
             r'(me|te|le)\s+(gast|compr|pag|recib|ingres)',  # "me gasté"
+            r'(me\s+com[ií]|com[ií])\s+\d+',
             r'\d+[.,\d]*\s+(cop|usd|pesos|dolares|€)',  # "25000 pesos"
         ]
         
@@ -839,14 +843,19 @@ Sé conciso y práctico."""
         tx_type = 'expense'  # Default a gasto
         
         # Buscar palabras claras de GASTO
-        clear_expense_words = ['compr', 'gast', 'saque', 'retire', 'pagué', 'pague', 'pagado', 'debit', 'cancelé', 'cancel', 'me cobr', 'pasé', 'pase', 'di', 'dí', 'presté']
-        clear_income_words = ['recibí', 'recibe', 'cobré', 'cobre', 'ingres', 'ganancia', 'salario', 'sueldo', 'depósito', 'deposito', 'devolución', 'vendí', 'vendi']
+        clear_expense_words = ['compr', 'gast', 'comí', 'comi', 'saque', 'retire', 'pagué', 'pague', 'pagado', 'debit', 'cancelé', 'cancel', 'me cobr', 'pasé', 'pase', 'di', 'dí', 'presté']
+        clear_income_words = ['recibí', 'recibe', 'cobré', 'cobre', 'ingres', 'ganancia', 'salario', 'sueldo', 'depósito', 'deposito', 'devolución', 'vendí', 'vendi', 'me pagó', 'me pago', 'me pagaron', 'consignó', 'consigno']
         
         clear_expense = any(word in message_lower for word in clear_expense_words)
         clear_income = any(word in message_lower for word in clear_income_words)
         
         # Detectar contexto con pronombre pasivo "me" para ingresos
-        has_passive_me_income = 'me' in message_lower and any(word in message_lower for word in ['llegó', 'llego', 'depositaron', 'depos', 'acreditaron', 'acredit', 'pagaron', 'dieron', 'regalo'])
+        has_passive_me_income = 'me' in message_lower and any(word in message_lower for word in ['llegó', 'llego', 'depositaron', 'depos', 'acreditaron', 'acredit', 'pagaron', 'pagó', 'pago', 'dieron', 'regalo', 'consignó', 'consigno'])
+
+        # Si explícitamente dice "me pagó/me pagaron", forzar ingreso
+        if any(phrase in message_lower for phrase in ['me pagó', 'me pago', 'me pagaron', 'me consignó', 'me consigno']):
+            clear_income = True
+            clear_expense = False
         
         if clear_expense:
             tx_type = 'expense'
@@ -1705,6 +1714,279 @@ Responde SOLO con el consejo, sin explicaciones adicionales."""
                 'action': 'zero_accounts',
                 'raw_message': message
             }
+        
+        return None
+
+    def clean_user_input(self, message):
+        """
+        🧹 LIMPIEZA BRUTAL DE ENTRADA
+        - Remover emojis
+        - Remover texto pegado (múltiples líneas de respuestas anteriores)
+        - Normalizar espacios
+        - Detectar intención real del usuario
+        """
+        import re
+        
+        original = message
+        
+        # 1️⃣ REMOVER EMOJIS Y SÍMBOLOS ESPECIALES VISUALES
+        emoji_pattern = re.compile(
+            "["
+            "\U0001F600-\U0001F64F"  # Emojis
+            "\U0001F300-\U0001F5FF"
+            "\U0001F680-\U0001F6FF"  
+            "\U0001F1E0-\U0001F1FF"
+            "\U00002702-\U000027B0"
+            "\U000024C2-\U0001F251"
+            "\U0001f926-\U0001f937"
+            "\U00010000-\U0010ffff"
+            "\u2640-\u2642"
+            "\u2600-\u2B55"
+            "\u200d"
+            "\u23cf"
+            "\u23e9"
+            "\u231a"
+            "\ufe0f"  # Variante de emoji
+            "\u3030"
+            "]+"
+        )
+        text = emoji_pattern.sub('', message).strip()
+        
+        # 2️⃣ REMOVER "<XXXX" tags (si hay parsing HTML accidental)
+        text = re.sub(r'<[^>]+>', '', text)
+        
+        # 3️⃣ REMOVER LÍNEAS QUE PARECEN RESPUESTAS ANTERIORES PEGADAS
+        # Detectar patrones como "✅ **Gasto registrado**", "🍟 **Gasto...", "❌ No pude..."
+        lines = text.split('\n')
+        cleaned_lines = []
+        
+        for line in lines:
+            line_stripped = line.strip()
+            if not line_stripped:
+                continue
+
+            # Líneas técnicas de respuestas anteriores que deben descartarse siempre
+            metadata_prefixes = [
+                '- **monto:', '- **cuenta:', '- **descripción:', '- **descripcion:',
+                '- **gasto:', '- **ingreso:', '- **nuevo balance:', '- **anterior:',
+                'monto:', 'cuenta:', 'descripción:', 'descripcion:', 'balance:',
+                '📊 **balance', '⚠️ **nota:', '💡 **recuerda', '🔄 **balance'
+            ]
+            lower_line = line_stripped.lower()
+            if any(lower_line.startswith(prefix) for prefix in metadata_prefixes):
+                continue
+
+            # Si la línea se ve como una respuesta del sistema (comienza con símbolos de respuesta)
+            # Y NO es la línea principal del usuario, ignorarla
+            is_response_line = any([
+                line_stripped.startswith('✅'),
+                line_stripped.startswith('❌'),
+                line_stripped.startswith('⚠️'),
+                line_stripped.startswith('📊'),
+                line_stripped.startswith('🍟'),
+                line_stripped.startswith('💡'),
+                line_stripped.startswith('📝'),
+                line_stripped.startswith('🔄'),
+                line_stripped.startswith('💰'),
+                line_stripped.startswith('📈'),
+                line_stripped.startswith('📉'),
+                line_stripped.startswith('✨'),
+                # Patrones de código de respuesta
+                re.match(r'^Gasto registrado|^Ingreso registrado|^Balance actualizado|^Transacción', line_stripped),
+                re.match(r'^\*\*', line_stripped),  # **Bold text** de respuestas
+            ])
+
+            # Si la línea contiene una intención clara del usuario, conservarla
+            has_user_action_words = any(token in lower_line for token in [
+                'aplica', 'aplíca', 'hazlo', 'registra', 'guarda', 'agrega', 'crea',
+                'cambia', 'modifica', 'edita', 'corrige', 'ajusta', 'cancela', 'no',
+                'dale', 'ok', 'si', 'sí'
+            ])
+            
+            # Si es respuesta del sistema, ignorar (aunque tenga números)
+            if is_response_line and not has_user_action_words:
+                continue
+            
+            cleaned_lines.append(line_stripped)
+        
+        # Reconstruir: quedarse con líneas que tengan contenido nuevo
+        text = ' '.join(cleaned_lines).strip()
+        
+        # 4️⃣ SI QUEDA VACÍO, REGRESAR ORIGINAL (fue solo símbolos)
+        if not text or text.isspace():
+            # Buscar al menos el primer número o palabra significativa
+            match = re.search(r'COP\s*[\d,.]+|USD\s*[\d,.]+|EUR\s*[\d,.]+|\d+|\w+', original)
+            if match:
+                text = match.group().strip()
+            else:
+                text = original.strip()
+        
+        # 5️⃣ NORMALIZAR ESPACIOS Y PUNTUACIÓN
+        text = re.sub(r'\s+', ' ', text)  # Múltiples espacios → uno
+        text = re.sub(r'\s+([.,!?])', r'\1', text)  # Espacio antes de puntuación
+        
+        return text.strip()
+
+    def detect_action_intent(self, message):
+        """
+        ⚡ DETECCIÓN DE INTENCIÓN DE APLICACIÓN/EJECUCIÓN
+        Detecta palabras que significan "aplica la última transacción"
+        
+        Returns:
+            str: Tipo de acción ('apply', 'edit', None)
+        """
+        message_lower = message.lower().strip()
+        
+        # ❌ RECHAZO (primero para evitar falsos positivos)
+        reject_keywords = [
+            'cancela', 'cancel', 'no', 'desecha', 'borr',
+            'elimina', 'olvida', 'olvídalo', 'olvide',
+            'atrás', 'atras', 'volver', 'no me',
+        ]
+
+        for keyword in reject_keywords:
+            if keyword in message_lower:
+                return 'reject'
+
+        # 🔧 PALABRAS CLAVE DE EDICIÓN (antes de apply)
+        edit_keywords = [
+            'cambiar', 'cambia', 'cámbiale', 'cambiale', 'modifica', 'edita', 'actualiza',
+            'corrige', 'ajusta', 'arregla', 'modifica nombre', 'cambiar monto',
+            'cambiar descripción', 'cambiar descripcion', 'cambiar cuenta', 'cambiar categoria',
+        ]
+
+        for keyword in edit_keywords:
+            if keyword in message_lower:
+                return 'edit'
+
+        # 🎯 PALABRAS CLAVE DE APLICACIÓN/EJECUCIÓN (sin confirmaciones ambiguas)
+        apply_keywords = [
+            'aplícalo', 'aplica', 'aplico', 'aplicala', 'aplicalo',
+            'hazlo', 'haz lo', 'hazlo pue', 'hazlo pues', 'haz', 'hezblo', 'hazo',
+            'registralo', 'registrala', 'registra',
+            'guardalo', 'guardala', 'guarda',
+            'agrega', 'agregalo', 'agregala', 'agregalo',
+            'confirmalo', 'confirma', 'confirmalo',
+            'crealo', 'crea',
+            'ejecuta', 'ejecutalo',
+            'dale pa', 'vamos',
+            'ándale', 'andale',
+        ]
+        
+        for keyword in apply_keywords:
+            if keyword in message_lower:
+                return 'apply'
+        
+        return None
+
+    def detect_confirmation_words(self, message):
+        """
+        ✅ DETECCIÓN AGRESIVA DE CONFIRMACIÓN
+        Simple affirmations that mean "YES, apply it"
+        """
+        message_lower = message.lower().strip()
+
+        # Negaciones primero
+        if any(neg in message_lower for neg in [' no ', 'no ', ' no', 'cancel', 'cancela', 'olvida']):
+            return False
+        
+        # Si el mensaje tiene menos de 15 caracteres y contiene confirmación, es confirmación
+        if len(message_lower) < 15:
+            simple_confirmations = [
+                'sí', 'si', 'ok', 'dale', 'listo', 'ya', 'bien',
+                'sipi', 'yes', 'ándale', 'andale', 'okey', 'okei',
+                'confirmo', 'acepto', 'aprobado', 'vai', 'vamo', 'claro',
+            ]
+            
+            for conf in simple_confirmations:
+                if conf == message_lower or message_lower.startswith(conf):
+                    return True
+        
+        # Patterns más largos pero claros
+        patterns = [
+            r'^(sí|si)[\s.,!]*$',
+            r'^está bien',
+            r'^está\s+bien',
+            r'^pues bien',
+            r'^ok[\s.,!]*$',
+            r'^dale[\s.,!]*$',
+            r'^listo[\s.,!]*$',
+            r'^confirmo[\s.,!]*$',
+            r'^acepto[\s.,!]*$',
+            r'^claro[\s.,!]*$',
+            r'^ok(\s+ok)+[\s.,!]*$',
+            r'^(sí|si)\s*(está\s+)?bien',
+            r'^está\s+bien,?\s*(sí|si)$',
+        ]
+        
+        import re
+        for pattern in patterns:
+            if re.match(pattern, message_lower):
+                return True
+        
+        return False
+
+    def extract_pending_transaction(self, messages_history):
+        """
+        🔍 EXTRAE TRANSACCIÓN SIMULADA DE HISTORIAL
+        Busca en los últimos mensajes del asistente si hay una transacción simulada
+        
+        Returns:
+            dict: {monto, cuenta, descripción, tipo} o None
+        """
+        import re
+        
+        # Buscar en los últimos 3 mensajes del asistente
+        for msg in reversed(messages_history[-3:]):
+            if msg.get('role') != 'assistant':
+                continue
+            
+            content = msg.get('content', '')
+            
+            # Buscar patrones de transacción simulada
+            # Patrón: "Monto: COP/USD/EUR XXXXX" o similar
+            monto_match = re.search(
+                r'(?:Monto|MONTO|Amount):\s*(?:COP|USD|EUR|MXN|ARS)?\s*([\d,.]+)',
+                content,
+                re.IGNORECASE
+            )
+            
+            if not monto_match:
+                continue
+            
+            # Extraer monto limpio
+            monto_str = monto_match.group(1).replace(',', '').replace('.', ',')
+            monto_str = monto_str.replace(',', '.')
+            monto = float(monto_str) if '.' in monto_str else float(monto_str.replace(',', ''))
+            
+            # Extraer cuenta
+            cuenta_match = re.search(
+                r'(?:Cuenta|CUENTA):\s*([^\n.]+)',
+                content,
+                re.IGNORECASE
+            )
+            cuenta = cuenta_match.group(1).strip() if cuenta_match else None
+            
+            # Extraer descripción
+            desc_match = re.search(
+                r'(?:Descripción|DESCRIPCIÓN|Description):\s*([^\n.]+)',
+                content,
+                re.IGNORECASE
+            )
+            descripcion = desc_match.group(1).strip() if desc_match else 'Transacción'
+            
+            # Detectar tipo (gasto o ingreso)
+            is_expense = 'gasto' in content.lower() or 'compró' in content.lower()
+            tx_type = 'expense' if is_expense else 'income'
+            
+            if monto and cuenta:
+                return {
+                    'monto': monto,
+                    'cuenta': cuenta,
+                    'descripcion': descripcion,
+                    'tipo': tx_type,
+                    'original_message': content
+                }
         
         return None
 

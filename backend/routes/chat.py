@@ -1041,11 +1041,15 @@ Ejemplo: *"USD"*"""
     if not data or not data.get('content'):
         return jsonify({'error': 'Contenido del mensaje vacío'}), 400
     
-    # Guardar mensaje del usuario
+    # 🧹 LIMPIAR ENTRADA BRUTAL: Remover emojis, texto pegado, etc.
+    user_input_raw = data['content']
+    user_input_clean = ai_service.clean_user_input(user_input_raw)
+    
+    # Guardar mensaje ORIGINAL (lo que escribió el usuario)
     user_message = ChatMessage(
         user_id=user_id,
         role='user',
-        content=data['content'],
+        content=user_input_raw,  # Guardar original para auditoría
         message_metadata=data.get('metadata')
     )
     
@@ -1055,16 +1059,151 @@ Ejemplo: *"USD"*"""
     # Obtener historial de conversación
     recent_messages = ChatMessage.query.filter_by(user_id=user_id).order_by(
         ChatMessage.created_at.desc()
-    ).limit(10).all()
+    ).limit(15).all()
     
     conversation_history = [
         {'role': m.role, 'content': m.content} 
         for m in reversed(recent_messages)
     ]
     
+    # ⚡ DETECTAR SI USUARIO QUIERE APLICAR UNA TRANSACCIÓN PREVIA SIMULADA
+    # Precedencia: 1) Palabras explícitas de acción, 2) Confirmación simple, 3) Lógica normal
+    action_intent = ai_service.detect_action_intent(user_input_clean)
+    is_confirmation = ai_service.detect_confirmation_words(user_input_clean)
+    
+    print(f"DEBUG: action_intent={action_intent}, is_confirmation={is_confirmation}")
+    print(f"DEBUG: user_input_clean='{user_input_clean}'")
+    
+    # Si detecta "aplícalo", "hazlo", etc. → intentar extraer última transacción simulada
+    if action_intent == 'apply' or (is_confirmation and action_intent != 'edit'):
+        print(f"DEBUG: Attempting to apply/confirm pending transaction...")
+        pending_tx = ai_service.extract_pending_transaction(conversation_history)
+        
+        if pending_tx:
+            print(f"DEBUG: Found pending transaction to apply: {pending_tx}")
+            
+            # Procesar la transacción extraída
+            account_name = pending_tx.get('cuenta')
+            monto = pending_tx.get('monto')
+            descripcion = pending_tx.get('descripcion')
+            tx_type = pending_tx.get('tipo', 'expense')
+            
+            # Buscar cuenta por nombre fuzzy match
+            accounts = Account.query.filter_by(user_id=user_id, is_active=True).all()
+            account = None
+            
+            if accounts:
+                account_names = [a.name for a in accounts]
+                # Búsqueda fuzzy del nombre
+                from rapidfuzz import process as rfuzz_process, fuzz
+                best_match = rfuzz_process.extractOne(
+                    account_name, 
+                    account_names, 
+                    scorer=fuzz.WRatio
+                )
+                
+                if best_match and best_match[1] >= 60:
+                    account = next(a for a in accounts if a.name == best_match[0])
+                else:
+                    account = accounts[0]  # Usar primera cuenta por defecto
+            
+            if account:
+                # Buscar o crear categoría
+                category = Category.query.filter(
+                    Category.user_id == user_id,
+                    Category.category_type == tx_type
+                ).first()
+                
+                if category:
+                    try:
+                        # Crear TRANSACCIÓN REAL
+                        sign = -1 if tx_type == 'expense' else 1
+                        new_transaction = Transaction(
+                            user_id=user_id,
+                            account_id=account.id,
+                            category_id=category.id,
+                            amount=monto * sign,
+                            description=descripcion,
+                            transaction_type=tx_type,
+                            transaction_date=datetime.utcnow()
+                        )
+                        
+                        # Actualizar balance
+                        if tx_type == 'expense':
+                            account.current_balance -= monto
+                        else:
+                            account.current_balance += monto
+                        
+                        account.updated_at = datetime.utcnow()
+                        
+                        db.session.add(new_transaction)
+                        db.session.commit()
+                        
+                        currency = user.preferred_currency
+                        ai_response = f"""✅ **¡TRANSACCIÓN APLICADA!**
+- **Monto:** {currency} {monto:,.2f}
+- **Cuenta:** {account.name}
+- **Descripción:** {descripcion}
+- **Tipo:** {'Gasto' if tx_type == 'expense' else 'Ingreso'}
+
+🔄 **Balance actualizado:** {currency} {account.current_balance:,.2f}
+
+¡Transacción registrada exitosamente! 🎉"""
+                        
+                        assistant_message = ChatMessage(
+                            user_id=user_id,
+                            role='assistant',
+                            content=ai_response,
+                            message_metadata={'type': 'transaction_applied', 'action': 'auto_apply'}
+                        )
+                        db.session.add(assistant_message)
+                        db.session.commit()
+                        
+                        return jsonify({
+                            'user_message': {
+                                'id': user_message.id,
+                                'role': 'user',
+                                'content': user_message.content,
+                                'created_at': user_message.created_at.isoformat()
+                            },
+                            'assistant_message': {
+                                'id': assistant_message.id,
+                                'role': 'assistant',
+                                'content': assistant_message.content,
+                                'created_at': assistant_message.created_at.isoformat()
+                            }
+                        }), 201
+                    except Exception as e:
+                        print(f"Error applying transaction: {e}")
+                        ai_response = f"❌ Error al aplicar transacción: {str(e)}"
+                        
+                        assistant_message = ChatMessage(
+                            user_id=user_id,
+                            role='assistant',
+                            content=ai_response,
+                            message_metadata={'type': 'transaction_apply_error'}
+                        )
+                        db.session.add(assistant_message)
+                        db.session.commit()
+                        
+                        return jsonify({
+                            'user_message': {
+                                'id': user_message.id,
+                                'role': 'user',
+                                'content': user_message.content,
+                                'created_at': user_message.created_at.isoformat()
+                            },
+                            'assistant_message': {
+                                'id': assistant_message.id,
+                                'role': 'assistant',
+                                'content': assistant_message.content,
+                                'created_at': assistant_message.created_at.isoformat()
+                            }
+                        }), 201
+    
     # Detectar si el usuario quiere SIMULAR (no crear real)
     simulate_keywords = ['simula', 'ejemplo', 'simulación', 'muestra ejemplo', 'como sería', 'cómo quedaría']
-    wants_simulation = any(keyword in data['content'].lower() for keyword in simulate_keywords)
+    wants_simulation = any(keyword in user_input_clean.lower() for keyword in simulate_keywords)
     
     # NUEVA ARQUITECTURA: La IA detecta primero qué comando es (SI ESTÁ DISPONIBLE)
     # Pero si falla, el fallback de regex funciona perfectamente
@@ -1286,8 +1425,8 @@ Ejemplo: *"USD"*"""
     # PRIORIDAD 1: Detectar comandos de control (REGEX LOCAL - MÁS RÁPIDO)
     # Estos comandos se procesan ANTES que transacciones/consultas
     print(f"DEBUG CHAT: Checking for control commands...")
-    print(f"DEBUG CHAT: Message content: '{data['content']}'")
-    control_cmd = ai_service.detect_control_command(data['content'])
+    print(f"DEBUG CHAT: Message content (clean): '{user_input_clean}'")
+    control_cmd = ai_service.detect_control_command(user_input_clean)
     print(f"DEBUG CHAT: Control command result: {control_cmd}")
     
     # PRIORIDAD 1.5: Verificar si hay acción pendiente (confirmación)
@@ -1384,7 +1523,7 @@ Ejemplo: *"USD"*"""
     
     # Si no es comando de control, continuar con detección de transacciones
     # OPTIMIZACIÓN: Detectar localmente primero, solo llamar IA si falla
-    intent = ai_service.detect_local_first(data['content'], user_id)
+    intent = ai_service.detect_local_first(user_input_clean, user_id)
 
     print(f"DEBUG CHAT: Intent detected = {intent}, wants_simulation = {wants_simulation}")
     
