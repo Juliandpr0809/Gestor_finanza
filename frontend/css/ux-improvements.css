@@ -58,8 +58,16 @@
     display: flex;
     gap: 8px;
     margin-bottom: 20px;
-    flex-wrap: wrap;
+    overflow-x: auto;
+    overflow-y: hidden;
     padding: 16px 0;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+    scroll-behavior: smooth;
+}
+
+.quick-filters::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Edge */
 }
 
 .filter-chip {
@@ -75,6 +83,8 @@
     display: flex;
     align-items: center;
     gap: 6px;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .filter-chip:hover {
@@ -492,14 +502,7 @@
    ========================================== */
 @media (max-width: 768px) {
     .quick-filters {
-        overflow-x: auto;
-        flex-wrap: nowrap;
         padding-bottom: 8px;
-        -webkit-overflow-scrolling: touch;
-    }
-    
-    .filter-chip {
-        flex-shrink: 0;
     }
     
     .category-icon {

@@ -1,4 +1,6 @@
-const CACHE_NAME = 'ordenc-v4.1';
+// Service Worker para OrdenC - PWA
+// Versión 4.2 - Mejoras UI: iconos FontAwesome y scroll horizontal en filtros
+const CACHE_NAME = 'ordenc-v4.2';
 const urlsToCache = [
   '/frontend/html/index.html',
   '/frontend/html/login.html',

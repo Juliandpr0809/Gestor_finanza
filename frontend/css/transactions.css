@@ -846,6 +846,11 @@
     transition: all 0.3s ease;
 }
 
+.category-icon i {
+    font-size: 24px;
+    color: #fff;
+}
+
 .category-card:hover .category-icon {
     transform: scale(1.08) rotate(-3deg);
     box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);

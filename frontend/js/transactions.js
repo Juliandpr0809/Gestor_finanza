@@ -348,10 +348,15 @@ function renderCategorySummary() {
         const typeLabel = isExpense ? 'Gastos' : 'Ingresos';
         const formattedAmount = formatCurrencyTx(cat.total, currency);
         
+        // Convertir nombre de clase FontAwesome a icono
+        const iconHtml = cat.icon.startsWith('fa-') 
+            ? `<i class="fas ${cat.icon}"></i>` 
+            : cat.icon;
+        
         return `
             <div class="category-card ${cat.type}" data-category-id="${cat.id}">
                 <div class="category-card-header">
-                    <div class="category-icon">${cat.icon}</div>
+                    <div class="category-icon">${iconHtml}</div>
                     <div class="category-name">
                         <span class="category-title">${cat.name}</span>
                         <span class="category-type">${typeLabel}</span>
