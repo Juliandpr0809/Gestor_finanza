@@ -400,18 +400,20 @@
     gap: 12px;
     cursor: pointer;
     position: relative;
-    padding: 8px 0;
-    background: rgba(255, 255, 255, 0.02);
-    padding-left: 12px;
-    padding-right: 12px;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    padding-left: 16px;
+    padding-right: 16px;
+    border-radius: 12px;
+    border: 1.5px solid rgba(102, 126, 234, 0.3);
     transition: all 0.2s ease;
 }
 
 .checkbox-container:hover {
-    background: rgba(107, 159, 255, 0.05);
-    border-color: rgba(107, 159, 255, 0.2);
+    background: rgba(102, 126, 234, 0.1);
+    border-color: rgba(102, 126, 234, 0.5);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
 }
 
 .checkbox-container input[type="checkbox"] {
@@ -425,9 +427,9 @@
 .checkbox-container .checkbox-custom {
     width: 24px;
     height: 24px;
-    border: 2.5px solid rgba(255, 255, 255, 0.3);
+    border: 2.5px solid rgba(102, 126, 234, 0.6);
     border-radius: 6px;
-    background: transparent;
+    background: rgba(255, 255, 255, 0.08);
     transition: all 0.3s ease;
     position: relative;
     flex-shrink: 0;
@@ -435,9 +437,9 @@
 }
 
 .checkbox-container input[type="checkbox"]:checked + .checkbox-custom {
-    background: linear-gradient(135deg, #6B9FFF 0%, #8B6BFF 100%);
-    border-color: #6B9FFF;
-    box-shadow: 0 0 12px rgba(107, 159, 255, 0.4);
+    background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+    border-color: #667EEA;
+    box-shadow: 0 0 16px rgba(102, 126, 234, 0.6);
 }
 
 .checkbox-container .checkbox-custom::after {
@@ -458,15 +460,16 @@
 }
 
 .checkbox-label {
-    font-size: 14px;
-    color: rgba(255, 255, 255, 0.7);
+    font-size: 15px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
     user-select: none;
     transition: color 0.2s ease;
     line-height: 1.5;
 }
 
 .checkbox-container:hover .checkbox-label {
-    color: rgba(255, 255, 255, 0.8);
+    color: #ffffff;
 }
 
 /* Email saved indicator */

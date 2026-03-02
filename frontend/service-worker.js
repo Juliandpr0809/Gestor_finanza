@@ -1,6 +1,6 @@
 // Service Worker para OrdenC - PWA
-// Versión 4.6 - Autocompletado de contraseñas + Recuperación de contraseña
-const CACHE_NAME = 'ordenc-v4.6';
+// Versión 4.7 - Checkbox "Recordar contraseña" más visible
+const CACHE_NAME = 'ordenc-v4.7';
 const urlsToCache = [
   '/frontend/html/index.html',
   '/frontend/html/login.html',
