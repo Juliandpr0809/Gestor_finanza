@@ -124,6 +124,25 @@ class AccountBalanceBackup(db.Model):
     def __repr__(self):
         return f'<AccountBalanceBackup user={self.user_id} type={self.backup_type}>'
 
+class PasswordResetToken(db.Model):
+    """Modelo para tokens de recuperación de contraseña"""
+    __tablename__ = 'password_reset_tokens'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    token = db.Column(db.String(255), unique=True, nullable=False)  # Token único
+    expires_at = db.Column(db.DateTime, nullable=False)  # Expira en 24 horas
+    used_at = db.Column(db.DateTime)  # Cuando se usó
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def is_valid(self):
+        """Verifica si el token sigue siendo válido"""
+        from datetime import datetime as dt
+        return self.used_at is None and self.expires_at > dt.utcnow()
+    
+    def __repr__(self):
+        return f'<PasswordResetToken user={self.user_id}>'
+
 # Categorías predefinidas
 DEFAULT_CATEGORIES = {
     'income': [

@@ -120,6 +120,28 @@ class APIClient {
         return await this.request('/auth/me');
     }
 
+    // Password Recovery endpoints
+    async forgotPassword(email) {
+        return await this.request('/auth/forgot-password', {
+            method: 'POST',
+            body: JSON.stringify({ email }),
+        });
+    }
+
+    async validateResetToken(token) {
+        return await this.request('/auth/validate-reset-token', {
+            method: 'POST',
+            body: JSON.stringify({ token }),
+        });
+    }
+
+    async resetPassword(token, password) {
+        return await this.request('/auth/reset-password', {
+            method: 'POST',
+            body: JSON.stringify({ token, password }),
+        });
+    }
+
     // Accounts endpoints
     async getAccounts() {
         return await this.request('/accounts');

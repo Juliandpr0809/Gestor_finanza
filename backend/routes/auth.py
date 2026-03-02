@@ -1,6 +1,7 @@
 """
 Rutas de autenticación con JWT
 """
+from datetime import datetime
 from flask import Blueprint, request, jsonify, current_app
 from sqlalchemy import or_
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -129,6 +130,113 @@ def login():
 def logout():
     """Cerrar sesión (cliente debe eliminar el token)"""
     return jsonify({'message': 'Sesión cerrada. Elimine el token en el cliente.'}), 200
+
+
+@auth_bp.route('/forgot-password', methods=['POST'])
+def forgot_password():
+    """Solicitar recuperación de contraseña"""
+    try:
+        from utils.password_reset import generate_reset_token, send_reset_email
+        
+        data = request.get_json() or {}
+        email = data.get('email', '').lower().strip()
+        
+        if not email:
+            return jsonify({'error': 'Email es requerido'}), 400
+        
+        # Buscar usuario por email
+        user = User.query.filter_by(email=email).first()
+        
+        # Por seguridad, siempre responder "ok" aunque no exista el usuario
+        # para evitar revelar qué emails están registrados
+        if not user:
+            return jsonify({
+                'message': 'Si el email existe en nuestro sistema, recibirás instrucciones para cambiar tu contraseña'
+            }), 200
+        
+        # Generar token de reset
+        token = generate_reset_token(user.id)
+        
+        # Enviar email (en desarrollo muestra el token en consola)
+        base_url = request.host_url.rstrip('/')
+        reset_link = f"{base_url}/html/reset-password.html?token={token}"
+        send_reset_email(user.email, token, reset_link)
+        
+        return jsonify({
+            'message': 'Si el email existe en nuestro sistema, recibirás instrucciones para cambiar tu contraseña',
+            'token': token  # En desarrollo, devolvemos el token para pruebas
+        }), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"Forgot password error: {str(e)}", exc_info=True)
+        return jsonify({'error': 'Error procesando solicitud'}), 500
+
+
+@auth_bp.route('/reset-password', methods=['POST'])
+def reset_password():
+    """Cambiar contraseña con token de recuperación"""
+    try:
+        from utils.password_reset import validate_reset_token, mark_reset_as_used
+        from werkzeug.security import generate_password_hash
+        
+        data = request.get_json() or {}
+        token = data.get('token', '').strip()
+        new_password = data.get('password', '').strip()
+        
+        if not token or not new_password:
+            return jsonify({'error': 'Token y contraseña son requeridos'}), 400
+        
+        if len(new_password) < 6:
+            return jsonify({'error': 'La contraseña debe tener al menos 6 caracteres'}), 400
+        
+        # Validar token
+        validation = validate_reset_token(token)
+        if not validation['valid']:
+            return jsonify({'error': validation['error']}), 400
+        
+        user_id = validation['user_id']
+        user = User.query.get(user_id)
+        
+        if not user:
+            return jsonify({'error': 'Usuario no encontrado'}), 404
+        
+        # Cambiar contraseña
+        user.password_hash = generate_password_hash(new_password)
+        user.updated_at = datetime.utcnow()
+        
+        # Marcar token como usado
+        mark_reset_as_used(token)
+        
+        db.session.commit()
+        
+        return jsonify({
+            'message': 'Contraseña cambiada exitosamente'
+        }), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"Reset password error: {str(e)}", exc_info=True)
+        return jsonify({'error': 'Error al cambiar contraseña'}), 500
+
+
+@auth_bp.route('/validate-reset-token', methods=['POST'])
+def validate_reset_token_endpoint():
+    """Valida si un token de reset es válido"""
+    try:
+        from utils.password_reset import validate_reset_token
+        
+        data = request.get_json() or {}
+        token = data.get('token', '').strip()
+        
+        if not token:
+            return jsonify({'valid': False, 'error': 'Token requerido'}), 400
+        
+        validation = validate_reset_token(token)
+        
+        return jsonify(validation), 200 if validation['valid'] else 400
+        
+    except Exception as e:
+        current_app.logger.error(f"Token validation error: {str(e)}", exc_info=True)
+        return jsonify({'valid': False, 'error': 'Error validando token'}), 500
 
 
 @auth_bp.route('/me', methods=['GET'])
