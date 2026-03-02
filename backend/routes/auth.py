@@ -67,7 +67,8 @@ def register():
 
     db.session.commit()
 
-    token = generate_access_token(user.id, user.email)
+    # Generar token - al registrarse, mantener sesión 30 días por defecto
+    token = generate_access_token(user.id, user.email, remember_me=True)
 
     return jsonify({
         'message': 'Usuario registrado exitosamente',
@@ -93,6 +94,7 @@ def login():
         
         identifier = validated_data['identifier'].lower().strip()
         password = validated_data['password']
+        remember_me = request.get_json().get('remember_me', False) if request.get_json() else False
 
         # Buscar usuario por username o email
         user = User.query.filter(or_(User.username == identifier, User.email == identifier)).first()
@@ -103,7 +105,8 @@ def login():
         if not check_password_hash(user.password_hash, password):
             return jsonify({'error': 'Usuario o contraseña incorrectos'}), 401
 
-        token = generate_access_token(user.id, user.email)
+        # Generar token con duración extendida si "Remember me" está activado
+        token = generate_access_token(user.id, user.email, remember_me=remember_me)
 
         return jsonify({
             'message': 'Sesión iniciada',

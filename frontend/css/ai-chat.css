@@ -16,9 +16,8 @@
     flex-direction: column;
     height: 100vh;
     min-height: 100vh;
-    overflow-y: auto;
-    overflow-x: hidden;
-    /* Allow scroll en zoom alto */
+    overflow: hidden;
+    /* Contenedor no scrollea, los hijos lo hacen */
     padding: 0;
     /* Remove padding, handle in children */
     background: #06070c;
@@ -28,13 +27,14 @@
 /* Fix para móviles: restar espacio de la barra de navegación */
 @media (max-width: 768px) {
     .chat-container {
-        height: auto;
+        height: calc(100vh - 80px);
         min-height: calc(100vh - 80px);
         padding-bottom: 0;
     }
     
     @supports (padding: max(0px)) {
         .chat-container {
+            height: calc(100vh - 80px - env(safe-area-inset-bottom));
             min-height: calc(100vh - 80px - env(safe-area-inset-bottom));
         }
     }
@@ -426,6 +426,7 @@
 .chat-messages {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
     padding: 20px 0 32px 0;
     display: flex;
     flex-direction: column;
@@ -630,7 +631,7 @@
     /* Ensure background handles transparency */
     flex-shrink: 0;
     z-index: 100;
-    overflow-y: visible;
+    overflow-y: hidden;
     overflow-x: hidden;
     position: relative;
 }

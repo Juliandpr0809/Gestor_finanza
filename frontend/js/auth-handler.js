@@ -68,36 +68,41 @@ function checkSessionValidity() {
         const payload = parseJwt(token);
         const expirationTime = payload.exp * 1000;
         const currentTime = Date.now();
+        const horasParaExp = (expirationTime - currentTime) / (1000 * 60 * 60);
         
-        // Si NO tiene "Remember Me" activado
-        if (rememberSession !== 'true') {
-            // Verificar si la pestaña se cerró (usando sessionStorage como indicador)
-            if (!sessionStorage.getItem('sessionActive')) {
-                // Primera carga de la página, marcar sesión como activa
-                sessionStorage.setItem('sessionActive', 'true');
-                
-                // Configurar listener para detectar cierre de ventana
-                window.addEventListener('beforeunload', () => {
-                    // Si no hay "Remember Me", limpia el token al cerrar
-                    if (localStorage.getItem('rememberSession') !== 'true') {
-                        console.log('🔒 Sesión temporal - Limpiando al cerrar ventana');
-                        // No limpiamos aquí porque beforeunload es inconsistente
-                    }
-                });
-            }
-        } else {
-            console.log('✅ Remember Me activo - Sesión persistente');
-        }
+        console.log(`🔐 Token válido por ${horasParaExp.toFixed(2)} horas. Remember: ${rememberSession}`);
         
         // Verificar expiración del token
         if (currentTime >= expirationTime) {
             console.warn('⚠️ Token expirado');
             handleSessionExpired();
+            return;
+        }
+        
+        // Advertencia si el token expira en menos de 1 hora
+        if (horasParaExp < 1) {
+            console.warn(`⚠️ Token expirará en ${horasParaExp.toFixed(2)} horas`);
         }
         
     } catch (error) {
         console.error('Error verificando sesión:', error);
     }
+}
+
+// Configurar verificación periódica de sesión
+function setupSessionMonitoring() {
+    // Verificar cada 5 minutos si el token sigue siendo válido
+    setInterval(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            checkSessionValidity();
+        }
+    }, 5 * 60 * 1000); // 5 minutos
+    
+    // Ejecutar verificación inicial
+    checkSessionValidity();
+    
+    console.log('✅ Monitoreo de sesión configurado (cada 5 minutos)');
 }
 
 // Manejar sesión expirada
@@ -176,6 +181,13 @@ function initializeAuth() {
     
     // Ejecutar verificación de autenticación
     initAuthCheck();
+    
+    // Configurar monitoreo periódico de sesión (si NO es página pública)
+    const currentPath = window.location.pathname.toLowerCase();
+    const isPublicPage = currentPath.includes('login') || currentPath.includes('register');
+    if (!isPublicPage) {
+        setupSessionMonitoring();
+    }
 }
 
 // Ejecutar verificación cuando el DOM esté listo

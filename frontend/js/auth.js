@@ -197,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const resetLoading = setButtonLoading(submitBtn, 'Signing in...');
             setLoginFeedback(null, '');
 
-            api.login(identifier, password)
+            api.login(identifier, password, rememberMe)
                 .then((data) => {
                     console.log('Login successful:', data);
                     console.log('Token recibido:', data.access_token);

@@ -1,6 +1,6 @@
 // Service Worker para OrdenC - PWA
-// Versión 4.3 - Soportar zoom completo en móviles sin restricciones
-const CACHE_NAME = 'ordenc-v4.3';
+// Versión 4.5 - Arreglar scroll en chat IA con zoom completo
+const CACHE_NAME = 'ordenc-v4.5';
 const urlsToCache = [
   '/frontend/html/index.html',
   '/frontend/html/login.html',

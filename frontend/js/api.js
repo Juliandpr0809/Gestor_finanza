@@ -102,10 +102,10 @@ class APIClient {
         return data;
     }
 
-    async login(identifier, password) {
+    async login(identifier, password, remember_me = false) {
         const data = await this.request('/auth/login', {
             method: 'POST',
-            body: JSON.stringify({ identifier, password }),
+            body: JSON.stringify({ identifier, password, remember_me }),
         });
         this.setToken(data.access_token);
         return data;
