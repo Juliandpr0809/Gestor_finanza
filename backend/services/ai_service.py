@@ -1930,6 +1930,7 @@ Responde SOLO con el consejo, sin explicaciones adicionales."""
         """
         🔍 EXTRAE TRANSACCIÓN SIMULADA DE HISTORIAL
         Busca en los últimos mensajes del asistente si hay una transacción simulada
+        Soporta múltiples formatos: "Monto: COP 50000" o "Has gastado COP 50,000 en..."
         
         Returns:
             dict: {monto, cuenta, descripción, tipo} o None
@@ -1943,41 +1944,91 @@ Responde SOLO con el consejo, sin explicaciones adicionales."""
             
             content = msg.get('content', '')
             
-            # Buscar patrones de transacción simulada
-            # Patrón: "Monto: COP/USD/EUR XXXXX" o similar
+            # PATRÓN 1: "Monto: COP/USD/EUR XXXXX"
             monto_match = re.search(
                 r'(?:Monto|MONTO|Amount):\s*(?:COP|USD|EUR|MXN|ARS)?\s*([\d,.]+)',
                 content,
                 re.IGNORECASE
             )
             
+            # PATRÓN 2: Si no encuentra con etiqueta, buscar "Has gastado COP 50,000"
+            if not monto_match:
+                monto_match = re.search(
+                    r'(?:Has |te )?(?:gastado|depositan|llegaron|pagan|ingresó)\s+(?:COP|USD|EUR|MXN|ARS)?\s*([0-9,.]+)',
+                    content,
+                    re.IGNORECASE
+                )
+            
+            # PATRÓN 3: Números con formatos numéricos "COP 50,000.00"
+            if not monto_match:
+                monto_match = re.search(
+                    r'(?:COP|USD|EUR|MXN|ARS)\s+([0-9,.]+)',
+                    content,
+                    re.IGNORECASE
+                )
+            
             if not monto_match:
                 continue
             
             # Extraer monto limpio
-            monto_str = monto_match.group(1).replace(',', '').replace('.', ',')
-            monto_str = monto_str.replace(',', '.')
-            monto = float(monto_str) if '.' in monto_str else float(monto_str.replace(',', ''))
+            try:
+                monto_str = monto_match.group(1).replace(',', '').replace('.', ',')
+                monto_str = monto_str.replace(',', '.')
+                monto = float(monto_str) if '.' in monto_str else float(monto_str.replace(',', ''))
+            except:
+                continue
             
-            # Extraer cuenta
+            # Extraer cuenta (buscar patrones como "en Nu", "en tu cuenta Nu", "Nu (savings)", etc)
             cuenta_match = re.search(
-                r'(?:Cuenta|CUENTA):\s*([^\n.]+)',
+                r'(?:Cuenta|CUENTA|en tu cuenta|en su cuenta|en la cuenta):\s*([^\n.]+)|(?:en|de)\s+(Nu|Nequi|Efectivo|Cuenta\s+\w+)',
                 content,
                 re.IGNORECASE
             )
-            cuenta = cuenta_match.group(1).strip() if cuenta_match else None
+            cuenta = None
+            if cuenta_match:
+                # Obtener el último grupo capturado que no sea None
+                cuenta = cuenta_match.group(1) or cuenta_match.group(2)
+                if cuenta:
+                    cuenta = cuenta.strip()
+            
+            # Si aún no hay cuenta, buscar palabras clave de cuentas comunes
+            if not cuenta:
+                account_keywords = ['nu', 'nequi', 'efectivo', 'banco', 'ahorros', 'corriente']
+                for keyword in account_keywords:
+                    if keyword in content.lower():
+                        cuenta = keyword.capitalize()
+                        break
             
             # Extraer descripción
             desc_match = re.search(
-                r'(?:Descripción|DESCRIPCIÓN|Description):\s*([^\n.]+)',
+                r'(?:Descripción|DESCRIPCIÓN|Description):\s*([^\n.]+)|(?:en|de)\s+([a-záéíóú\s]+)(?:\.|,|para)',
                 content,
                 re.IGNORECASE
             )
-            descripcion = desc_match.group(1).strip() if desc_match else 'Transacción'
+            descripcion = 'Transacción'
+            if desc_match:
+                descripcion = (desc_match.group(1) or desc_match.group(2) or '').strip()
+                if descripcion and len(descripcion) > 1:
+                    descripcion = descripcion.capitalize()
+                else:
+                    descripcion = 'Transacción'
+            
+            # Si no hay descripción clara, extraer de frases como "Has gastado ... en XXX para YYY"
+            if descripcion == 'Transacción':
+                frase_match = re.search(
+                    r'(?:en|de|por)\s+([a-záéíóú\s]+?)(?:\s+para|\s+en|\s+a tu|\.)',
+                    content,
+                    re.IGNORECASE
+                )
+                if frase_match:
+                    descripcion = frase_match.group(1).strip().capitalize()
             
             # Detectar tipo (gasto o ingreso)
-            is_expense = 'gasto' in content.lower() or 'compró' in content.lower()
-            tx_type = 'expense' if is_expense else 'income'
+            is_expense = any(word in content.lower() for word in ['gasto', 'gastado', 'compró', 'compre', 'gaste', 'pagué'])
+            is_income = any(word in content.lower() for word in ['ingreso', 'ingresó', 'depositan', 'llegaron', 'pagan', 'depositó', 'recibió'])
+            
+            # Prioridad: si se detecta explícitamente ingreso, usar eso
+            tx_type = 'income' if is_income else ('expense' if is_expense else 'expense')
             
             if monto and cuenta:
                 return {

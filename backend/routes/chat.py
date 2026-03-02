@@ -2,6 +2,7 @@
 Rutas para gestión del chat con IA
 """
 from flask import Blueprint, request, jsonify
+import time
 
 # rapidfuzz es opcional (pesado para PythonAnywhere)
 try:
@@ -1036,6 +1037,9 @@ Ejemplo: *"USD"*"""
         }), 201
     
     # Chat ya inicializado - procesar normalmente
+    t_start = time.time()
+    times = {}
+    
     data = request.get_json()
     
     if not data or not data.get('content'):
@@ -1043,7 +1047,9 @@ Ejemplo: *"USD"*"""
     
     # 🧹 LIMPIAR ENTRADA BRUTAL: Remover emojis, texto pegado, etc.
     user_input_raw = data['content']
+    t_input_start = time.time()
     user_input_clean = ai_service.clean_user_input(user_input_raw)
+    times['input_cleaning'] = time.time() - t_input_start
     
     # Guardar mensaje ORIGINAL (lo que escribió el usuario)
     user_message = ChatMessage(
@@ -1053,10 +1059,13 @@ Ejemplo: *"USD"*"""
         message_metadata=data.get('metadata')
     )
     
+    t_db_save = time.time()
     db.session.add(user_message)
     db.session.commit()
+    times['db_save_user_message'] = time.time() - t_db_save
     
     # Obtener historial de conversación
+    t_history = time.time()
     recent_messages = ChatMessage.query.filter_by(user_id=user_id).order_by(
         ChatMessage.created_at.desc()
     ).limit(15).all()
@@ -1065,11 +1074,14 @@ Ejemplo: *"USD"*"""
         {'role': m.role, 'content': m.content} 
         for m in reversed(recent_messages)
     ]
+    times['fetch_history'] = time.time() - t_history
     
     # ⚡ DETECTAR SI USUARIO QUIERE APLICAR UNA TRANSACCIÓN PREVIA SIMULADA
     # Precedencia: 1) Palabras explícitas de acción, 2) Confirmación simple, 3) Lógica normal
+    t_detect = time.time()
     action_intent = ai_service.detect_action_intent(user_input_clean)
     is_confirmation = ai_service.detect_confirmation_words(user_input_clean)
+    times['detect_intent'] = time.time() - t_detect
     
     print(f"DEBUG: action_intent={action_intent}, is_confirmation={is_confirmation}")
     print(f"DEBUG: user_input_clean='{user_input_clean}'")
@@ -1077,7 +1089,9 @@ Ejemplo: *"USD"*"""
     # Si detecta "aplícalo", "hazlo", etc. → intentar extraer última transacción simulada
     if action_intent == 'apply' or (is_confirmation and action_intent != 'edit'):
         print(f"DEBUG: Attempting to apply/confirm pending transaction...")
+        t_pending = time.time()
         pending_tx = ai_service.extract_pending_transaction(conversation_history)
+        times['extract_pending'] = time.time() - t_pending
         
         if pending_tx:
             print(f"DEBUG: Found pending transaction to apply: {pending_tx}")
@@ -1136,10 +1150,24 @@ Ejemplo: *"USD"*"""
                         
                         account.updated_at = datetime.utcnow()
                         
+                        t_tx_create = time.time()
                         db.session.add(new_transaction)
                         db.session.commit()
+                        times['create_transaction'] = time.time() - t_tx_create
                         
                         currency = user.preferred_currency
+                        
+                        # Calcular timing total
+                        total_time = time.time() - t_start
+                        timing_info = f"\n\n⏱️ **TIMING DE PROCESAMIENTO:**\n"
+                        timing_info += f"• Limpieza de entrada: {times.get('input_cleaning', 0)*1000:.1f}ms\n"
+                        timing_info += f"• Guardar mensaje: {times.get('db_save_user_message', 0)*1000:.1f}ms\n"
+                        timing_info += f"• Obtener historial: {times.get('fetch_history', 0)*1000:.1f}ms\n"
+                        timing_info += f"• Detectar intención: {times.get('detect_intent', 0)*1000:.1f}ms\n"
+                        timing_info += f"• Extraer pending: {times.get('extract_pending', 0)*1000:.1f}ms\n"
+                        timing_info += f"• Crear transacción: {times.get('create_transaction', 0)*1000:.1f}ms\n"
+                        timing_info += f"**⏲️ TOTAL: {total_time*1000:.1f}ms**"
+                        
                         ai_response = f"""✅ **¡TRANSACCIÓN APLICADA!**
 - **Monto:** {currency} {monto:,.2f}
 - **Cuenta:** {account.name}
@@ -1148,7 +1176,7 @@ Ejemplo: *"USD"*"""
 
 🔄 **Balance actualizado:** {currency} {account.current_balance:,.2f}
 
-¡Transacción registrada exitosamente! 🎉"""
+¡Transacción registrada exitosamente! 🎉{timing_info}"""
                         
                         assistant_message = ChatMessage(
                             user_id=user_id,
@@ -1200,6 +1228,44 @@ Ejemplo: *"USD"*"""
                                 'created_at': assistant_message.created_at.isoformat()
                             }
                         }), 201
+        
+        # Si se detectó "aplica" pero NO hay transacción simulada, avisar
+        elif action_intent == 'apply':
+            print(f"DEBUG: User said 'apply' but no pending transaction found")
+            ai_response = """❌ **No hay transacción pendiente para aplicar**
+
+No encontré una transacción simulada anterior. Prueba:
+• Describir una transacción primero: "Gaste 50k en pasajes para Nu"
+• Luego aplicarla: "Aplícalo" o "Aplica esa transacción"
+
+También puedes usar:
+• "Registra una transacción" + descripción
+• "Crea un gasto de 50k en pasajes"
+"""
+            
+            assistant_message = ChatMessage(
+                user_id=user_id,
+                role='assistant',
+                content=ai_response,
+                message_metadata={'type': 'no_pending_transaction'}
+            )
+            db.session.add(assistant_message)
+            db.session.commit()
+            
+            return jsonify({
+                'user_message': {
+                    'id': user_message.id,
+                    'role': 'user',
+                    'content': user_message.content,
+                    'created_at': user_message.created_at.isoformat()
+                },
+                'assistant_message': {
+                    'id': assistant_message.id,
+                    'role': 'assistant',
+                    'content': assistant_message.content,
+                    'created_at': assistant_message.created_at.isoformat()
+                }
+            }), 201
     
     # Detectar si el usuario quiere SIMULAR (no crear real)
     simulate_keywords = ['simula', 'ejemplo', 'simulación', 'muestra ejemplo', 'como sería', 'cómo quedaría']
@@ -1545,15 +1611,22 @@ Ejemplo: *"USD"*"""
         created_transactions = []
         failed_transactions = []
         
+        t_main_start = time.time()
+        timing_data = {}
+        
         # Procesar cada parte del mensaje como una transacción
-        for part in transaction_parts:
-            print(f"DEBUG CHAT: Processing part: {part}")
+        for i, part in enumerate(transaction_parts):
+            print(f"DEBUG CHAT: Processing part {i+1}/{len(transaction_parts)}: {part}")
+            
+            t_part_start = time.time()
             
             # Obtener último mensaje del usuario para contexto (si existe)
             last_user_msg = ChatMessage.query.filter_by(user_id=user_id, role='user').order_by(ChatMessage.created_at.desc()).offset(1).first()
             context_msg = last_user_msg.content if last_user_msg else None
             
+            t_extract = time.time()
             transaction_data = ai_service.extract_transaction_from_text(user_id, part, context_msg)
+            timing_data[f'extract_tx_{i+1}'] = time.time() - t_extract
             print(f"DEBUG CHAT: Extracted data: {transaction_data}")
             
             if not transaction_data:
@@ -1730,6 +1803,10 @@ Ejemplo: *"USD"*"""
                 
                 if failed_transactions:
                     ai_response += f"\n\n⚠️ No se pudieron procesar {len(failed_transactions)} transacciones."
+                
+                # Agregar timing info
+                total_time = time.time() - t_main_start
+                ai_response += f"\n\n⏱️ **TIMING:** {total_time*1000:.1f}ms totales"
             
             else:
                     # Respuesta para una sola transacción
@@ -1740,6 +1817,10 @@ Ejemplo: *"USD"*"""
 - **Descripción:** {tx['description']}
 
 🔄 **Balance actualizado:** {currency_symbol} {tx['account'].current_balance:,.2f}"""
+                
+                # Agregar timing info
+                total_time = time.time() - t_main_start
+                ai_response += f"\n\n⏱️ **TIMING:** {total_time*1000:.1f}ms totales"
         
         elif failed_transactions:
             # Generar mensaje MUY específico con las razones de fallo
@@ -1814,6 +1895,75 @@ Si querías registrar un gasto o ingreso, intenta con frases claras:
             }
         }), 201
     else:
+        # FALLBACK CRÍTICO: Si detect_local_first falló, intentar ÚLTIMA opción antes de simulación
+        # Checar si el mensaje tiene palabras claras de gasto/ingreso
+        expense_keywords = ['gast', 'compr', 'comí', 'comi', 'saque', 'retire', 'pagué', 'pague', 'debit', 'cancelé', 'cancel', 'pasé', 'pase', 'presté']
+        income_keywords = ['recibí', 'recibe', 'cobré', 'cobre', 'ingres', 'ganancia', 'salario', 'sueldo', 'depósito', 'deposito', 'devolución', 'vendí', 'vendi', 'me pagó', 'me pago', 'me pagaron']
+        
+        has_expense_word = any(keyword in user_input_clean.lower() for keyword in expense_keywords)
+        has_income_word = any(keyword in user_input_clean.lower() for keyword in income_keywords)
+        has_number = any(char.isdigit() for char in user_input_clean)
+        
+        # Si tiene palabras de transacción Y número, intentar crear real antes de simulación
+        if (has_expense_word or has_income_word) and has_number:
+            print(f"DEBUG CHAT: FALLBACK - Attempting to create real transaction despite no intent detection")
+            
+            # Intentar extraer transacción
+            try:
+                transaction_data = ai_service.extract_transaction_from_text(user_id, data['content'], None)
+                
+                if transaction_data and transaction_data.get('amount') and transaction_data.get('transaction_type') and transaction_data.get('description'):
+                    # ✅ Datos válidos - CREAR TRANSACCIÓN REAL
+                    print(f"DEBUG CHAT: FALLBACK SUCCESS - Creating real transaction")
+                    
+                    account = Account.query.filter_by(user_id=user_id, is_active=True).first()
+                    if not account:
+                        ai_response = "❌ No tienes cuentas configuradas. Ve a la página de 'Cuentas' y crea una."
+                        assistant_message = ChatMessage(user_id=user_id, role='assistant', content=ai_response, message_metadata={'type': 'no_account'})
+                        db.session.add(assistant_message)
+                        db.session.commit()
+                        return jsonify({'user_message': {'id': user_message.id, 'role': 'user', 'content': user_message.content, 'created_at': user_message.created_at.isoformat()}, 'assistant_message': {'id': assistant_message.id, 'role': 'assistant', 'content': assistant_message.content, 'created_at': assistant_message.created_at.isoformat()}}), 201
+                    
+                    category = Category.query.filter_by(user_id=user_id, category_type=transaction_data['transaction_type']).first()
+                    if not category:
+                        default_name = 'Otros Ingresos' if transaction_data['transaction_type'] == 'income' else 'Otros'
+                        category = Category(user_id=user_id, name=default_name, icon='📊', category_type=transaction_data['transaction_type'])
+                        db.session.add(category)
+                        db.session.commit()
+                    
+                    # Crear transacción
+                    amount = abs(transaction_data['amount'])
+                    balance_change = -amount if transaction_data['transaction_type'] == 'expense' else amount
+                    new_tx = Transaction(
+                        user_id=user_id, account_id=account.id, category_id=category.id,
+                        amount=amount, description=transaction_data['description'],
+                        transaction_type=transaction_data['transaction_type'],
+                        transaction_date=datetime.utcnow()
+                    )
+                    account.current_balance = float(Decimal(str(account.current_balance)) + balance_change)
+                    account.updated_at = datetime.utcnow()
+                    db.session.add(new_tx)
+                    db.session.commit()
+                    
+                    currency = user.preferred_currency
+                    tipo = "Ingreso" if transaction_data['transaction_type'] == 'income' else "Gasto"
+                    ai_response = f"""✅ **Transaccion registrada**
+- **Monto:** {currency} {amount:,.2f}
+- **Cuenta:** {account.name}
+- **Descripcion:** {transaction_data['description']}
+- **Tipo:** {tipo}
+
+Balance actualizado: {currency} {account.current_balance:,.2f}"""
+                    
+                    assistant_message = ChatMessage(user_id=user_id, role='assistant', content=ai_response, message_metadata={'type': 'fallback_transaction_created'})
+                    db.session.add(assistant_message)
+                    db.session.commit()
+                    return jsonify({'user_message': {'id': user_message.id, 'role': 'user', 'content': user_message.content, 'created_at': user_message.created_at.isoformat()}, 'assistant_message': {'id': assistant_message.id, 'role': 'assistant', 'content': assistant_message.content, 'created_at': assistant_message.created_at.isoformat()}}), 201
+            except Exception as e:
+                print(f"DEBUG CHAT: FALLBACK FAILED - {str(e)}")
+                # Continuar a simulación
+                pass
+        
         # No hay intención de crear transacción, responder normalmente con la IA
         # La IA maneja: consultas, análisis, consejos, gestión de cuentas, etc.
         print(f"DEBUG CHAT: No transaction intent, using AI for response (Groq)")
@@ -1822,7 +1972,7 @@ Si querías registrar un gasto o ingreso, intenta con frases claras:
         # ⚠️ ADVERTENCIA: Si la IA menciona "transacción registrada" pero NO creó nada
         if any(keyword in ai_response.lower() for keyword in ['transacción registrada', 'balance actualizado', 'gasto registrado']):
             print(f"DEBUG CHAT: ⚠️️ AI simulated transaction without creating it!")
-            ai_response += "\n\n⚠️ **Nota:** Esta es solo una simulación. Para crear transacciones reales, usa frases como:\n• *'Gasté 25000 en mercado'*\n• *'Le pasé 200k para arriendo'*"
+            ai_response += "\n\n⚠️ **Nota:** Esta es solo una simulacion. Para crear transacciones reales, usa frases como:\n• *'Gaste 25000 en mercado'*\n• *'Le pase 200k para arriendo'*"
     
     # Guardar respuesta del asistente en la base de datos
     response_metadata = {'ai_service': 'groq', 'processed': True}
