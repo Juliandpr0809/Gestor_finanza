@@ -1916,13 +1916,78 @@ Si querías registrar un gasto o ingreso, intenta con frases claras:
                     # ✅ Datos válidos - CREAR TRANSACCIÓN REAL
                     print(f"DEBUG CHAT: FALLBACK SUCCESS - Creating real transaction")
                     
-                    account = Account.query.filter_by(user_id=user_id, is_active=True).first()
-                    if not account:
+                    # MEJORADO: Buscar cuenta mencionada en el mensaje con aliases
+                    all_accounts = Account.query.filter_by(user_id=user_id, is_active=True).all()
+                    if not all_accounts:
                         ai_response = "❌ No tienes cuentas configuradas. Ve a la página de 'Cuentas' y crea una."
                         assistant_message = ChatMessage(user_id=user_id, role='assistant', content=ai_response, message_metadata={'type': 'no_account'})
                         db.session.add(assistant_message)
                         db.session.commit()
                         return jsonify({'user_message': {'id': user_message.id, 'role': 'user', 'content': user_message.content, 'created_at': user_message.created_at.isoformat()}, 'assistant_message': {'id': assistant_message.id, 'role': 'assistant', 'content': assistant_message.content, 'created_at': assistant_message.created_at.isoformat()}}), 201
+                    
+                    # Alias mapping para reconocer variantes
+                    account_aliases = {
+                        'nequi': ['nequi', 'neq', 'nqi'],
+                        'nu': ['nu', 'banco nu'],
+                        'efectivo': ['efectivo', 'cash', 'efecti'],
+                        'banco': ['banco', 'ahorros', 'corriente'],
+                        'bolsillo': ['bolsillo', 'bolsi'],
+                    }
+                    
+                    # Buscar cuenta por nombre fuzzy match
+                    account = None
+                    account_names = [a.name for a in all_accounts]
+                    
+                    # Primero: buscar en el mensaje original patrones claros
+                    msg_lower = data['content'].lower()
+                    for account_obj in all_accounts:
+                        account_name_lower = account_obj.name.lower()
+                        # Búsqueda exacta/parcial
+                        if account_name_lower in msg_lower or msg_lower in account_name_lower:
+                            account = account_obj
+                            break
+                    
+                    # Segundo: buscar usando aliases
+                    if not account:
+                        for alias_group, aliases in account_aliases.items():
+                            if any(alias in msg_lower for alias in aliases):
+                                # Buscar cuenta que contenga el alias principal
+                                for account_obj in all_accounts:
+                                    if alias_group.lower() in account_obj.name.lower():
+                                        account = account_obj
+                                        break
+                                if account:
+                                    break
+                    
+                    # Tercero: fuzzy match con todas las cuentas
+                    if not account:
+                        from rapidfuzz import process as rfuzz_process, fuzz
+                        for account_obj in all_accounts:
+                            best_match = rfuzz_process.extractOne(
+                                account_obj.name, 
+                                [msg_lower], 
+                                scorer=fuzz.partial_ratio
+                            )
+                            if best_match and best_match[1] >= 40:
+                                account = account_obj
+                                break
+                    
+                    # Cuarto: Si transaction_data tiene nombre, fuzzy match
+                    if not account and transaction_data.get('account'):
+                        from rapidfuzz import process as rfuzz_process, fuzz
+                        best_match = rfuzz_process.extractOne(
+                            transaction_data['account'], 
+                            account_names, 
+                            scorer=fuzz.WRatio
+                        )
+                        if best_match and best_match[1] >= 60:
+                            account = next(a for a in all_accounts if a.name == best_match[0])
+                    
+                    # Fallback: usar primera cuenta
+                    if not account:
+                        account = all_accounts[0]
+                    
+                    print(f"DEBUG CHAT: Selected account: {account.name} (from all: {[a.name for a in all_accounts]})")
                     
                     category = Category.query.filter_by(user_id=user_id, category_type=transaction_data['transaction_type']).first()
                     if not category:
