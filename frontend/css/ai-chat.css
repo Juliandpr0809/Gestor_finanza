@@ -16,8 +16,9 @@
     flex-direction: column;
     height: 100vh;
     min-height: 100vh;
-    overflow: hidden;
-    /* Prevent body scroll, handle internally */
+    overflow-y: auto;
+    overflow-x: hidden;
+    /* Allow scroll en zoom alto */
     padding: 0;
     /* Remove padding, handle in children */
     background: #06070c;
@@ -27,14 +28,13 @@
 /* Fix para móviles: restar espacio de la barra de navegación */
 @media (max-width: 768px) {
     .chat-container {
-        height: calc(100vh - 80px);
+        height: auto;
         min-height: calc(100vh - 80px);
         padding-bottom: 0;
     }
     
     @supports (padding: max(0px)) {
         .chat-container {
-            height: calc(100vh - 80px - env(safe-area-inset-bottom));
             min-height: calc(100vh - 80px - env(safe-area-inset-bottom));
         }
     }
@@ -630,14 +630,17 @@
     /* Ensure background handles transparency */
     flex-shrink: 0;
     z-index: 100;
-    overflow-y: auto;
+    overflow-y: visible;
     overflow-x: hidden;
+    position: relative;
 }
 
-/* Asegurar que el input no se tape en móviles */
+/* Asegurar que el input siempre sea visible y accesible */
 @media (max-width: 768px) {
     .chat-input-container {
-        padding-bottom: 20px;
+        padding-bottom: 24px;
+        padding-top: 12px;
+        margin-bottom: 0;
     }
 }
 
