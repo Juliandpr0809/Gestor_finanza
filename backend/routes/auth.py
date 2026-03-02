@@ -94,7 +94,7 @@ def login():
         
         identifier = validated_data['identifier'].lower().strip()
         password = validated_data['password']
-        remember_me = request.get_json().get('remember_me', False) if request.get_json() else False
+        remember_me = validated_data.get('remember_me', False)
 
         # Buscar usuario por username o email
         user = User.query.filter(or_(User.username == identifier, User.email == identifier)).first()

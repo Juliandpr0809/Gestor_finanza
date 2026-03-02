@@ -24,6 +24,7 @@ class UserLoginSchema(Schema):
     """Schema para login de usuario"""
     identifier = fields.Str(required=True, validate=validate.Length(min=3, max=120))
     password = fields.Str(required=True, validate=validate.Length(min=1, max=128))
+    remember_me = fields.Bool(required=False, allow_none=True, dump_default=False)
 
 class AccountSchema(Schema):
     """Schema para cuentas"""
