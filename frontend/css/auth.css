@@ -396,47 +396,60 @@
 
 .checkbox-container {
     display: flex;
-    align-items: center;
-    gap: 10px;
+    align-items: flex-start;
+    gap: 12px;
     cursor: pointer;
     position: relative;
-    padding: 4px 0;
+    padding: 8px 0;
+    background: rgba(255, 255, 255, 0.02);
+    padding-left: 12px;
+    padding-right: 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease;
+}
+
+.checkbox-container:hover {
+    background: rgba(107, 159, 255, 0.05);
+    border-color: rgba(107, 159, 255, 0.2);
 }
 
 .checkbox-container input[type="checkbox"] {
     position: absolute;
     opacity: 0;
     cursor: pointer;
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
 }
 
 .checkbox-container .checkbox-custom {
-    width: 20px;
-    height: 20px;
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    width: 24px;
+    height: 24px;
+    border: 2.5px solid rgba(255, 255, 255, 0.3);
     border-radius: 6px;
     background: transparent;
     transition: all 0.3s ease;
     position: relative;
     flex-shrink: 0;
+    margin-top: 2px;
 }
 
 .checkbox-container input[type="checkbox"]:checked + .checkbox-custom {
     background: linear-gradient(135deg, #6B9FFF 0%, #8B6BFF 100%);
     border-color: #6B9FFF;
+    box-shadow: 0 0 12px rgba(107, 159, 255, 0.4);
 }
 
 .checkbox-container .checkbox-custom::after {
     content: '';
     position: absolute;
     display: none;
-    left: 6px;
-    top: 2px;
-    width: 5px;
-    height: 10px;
+    left: 7px;
+    top: 3px;
+    width: 6px;
+    height: 11px;
     border: solid white;
-    border-width: 0 2px 2px 0;
+    border-width: 0 2.5px 2.5px 0;
     transform: rotate(45deg);
 }
 
@@ -444,20 +457,12 @@
     display: block;
 }
 
-.checkbox-container:hover .checkbox-custom {
-    border-color: rgba(255, 255, 255, 0.4);
-    background: rgba(107, 159, 255, 0.1);
-}
-
-.checkbox-container input[type="checkbox"]:checked:hover + .checkbox-custom {
-    background: linear-gradient(135deg, #5A8FEE 0%, #7A5BEE 100%);
-}
-
 .checkbox-label {
     font-size: 14px;
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(255, 255, 255, 0.7);
     user-select: none;
     transition: color 0.2s ease;
+    line-height: 1.5;
 }
 
 .checkbox-container:hover .checkbox-label {
