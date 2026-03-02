@@ -481,14 +481,8 @@
         </div>
     </div>
 
-    <script>
-        // Registrar Service Worker para PWA
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('../service-worker.js')
-                .then(reg => console.log('Service Worker registrado:', reg))
-                .catch(err => console.log('Error registrando Service Worker:', err));
-        }
-    </script>
+    <!-- Service Worker con auto-actualización -->
+    <script src="../js/sw-update-handler.js"></script>
 </body>
 
 </html>

@@ -346,9 +346,10 @@ function renderCategorySummary() {
         const currency = (filteredTransactions.find(t => t.category === cat.id)?.accountCurrency) || 'USD'; 
         const isExpense = cat.type === 'expense';
         const typeLabel = isExpense ? 'Gastos' : 'Ingresos';
+        const formattedAmount = formatCurrencyTx(cat.total, currency);
         
         return `
-            <div class="category-card ${cat.type}">
+            <div class="category-card ${cat.type}" data-category-id="${cat.id}">
                 <div class="category-card-header">
                     <div class="category-icon">${cat.icon}</div>
                     <div class="category-name">
@@ -360,10 +361,11 @@ function renderCategorySummary() {
                 
                 <div class="category-card-body">
                     <div class="category-total">
-                        ${isExpense ? '−' : '+'} ${formatCurrencyTx(cat.total, currency)}
+                        ${formattedAmount}
                     </div>
                     <div class="category-trend ${isExpense ? 'negative' : ''}">
-                        ${isExpense ? '↓' : '↑'} ${cat.count} transacción${cat.count !== 1 ? 'es' : ''}
+                        <i class="fas fa-arrow-${isExpense ? 'down' : 'up'}"></i>
+                        ${cat.count} transacción${cat.count !== 1 ? 'es' : ''}
                     </div>
                 </div>
                 
@@ -373,9 +375,9 @@ function renderCategorySummary() {
                             <i class="fas fa-filter"></i> Filtrar
                         </button>
                     </div>
-                    <div class="category-view-all">
+                    <a class="category-view-all" onclick="filterByCategory('${cat.name}')">
                         Ver detalles →
-                    </div>
+                    </a>
                 </div>
             </div>
         `;
