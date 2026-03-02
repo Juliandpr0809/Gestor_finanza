@@ -956,7 +956,7 @@ Sé conciso y práctico."""
             
         return amount
 
-    def _extract_transaction_simple(self, user_id, message):
+    def _extract_transaction_simple(self, user_id, message, previous_message=None):
         """
         Extracción simple de transacciones sin IA usando regex
         Funciona cuando la API de IA no está disponible

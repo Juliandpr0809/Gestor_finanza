@@ -1690,7 +1690,8 @@ Ejemplo: *"USD"*"""
                     'transaction': new_transaction,
                     'account': account,
                     'amount': float(amount),
-                    'description': transaction_data['description']
+                    'description': transaction_data['description'],
+                    'transaction_type': transaction_data['transaction_type']
                 })
                 
             except Exception as e:
@@ -1718,7 +1719,7 @@ Ejemplo: *"USD"*"""
 
 """
                 for idx, tx in enumerate(created_transactions, 1):
-                    tipo = "💰 Ingreso" if tx['amount'] > 0 else "💸 Gasto"
+                    tipo = "💰 Ingreso" if tx['transaction_type'] == 'income' else "💸 Gasto"
                     ai_response += f"{idx}. {tipo}: {tx['description']} - {currency_symbol} {abs(tx['amount']):,.2f}\n"
                 
                 ai_response += f"\n🔄 **Balance actualizado**\n"
