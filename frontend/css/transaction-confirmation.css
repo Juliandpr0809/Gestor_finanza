@@ -1,0 +1,304 @@
+/* ==========================================
+   TRANSACTION CONFIRMATION COMPONENT
+   Componente de confirmación visual para transacciones
+   Integrado con la identidad visual de OrderC
+   ========================================== */
+
+/* Contenedor del componente de confirmación */
+.transaction-confirmation {
+    margin: 16px 0;
+    padding: 16px;
+    background: linear-gradient(135deg, rgba(107, 159, 255, 0.08) 0%, rgba(139, 107, 255, 0.08) 100%);
+    border: 1px solid rgba(107, 159, 255, 0.2);
+    border-radius: 16px;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Header del componente */
+.confirmation-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.confirmation-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #6B9FFF 0%, #8B6BFF 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: #ffffff;
+    flex-shrink: 0;
+}
+
+.confirmation-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+/* Contenido de la transacción */
+.confirmation-content {
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+}
+
+.confirmation-amount {
+    font-size: 28px;
+    font-weight: 700;
+    color: #6B9FFF;
+    margin: 0 0 8px 0;
+    line-height: 1;
+}
+
+.confirmation-amount.expense {
+    color: #FF6B6B;
+}
+
+.confirmation-amount.income {
+    color: #00D4AA;
+}
+
+.confirmation-details {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.confirmation-detail-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.confirmation-detail-item i {
+    width: 16px;
+    text-align: center;
+    opacity: 0.7;
+}
+
+.confirmation-detail-value {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+/* Área de confirmación con checkbox */
+.confirmation-checkbox-area {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1.5px solid rgba(107, 159, 255, 0.3);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.confirmation-checkbox-area:hover {
+    background: rgba(107, 159, 255, 0.12);
+    border-color: rgba(107, 159, 255, 0.5);
+}
+
+.confirmation-checkbox-area.active {
+    background: rgba(107, 159, 255, 0.15);
+    border-color: #6B9FFF;
+}
+
+.confirmation-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Custom checkbox */
+.custom-checkbox {
+    position: relative;
+    width: 22px;
+    height: 22px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.custom-checkbox.checked {
+    background: linear-gradient(135deg, #6B9FFF 0%, #8B6BFF 100%);
+    border-color: #6B9FFF;
+}
+
+.custom-checkbox.checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.checkbox-label {
+    font-size: 14px;
+    color: var(--text-primary);
+    font-weight: 500;
+    flex: 1;
+}
+
+/* Input checkbox oculto (para accesibilidad) */
+.confirmation-checkbox input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+/* Botones de acción */
+.confirmation-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-confirm {
+    flex: 1;
+    background: linear-gradient(135deg, #6B9FFF 0%, #8B6BFF 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 18px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-confirm:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(107, 159, 255, 0.4);
+}
+
+.btn-confirm:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.btn-confirm:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.btn-cancel {
+    flex: 0.4;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 12px 18px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-cancel:hover {
+    background: rgba(255, 107, 107, 0.15);
+    border-color: rgba(255, 107, 107, 0.3);
+    color: #FF6B6B;
+}
+
+/* Loading state */
+.btn-confirm.loading {
+    pointer-events: none;
+}
+
+.btn-confirm.loading i {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Variante compacta para móviles */
+@media (max-width: 768px) {
+    .transaction-confirmation {
+        padding: 12px;
+        margin: 12px 0;
+    }
+
+    .confirmation-content {
+        padding: 12px;
+    }
+
+    .confirmation-amount {
+        font-size: 24px;
+    }
+
+    .confirmation-detail-item {
+        font-size: 12px;
+    }
+
+    .confirmation-actions {
+        flex-direction: column;
+    }
+
+    .btn-confirm,
+    .btn-cancel {
+        width: 100%;
+        flex: 1;
+    }
+}
+
+/* Estados de feedback visual */
+.transaction-confirmation.success {
+    border-color: rgba(0, 212, 170, 0.4);
+    background: linear-gradient(135deg, rgba(0, 212, 170, 0.08) 0%, rgba(0, 212, 170, 0.08) 100%);
+}
+
+.transaction-confirmation.error {
+    border-color: rgba(255, 107, 107, 0.4);
+    background: linear-gradient(135deg, rgba(255, 107, 107, 0.08) 0%, rgba(255, 107, 107, 0.08) 100%);
+}
+
+/* Animación de éxito */
+@keyframes successPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.transaction-confirmation.success {
+    animation: successPulse 0.5s ease-out;
+}
