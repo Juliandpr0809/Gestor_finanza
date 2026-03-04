@@ -1091,16 +1091,16 @@ body {
 }
 
 .privacy-badge {
-    background: rgba(16, 185, 129, 0.12);
-    border-color: rgba(16, 185, 129, 0.36);
-    color: #86efac;
+    background: rgba(102, 126, 234, 0.14);
+    border-color: rgba(102, 126, 234, 0.4);
+    color: #c7d2fe;
     margin-left: 0;
     border-radius: 999px;
     padding: 4px 10px;
 }
 
 .status-dot {
-    background: #86efac;
+    background: #667EEA;
 }
 
 .chat-header-actions {
@@ -1119,7 +1119,7 @@ body {
 }
 
 .btn-help {
-    color: #d9f99d;
+    color: #a5b4fc;
 }
 
 .quick-suggestions {
@@ -1165,8 +1165,8 @@ body {
 }
 
 .suggestion-chip:hover {
-    border-color: rgba(16, 185, 129, 0.4);
-    background: rgba(16, 185, 129, 0.08);
+    border-color: rgba(102, 126, 234, 0.45);
+    background: rgba(102, 126, 234, 0.12);
     transform: translateY(-1px);
 }
 
@@ -1184,9 +1184,9 @@ body {
     width: 34px;
     height: 34px;
     border-radius: 10px;
-    background: rgba(16, 185, 129, 0.22);
-    color: #86efac;
-    border: 1px solid rgba(16, 185, 129, 0.4);
+    background: rgba(102, 126, 234, 0.22);
+    color: #c7d2fe;
+    border: 1px solid rgba(102, 126, 234, 0.45);
 }
 
 .user-message .message-avatar {
@@ -1254,13 +1254,13 @@ body {
 }
 
 .btn-send {
-    background: #bef264;
-    color: #0a0a0a;
+    background: #667EEA;
+    color: #ffffff;
 }
 
 .btn-send:disabled {
-    background: rgba(190, 242, 100, 0.3);
-    color: rgba(0, 0, 0, 0.45);
+    background: rgba(102, 126, 234, 0.35);
+    color: rgba(255, 255, 255, 0.7);
 }
 
 #chatInput {

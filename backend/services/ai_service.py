@@ -469,6 +469,8 @@ Proporciona análisis y consejos útiles basados en los datos REALES mostrados a
                 result = response.json()
                 return result['choices'][0]['message']['content']
             else:
+                if response.status_code == 401 and 'invalid_api_key' in response.text.lower():
+                    return "⚠️ El servicio de IA está temporalmente no disponible por configuración de credenciales. Puedes seguir registrando, editando y consultando transacciones con comandos directos en el chat."
                 error_msg = f"Error API ({response.status_code}): {response.text}"
                 return f"⚠️ {error_msg}"
                 
@@ -1053,24 +1055,62 @@ Sé conciso y práctico."""
         elif has_income and not has_expense:
             transaction_type = 'income'
         
-        # Extraer monto (soporta puntos y comas como separadores)
-        # Buscar patrones como: 25.000, 25,000, 2.300, 120000
-        amount_patterns = [
-            r'(\d{1,3}(?:[.,]\d{3})+)',  # 25.000 o 25,000
-            r'(\d+[.,]\d{2,3})',          # 2.300 o 2,30
-            r'(\d+)',                     # 25000
-        ]
-        
         amount = None
-        for pattern in amount_patterns:
-            match = re.search(pattern, message)
+
+        def _parse_number(num_str):
+            s = (num_str or '').replace(' ', '')
+            if '.' in s and ',' in s:
+                s = s.replace('.', '').replace(',', '.')
+            elif s.count('.') > 1:
+                s = s.replace('.', '')
+            elif s.count(',') > 1:
+                s = s.replace(',', '')
+            else:
+                s = s.replace(',', '.')
+            try:
+                return float(s)
+            except Exception:
+                return None
+
+        # Patrones abreviados: 1millon, 1 millón, 200k, 50 mil
+        scaled_patterns = [
+            r'(\d+(?:[.,]\d+)?)\s*(millon(?:es)?|mill[oó]n|mil|k)\b',
+            r'(\d+(?:[.,]\d+)?)(millon(?:es)?|mill[oó]n|mil|k)\b'
+        ]
+
+        for pattern in scaled_patterns:
+            match = re.search(pattern, msg_lower)
             if match:
-                amount_str = match.group(1).replace('.', '').replace(',', '')
-                try:
-                    amount = float(amount_str)
+                base_value = _parse_number(match.group(1))
+                if base_value is not None:
+                    scale_word = match.group(2)
+                    if scale_word in ['millon', 'millón', 'millones']:
+                        amount = base_value * 1_000_000
+                    elif scale_word in ['mil', 'k']:
+                        amount = base_value * 1_000
+                    else:
+                        amount = base_value
                     break
-                except:
-                    continue
+
+        # Patrones clásicos: 1.000.000, 25,000, 25000
+        if amount is None:
+            amount_patterns = [
+                r'(\d{1,3}(?:[.,]\d{3})+)',
+                r'(\d+[.,]\d{2,3})',
+                r'(\d+)'
+            ]
+
+            for pattern in amount_patterns:
+                match = re.search(pattern, message)
+                if match:
+                    raw = match.group(1)
+                    if re.match(r'^\d{1,3}(?:[.,]\d{3})+$', raw):
+                        parsed = float(raw.replace('.', '').replace(',', ''))
+                    else:
+                        parsed = _parse_number(raw)
+                    if parsed is not None:
+                        amount = parsed
+                        break
         
         if not amount:
             return None
@@ -1650,16 +1690,25 @@ Responde SOLO con el consejo, sin explicaciones adicionales."""
             # Verificar si se refiere a transacción
             keywords = ['transacci', 'registro', 'descripción', 'monto', 'anterior', 'ultima', 'última', 'esa', 'la']
             if any(k in msg_lower for k in keywords):
-                # Intentar extraer ID si existe
                 import re
-                numbers = re.findall(r'\d+', msg_lower)
-                # Si hay números grandes (>1000) probablemente es monto, no ID
-                ids = [n for n in numbers if int(n) < 10000]
+                target = 'last'
+
+                explicit_id_patterns = [
+                    r'(?:id\s*#?\s*)(\d+)',
+                    r'(?:transacci[oó]n|registro)\s*#?\s*(\d+)',
+                    r'(?:transacci[oó]n|registro)\s+n[uú]mero\s+(\d+)'
+                ]
+
+                for pattern in explicit_id_patterns:
+                    match = re.search(pattern, msg_lower)
+                    if match:
+                        target = match.group(1)
+                        break
                 
                 return {
                     'type': 'control_command',
                     'action': 'edit_transaction',
-                    'target': ids[0] if ids else 'last',
+                    'target': target,
                     'raw_message': message
                 }
         

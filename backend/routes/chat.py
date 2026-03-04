@@ -536,13 +536,73 @@ Ejemplo: "Eliminar transacción 45"
             
             # Monto
             import re
-            # Buscar número que NO sea el ID
-            amounts = re.findall(r'(\d+[.,]?\d*)', raw_msg)
             detected_amount = None
-            for amt in amounts:
-                val = float(amt.replace(',', '.'))
-                if val != float(transaction.id) and val != float(target if str(target).isdigit() else 0):
-                    detected_amount = val
+
+            def parse_money_from_text(text):
+                text = (text or '').lower()
+
+                def parse_number(num_str):
+                    val = (num_str or '').replace(' ', '')
+                    if '.' in val and ',' in val:
+                        val = val.replace('.', '').replace(',', '.')
+                    elif val.count('.') > 1:
+                        val = val.replace('.', '')
+                    elif val.count(',') > 1:
+                        val = val.replace(',', '')
+                    else:
+                        val = val.replace(',', '.')
+                    try:
+                        return float(val)
+                    except Exception:
+                        return None
+
+                # 1) Con escala (millon/mil/k)
+                scaled_patterns = [
+                    r'(\d+(?:[.,]\d+)?)\s*(millon(?:es)?|mill[oó]n|mil|k)\b',
+                    r'(\d+(?:[.,]\d+)?)(millon(?:es)?|mill[oó]n|mil|k)\b'
+                ]
+                for pattern in scaled_patterns:
+                    match = re.search(pattern, text)
+                    if match:
+                        base = parse_number(match.group(1))
+                        if base is not None:
+                            scale = match.group(2)
+                            if scale in ['millon', 'millón', 'millones']:
+                                return base * 1_000_000
+                            if scale in ['mil', 'k']:
+                                return base * 1_000
+                            return base
+
+                # 2) Miles con separadores
+                grouped = re.search(r'(\d{1,3}(?:[.,]\d{3})+)', text)
+                if grouped:
+                    return float(grouped.group(1).replace('.', '').replace(',', ''))
+
+                # 3) Número simple
+                simple = re.search(r'(\d+(?:[.,]\d+)?)', text)
+                if simple:
+                    return parse_number(simple.group(1))
+
+                return None
+
+            # Priorizar segmentos típicos de edición de monto
+            amount_scopes = []
+            scope_patterns = [
+                r'(?:monto|cantidad|valor)\s*(?:a|en|de)?\s*([^\n]+)$',
+                r'(?:editar|edita|cambiar|cambia|modificar|modifica)\s+[^\n]*?\s+a\s+([^\n]+)$',
+            ]
+
+            for pattern in scope_patterns:
+                match = re.search(pattern, raw_msg)
+                if match:
+                    amount_scopes.append(match.group(1))
+
+            amount_scopes.append(raw_msg)
+
+            for scope in amount_scopes:
+                parsed_amount = parse_money_from_text(scope)
+                if parsed_amount and parsed_amount > 0:
+                    detected_amount = parsed_amount
                     break
             
             if detected_amount:
@@ -2029,10 +2089,34 @@ Balance actualizado: {currency} {account.current_balance:,.2f}"""
                 # Continuar a simulación
                 pass
         
-        # No hay intención de crear transacción, responder normalmente con la IA
-        # La IA maneja: consultas, análisis, consejos, gestión de cuentas, etc.
-        print(f"DEBUG CHAT: No transaction intent, using AI for response (Groq)")
-        ai_response = ai_service.chat(user_id, data['content'], conversation_history)
+        # No hay intención de crear transacción.
+        # Responder localmente preguntas frecuentes críticas para evitar dependencia de IA externa.
+        lower_msg = user_input_clean.lower()
+        asks_last_transaction = any(phrase in lower_msg for phrase in [
+            'ultima transaccion', 'última transacción', 'ultimo movimiento',
+            'último movimiento', 'mi ultima transaccion', 'mi última transacción'
+        ])
+
+        if asks_last_transaction:
+            last_tx = Transaction.query.filter_by(user_id=user_id).order_by(
+                Transaction.transaction_date.desc(), Transaction.id.desc()
+            ).first()
+
+            if not last_tx:
+                ai_response = "❌ No tienes transacciones registradas todavía."
+            else:
+                tx_currency = user.preferred_currency
+                tx_type_label = 'Ingreso' if last_tx.transaction_type == 'income' else 'Gasto'
+                ai_response = f"""📌 **Tu última transacción fue:**
+- **Tipo:** {tx_type_label}
+- **Monto:** {tx_currency} {last_tx.amount:,.2f}
+- **Cuenta:** {last_tx.account.name if last_tx.account else 'N/A'}
+- **Descripción:** {last_tx.description}
+- **Fecha:** {last_tx.transaction_date.strftime('%d/%m/%Y %H:%M')}"""
+        else:
+            # La IA maneja: consultas, análisis, consejos, gestión de cuentas, etc.
+            print(f"DEBUG CHAT: No transaction intent, using AI for response (Groq)")
+            ai_response = ai_service.chat(user_id, data['content'], conversation_history)
         
         # ⚠️ ADVERTENCIA: Si la IA menciona "transacción registrada" pero NO creó nada
         if any(keyword in ai_response.lower() for keyword in ['transacción registrada', 'balance actualizado', 'gasto registrado']):
