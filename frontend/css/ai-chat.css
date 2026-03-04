@@ -978,6 +978,43 @@ body {
 }
 
 /* ==========================================
+   DESKTOP / TABLET (769px - 1199px)
+   Layout flex estándar para desktop
+   ========================================== */
+@media (min-width: 769px) and (max-width: 1199px) {
+    .chat-container {
+        display: flex !important;
+        flex-direction: column !important;
+        height: 100vh !important;
+        min-height: 100vh !important;
+        max-height: 100vh !important;
+        overflow: hidden !important;
+        padding: 0 !important;
+        margin: 0 auto !important;
+        max-width: 900px !important;
+    }
+
+    .chat-header {
+        flex-shrink: 0 !important;
+    }
+
+    .chat-messages {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        padding: 20px 32px 20px !important;
+    }
+
+    .chat-input-container {
+        flex-shrink: 0 !important;
+        padding: 16px 32px !important;
+        background: #06070c !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+}
+
+/* ==========================================
    DESKTOP GRID SYSTEM (> 1200px)
    ========================================== */
 @media (min-width: 1200px) {

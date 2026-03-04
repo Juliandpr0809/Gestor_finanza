@@ -17,13 +17,17 @@ body {
 .accounts-container,
 .transactions-container,
 .reports-container,
-.chat-container,
 .new-transaction-container,
 .voice-input-container {
   max-width: 1400px;
   margin: 0 auto;
   padding: 28px 32px 40px;
   min-height: calc(100vh - 80px);
+}
+
+/* Chat container tiene su propio layout específico en ai-chat.css */
+.chat-container {
+  /* No aplicar padding genérico - el chat tiene layout flex específico */
 }
 
 /* ========================================
