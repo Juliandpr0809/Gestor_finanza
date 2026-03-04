@@ -90,6 +90,44 @@ def get_user():
     
     return user, None
 
+def compact_financial_response(text, user_input):
+    """Compacta respuestas largas para que sean directas cuando el usuario no pidió detalle."""
+    if not text:
+        return text
+
+    user_lower = (user_input or '').lower()
+    asked_detail = any(keyword in user_lower for keyword in [
+        'detalle', 'detallado', 'analiza', 'análisis', 'insights',
+        'recomendaciones', 'explica', 'desglose'
+    ])
+
+    if asked_detail:
+        return text
+
+    # Recortar secciones verbosas no solicitadas
+    verbose_markers = [
+        '💡 **insights:**',
+        '🎯 **recomendaciones:**',
+        '📊 **resumen de cuentas:**',
+        '⚠️ **nota:**',
+        '⏱️ **timing de procesamiento:**'
+    ]
+
+    compact_text = text
+    lower_text = compact_text.lower()
+    for marker in verbose_markers:
+        idx = lower_text.find(marker)
+        if idx != -1:
+            compact_text = compact_text[:idx].rstrip()
+            lower_text = compact_text.lower()
+
+    # Limitar longitud para respuestas transaccionales
+    lines = [line for line in compact_text.split('\n') if line.strip()]
+    if len(lines) > 7:
+        compact_text = '\n'.join(lines[:7])
+
+    return compact_text.strip()
+
 def get_user():
     """Obtener objeto User actual"""
     user_id, error = get_user_id()
@@ -1221,26 +1259,10 @@ Ejemplo: *"USD"*"""
                         
                         currency = user.preferred_currency
                         
-                        # Calcular timing total
-                        total_time = time.time() - t_start
-                        timing_info = f"\n\n⏱️ **TIMING DE PROCESAMIENTO:**\n"
-                        timing_info += f"• Limpieza de entrada: {times.get('input_cleaning', 0)*1000:.1f}ms\n"
-                        timing_info += f"• Guardar mensaje: {times.get('db_save_user_message', 0)*1000:.1f}ms\n"
-                        timing_info += f"• Obtener historial: {times.get('fetch_history', 0)*1000:.1f}ms\n"
-                        timing_info += f"• Detectar intención: {times.get('detect_intent', 0)*1000:.1f}ms\n"
-                        timing_info += f"• Extraer pending: {times.get('extract_pending', 0)*1000:.1f}ms\n"
-                        timing_info += f"• Crear transacción: {times.get('create_transaction', 0)*1000:.1f}ms\n"
-                        timing_info += f"**⏲️ TOTAL: {total_time*1000:.1f}ms**"
-                        
-                        ai_response = f"""✅ **¡TRANSACCIÓN APLICADA!**
+                        ai_response = f"""✅ **Transacción aplicada**
 - **Monto:** {currency} {monto:,.2f}
 - **Cuenta:** {account.name}
-- **Descripción:** {descripcion}
-- **Tipo:** {'Gasto' if tx_type == 'expense' else 'Ingreso'}
-
-🔄 **Balance actualizado:** {currency} {account.current_balance:,.2f}
-
-¡Transacción registrada exitosamente! 🎉{timing_info}"""
+- **Saldo actual:** {currency} {account.current_balance:,.2f}"""
                         
                         assistant_message = ChatMessage(
                             user_id=user_id,
@@ -1698,10 +1720,7 @@ También puedes usar:
                         ai_response = f"""✅ **Transacción registrada**
 - **Monto:** {currency} {abs(amount):,.2f}
 - **Cuenta:** {account.name}
-- **Descripción:** {description.title()}
-- **Categoría:** {category.name}
-
-🔄 **Balance actualizado:** {currency} {account.current_balance:,.2f}"""
+- **Saldo actual:** {currency} {account.current_balance:,.2f}"""
                     
                     except Exception as e:
                         print(f"Error creating transaction: {e}")
@@ -2301,11 +2320,14 @@ Balance actualizado: {currency} {account.current_balance:,.2f}"""
             print(f"DEBUG CHAT: No transaction intent, using AI for response (Groq)")
             ai_response = ai_service.chat(user_id, data['content'], conversation_history)
         
-        # ⚠️ ADVERTENCIA: Si la IA menciona "transacción registrada" pero NO creó nada
+        # Aviso corto para simulaciones: sin texto largo ni ejemplos extensos
         if any(keyword in ai_response.lower() for keyword in ['transacción registrada', 'balance actualizado', 'gasto registrado']):
             print(f"DEBUG CHAT: ⚠️️ AI simulated transaction without creating it!")
-            ai_response += "\n\n⚠️ **Nota:** Esta es solo una simulacion. Para crear transacciones reales, usa frases como:\n• *'Gaste 25000 en mercado'*\n• *'Le pase 200k para arriendo'*"
+            ai_response += "\n\n⚠️ Simulación: confirma para guardarla."
     
+    # Compactar respuesta si el usuario no pidió detalle
+    ai_response = compact_financial_response(ai_response, data.get('content', ''))
+
     # Guardar respuesta del asistente en la base de datos
     response_metadata = {'ai_service': 'groq', 'processed': True}
     if not intent or not intent.get('has_intent') or wants_simulation:
