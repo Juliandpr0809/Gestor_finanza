@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const profileNameEl = document.getElementById('profileName');
     const profileAvatarEl = document.getElementById('profileAvatar');
     const activityList = document.getElementById('activityList');
+    const quickAccountsCountEl = document.getElementById('quickAccountsCount');
+    const quickActivityCountEl = document.getElementById('quickActivityCount');
     const cardSection = document.querySelector('.card-section');
     const headerRight = document.querySelector('.header-right');
 
@@ -192,6 +194,9 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadAccounts() {
         try {
             accounts = await api.getAccounts();
+            if (quickAccountsCountEl) {
+                quickAccountsCountEl.textContent = String(accounts.length || 0);
+            }
             if (!accounts.length) {
                 if (balanceEl) balanceEl.textContent = '$0';
                 if (numberEl) numberEl.textContent = 'Sin cuentas';
@@ -220,6 +225,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderTransactions(list) {
         if (!activityList) return;
+        if (quickActivityCountEl) {
+            quickActivityCountEl.textContent = String((list || []).length || 0);
+        }
         if (!list || !list.length) {
             activityList.innerHTML = `<div class="activity-group-header">${translate('no_transactions')}</div>`;
             return;

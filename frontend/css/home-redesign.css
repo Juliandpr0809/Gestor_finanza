@@ -1,0 +1,290 @@
+/* ========================================
+   HOME REDESIGN (Inicio)
+   Reorganiza solo la pantalla principal
+   ======================================== */
+
+.home-container {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 20px 0 120px;
+}
+
+.home-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.home-intro-card {
+  background: linear-gradient(140deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border: 1px solid var(--border-color);
+  border-radius: 22px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.home-intro-eyebrow {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+
+.home-intro-title {
+  font-size: 30px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.home-intro-subtitle {
+  margin-top: 8px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.home-intro-assistant {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--text-primary);
+  background: rgba(102, 126, 234, 0.14);
+  border: 1px solid rgba(102, 126, 234, 0.5);
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.home-balance-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 22px;
+  padding: 18px;
+}
+
+.home-balance-section .section-header {
+  margin-bottom: 14px;
+}
+
+.home-container .virtual-card {
+  min-height: 200px;
+  border-radius: 22px;
+  background: linear-gradient(145deg, #151a2a 0%, #0d1220 45%, #0b0f1a 100%);
+}
+
+.home-container .card-balance-overlay {
+  font-size: 34px;
+  letter-spacing: -0.02em;
+}
+
+.home-section-head h2 {
+  margin: 0;
+  font-size: 34px;
+  letter-spacing: -0.02em;
+}
+
+.home-container .actions-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.home-container .action-btn {
+  min-height: 124px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.home-container .action-btn-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(102, 126, 234, 0.2);
+  border: 1px solid rgba(102, 126, 234, 0.45);
+}
+
+.home-container .btn-blue .action-btn-icon,
+.home-container .btn-purple .action-btn-icon,
+.home-container .btn-purple-dark .action-btn-icon,
+.home-container .btn-purple-light .action-btn-icon {
+  color: #d6e0ff;
+}
+
+.home-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.home-metric-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 18px;
+  padding: 18px;
+}
+
+.home-metric-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.home-metric-value {
+  margin-top: 6px;
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.home-metric-foot {
+  margin-top: 6px;
+  color: var(--text-tertiary);
+  font-size: 12px;
+}
+
+.home-transactions-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 22px;
+  padding: 18px;
+}
+
+.home-transactions-section .activity-header {
+  margin-bottom: 8px;
+}
+
+.home-view-all {
+  text-decoration: none;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.home-container .activity-list {
+  max-height: 500px;
+  padding-right: 2px;
+}
+
+@media (max-width: 1024px) {
+  .home-container .actions-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .home-container {
+    padding: 12px 0 112px;
+  }
+
+  .home-intro-card {
+    padding: 16px;
+    border-radius: 18px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .home-intro-title {
+    font-size: 24px;
+  }
+
+  .home-intro-subtitle {
+    font-size: 13px;
+  }
+
+  .home-intro-assistant {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .home-section-head h2 {
+    font-size: 40px;
+  }
+
+  .home-balance-section,
+  .home-transactions-section {
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .home-container .card-balance-overlay {
+    font-size: 30px;
+  }
+
+  .home-container .actions-grid {
+    display: flex;
+    overflow-x: auto;
+    gap: 10px;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .home-container .actions-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .home-container .action-btn {
+    min-width: 122px;
+    min-height: 118px;
+    flex: 0 0 auto;
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .home-container .action-btn-icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .home-container .action-btn-text {
+    font-size: 13px;
+  }
+
+  .home-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-metric-card {
+    padding: 16px;
+  }
+
+  .home-metric-value {
+    font-size: 30px;
+  }
+
+  .home-container .activity-item {
+    padding: 10px 0;
+    gap: 10px;
+  }
+
+  .home-container .activity-item-time {
+    min-width: 38px;
+    font-size: 12px;
+  }
+
+  .home-container .activity-item-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 15px;
+  }
+
+  .home-container .activity-item-name {
+    font-size: 15px;
+  }
+
+  .home-container .activity-item-amount {
+    font-size: 15px;
+  }
+}

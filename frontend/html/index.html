@@ -25,6 +25,7 @@
     <link rel="stylesheet" href="../css/header-minimal.css?v=6">
     <link rel="stylesheet" href="../css/bottom-navigation.css?v=2">
     <link rel="stylesheet" href="../css/logo-menu.css">
+    <link rel="stylesheet" href="../css/home-redesign.css?v=1">
 </head>
 
 <body>
@@ -130,72 +131,93 @@
         </div>
     </header>
 
-    <div class="container">
-        <div class="dashboard-container">
-            <!-- LEFT SECTION: Card + Buttons -->
-            <div class="left-section">
-                <!-- Card Section -->
-                <section class="card-section">
-                    <div class="section-header">
-                        <h1 class="section-title" data-i18n="dashboard.cards.title">Mis Tarjetas Virtuales</h1>
-                        <button class="btn-add-card" onclick="window.location.href='accounts.html'">
-                            <span data-i18n="dashboard.add.card">Agregar Nueva Tarjeta</span> <i
-                                class="fas fa-plus-circle"></i>
-                        </button>
-                    </div>
+    <div class="container home-container">
+        <div class="home-shell">
+            <section class="home-intro-card">
+                <div>
+                    <div class="home-intro-eyebrow">Inicio</div>
+                    <h1 class="home-intro-title">Panel principal</h1>
+                    <p class="home-intro-subtitle">Visualiza tus cuentas y movimientos en un solo lugar</p>
+                </div>
+                <a href="ai-chat.html" class="home-intro-assistant">
+                    <i class="fas fa-robot"></i>
+                    <span>Asistente IA</span>
+                </a>
+            </section>
 
-                    <div class="card-wrapper" onclick="window.location.href='accounts.html'">
-                        <div class="virtual-card" id="virtualCard">
-                            <div class="card-bg-circle"></div>
-                            <div class="card-top-row">
-                                <div class="card-chip-icon">C</div>
-                                <div class="card-currency" id="cardCurrency">USD</div>
-                            </div>
-                            <div class="card-number" id="cardNumber">**** **** **** ----</div>
-                            <div class="card-bottom-row">
-                                <div class="card-expiry" id="cardHolder">Cuenta</div>
-                                <div class="card-brand" id="cardBrand">VISA</div>
-                            </div>
-                            <div class="card-balance-overlay" id="cardBalance">$0</div>
+            <section class="card-section home-balance-section">
+                <div class="section-header">
+                    <h2 class="section-title" data-i18n="dashboard.cards.title">Mis Tarjetas Virtuales</h2>
+                    <button class="btn-add-card" onclick="window.location.href='accounts.html'">
+                        <span data-i18n="dashboard.add.card">Agregar Nueva Tarjeta</span>
+                        <i class="fas fa-plus-circle"></i>
+                    </button>
+                </div>
+
+                <div class="card-wrapper" onclick="window.location.href='accounts.html'">
+                    <div class="virtual-card" id="virtualCard">
+                        <div class="card-bg-circle"></div>
+                        <div class="card-top-row">
+                            <div class="card-chip-icon">C</div>
+                            <div class="card-currency" id="cardCurrency">USD</div>
                         </div>
+                        <div class="card-number" id="cardNumber">**** **** **** ----</div>
+                        <div class="card-bottom-row">
+                            <div class="card-expiry" id="cardHolder">Cuenta</div>
+                            <div class="card-brand" id="cardBrand">ORDENC</div>
+                        </div>
+                        <div class="card-balance-overlay" id="cardBalance">$0</div>
                     </div>
-                </section>
+                </div>
+            </section>
 
-                <!-- Actions Section -->
-                <section class="actions-section">
-                    <div class="actions-grid">
-                        <button class="action-btn btn-blue" onclick="window.location.href='/frontend/html/new-transaction.html'">
-                            <div class="action-btn-icon"><i class="fas fa-plus"></i></div>
-                            <div class="action-btn-text" data-i18n="dashboard.add.transaction">Agregar Transacción</div>
-                        </button>
-                        <button class="action-btn btn-purple" onclick="window.location.href='/frontend/html/scan-receipt.html'">
-                            <div class="action-btn-icon"><i class="fas fa-file-upload"></i></div>
-                            <div class="action-btn-text" data-i18n="dashboard.upload.files">Subir Archivos</div>
-                        </button>
-                        <button class="action-btn btn-purple-dark" onclick="window.location.href='/frontend/html/ai-chat.html'">
-                            <div class="action-btn-icon"><i class="fas fa-robot"></i></div>
-                            <div class="action-btn-text" data-i18n="AI Chat">Chat IA</div>
-                        </button>
-                        <button class="action-btn btn-purple-light" onclick="window.location.href='/frontend/html/voice-chat.html'">
-                            <div class="action-btn-icon"><i class="fas fa-microphone-lines"></i></div>
-                            <div class="action-btn-text" data-i18n="Voice Chat">Chat de Voz</div>
-                        </button>
-                    </div>
-                </section>
-            </div>
+            <section class="actions-section">
+                <div class="home-section-head">
+                    <h2>Acciones Rápidas</h2>
+                </div>
+                <div class="actions-grid">
+                    <button class="action-btn btn-blue" onclick="window.location.href='/frontend/html/new-transaction.html'">
+                        <div class="action-btn-icon"><i class="fas fa-plus"></i></div>
+                        <div class="action-btn-text" data-i18n="dashboard.add.transaction">Agregar Transacción</div>
+                    </button>
+                    <button class="action-btn btn-purple" onclick="window.location.href='/frontend/html/scan-receipt.html'">
+                        <div class="action-btn-icon"><i class="fas fa-file-upload"></i></div>
+                        <div class="action-btn-text" data-i18n="dashboard.upload.files">Subir Archivos</div>
+                    </button>
+                    <button class="action-btn btn-purple-dark" onclick="window.location.href='/frontend/html/ai-chat.html'">
+                        <div class="action-btn-icon"><i class="fas fa-robot"></i></div>
+                        <div class="action-btn-text" data-i18n="AI Chat">Chat IA</div>
+                    </button>
+                    <button class="action-btn btn-purple-light" onclick="window.location.href='/frontend/html/voice-chat.html'">
+                        <div class="action-btn-icon"><i class="fas fa-microphone-lines"></i></div>
+                        <div class="action-btn-text" data-i18n="Voice Chat">Chat de Voz</div>
+                    </button>
+                </div>
+            </section>
 
-            <!-- RIGHT SECTION: Transactions -->
-            <div class="right-section">
-                <section class="activity-section">
-                    <div class="activity-header">
-                        <h2 class="activity-title" data-i18n="Transactions">Transacciones</h2>
-                    </div>
+            <section class="home-metrics-grid">
+                <article class="home-metric-card">
+                    <div class="home-metric-label">Cuentas activas</div>
+                    <div class="home-metric-value" id="quickAccountsCount">0</div>
+                    <div class="home-metric-foot">Conectadas al panel</div>
+                </article>
+                <article class="home-metric-card">
+                    <div class="home-metric-label">Movimientos recientes</div>
+                    <div class="home-metric-value" id="quickActivityCount">0</div>
+                    <div class="home-metric-foot">Últimos registros cargados</div>
+                </article>
+            </section>
 
-                    <div class="activity-list" id="activityList">
-                        <div class="activity-group-header" data-i18n="Loading">Cargando...</div>
-                    </div>
-                </section>
-            </div>
+            <section class="activity-section home-transactions-section">
+                <div class="activity-header">
+                    <h2 class="activity-title" data-i18n="Transactions">Transacciones</h2>
+                    <a class="home-view-all" href="transactions.html">Ver todo</a>
+                </div>
+
+                <div class="activity-list" id="activityList">
+                    <div class="activity-group-header" data-i18n="Loading">Cargando...</div>
+                </div>
+            </section>
         </div>
     </div>
 
