@@ -92,7 +92,7 @@ async function loadInitialData() {
                 description: t.description || '',
                 category: t.category_id,
                 categoryName: t.category_name || 'Sin categoría',
-                categoryIcon: t.category_icon || categoriesMap[t.category_id]?.icon || '📌',
+                categoryIcon: t.category_icon || categoriesMap[t.category_id]?.icon || null,
                 account: t.account_id,
                 accountName: t.account_name || accountsMap[t.account_id] || 'Sin cuenta',
                 accountCurrency: t.account_currency || accountsMap[t.account_id]?.currency || 'USD',
@@ -311,7 +311,7 @@ function renderCategorySummary() {
     filteredTransactions.forEach(t => {
         const catId = t.category;
         const catName = t.categoryName || 'Sin categoría';
-        const catIcon = t.categoryIcon || '📌';
+        const catIcon = t.categoryIcon || null;
         const catType = t.type || 'expense';
 
         if (!categoryMap[catId]) {
@@ -349,10 +349,8 @@ function renderCategorySummary() {
         const typeLabel = isExpense ? 'Gastos' : 'Ingresos';
         const formattedAmount = formatCurrencyTx(cat.total, currency);
         
-        // Convertir nombre de clase FontAwesome a icono
-        const iconHtml = cat.icon.startsWith('fa-') 
-            ? `<i class="fas ${cat.icon}"></i>` 
-            : cat.icon;
+        const categoryFaIcon = getCategoryFaIcon(cat.name, cat.type, cat.icon);
+        const iconHtml = `<i class="fas ${categoryFaIcon}"></i>`;
         
         return `
             <div class="category-card ${cat.type}" data-category-id="${cat.id}">
@@ -412,12 +410,10 @@ function renderTransactions() {
         tbody.innerHTML = '<tr><td colspan="6" class="text-center text-gray" style="padding: 40px;">Sin transacciones</td></tr>';
     } else {
         tbody.innerHTML = pageTransactions.map(t => {
-            // Icono de categoría con emojis y color (usa helpers de ux-improvements.js)
+            // Icono de categoría unificado con estilo de marca
             const categoryLabel = t.categoryName || t.category || 'Sin categoría';
-            const categoryType = t.type === 'income' ? 'income' : 'expense';
-            const categoryIconEl = (typeof createCategoryIcon === 'function')
-                ? createCategoryIcon(categoryLabel, categoryType)
-                : `<div class="table-icon-circle ${t.type === 'income' ? 'bg-work' : 'bg-grocery'}"><i class="fas fa-${t.amount > 0 ? 'arrow-down' : 'shopping-bag'}"></i></div>`;
+            const categoryFaIcon = getCategoryFaIcon(categoryLabel, t.type, t.categoryIcon);
+            const categoryIconEl = `<div class="table-icon-circle ${t.type === 'income' ? 'income' : 'expense'}"><i class="fas ${categoryFaIcon}"></i></div>`;
 
             const amountColor = t.type === 'income' ? 'text-green' : 'text-white';
             const amountPrefix = t.type === 'income' ? '+' : '-';
@@ -828,32 +824,30 @@ function applyQuickFiltersToList(baseList) {
 /**
  * Obtener icono de categoría basado en nombre
  */
-function getCategoryIcon(categoryName, type) {
-    if (!categoryName) {
-        return type === 'income' ? '💰' : '💸';
+function getCategoryFaIcon(categoryName, type, serverIcon = null) {
+    if (serverIcon && typeof serverIcon === 'string' && serverIcon.startsWith('fa-')) {
+        return serverIcon;
     }
 
-    const catLower = categoryName.toLowerCase();
-
-    // Mapeo de categorías a emojis
+    const name = (categoryName || '').toLowerCase();
     const iconMap = {
-        'food': '🍔', 'comida': '🍔', 'restaurante': '🍽️',
-        'transport': '🚗', 'transporte': '🚗', 'taxi': '🚕', 'gasolina': '⛽',
-        'services': '📱', 'servicios': '📱', 'utilities': '💡', 'internet': '🌐',
-        'entertainment': '🎮', 'entretenimiento': '🎮', 'movies': '🎬',
-        'health': '💊', 'salud': '💊', 'medical': '🏥',
-        'shopping': '🛍️', 'compras': '🛍️',
-        'bills': '📄', 'facturas': '📄', 'rent': '🏠',
-        'salary': '💰', 'salario': '💰', 'income': '💵', 'ingreso': '💵'
+        'food': 'fa-utensils', 'comida': 'fa-utensils', 'restaurante': 'fa-utensils',
+        'transport': 'fa-car', 'transporte': 'fa-car', 'taxi': 'fa-taxi', 'gasolina': 'fa-gas-pump',
+        'services': 'fa-bolt', 'servicios': 'fa-bolt', 'utilities': 'fa-bolt', 'internet': 'fa-wifi',
+        'entertainment': 'fa-film', 'entretenimiento': 'fa-film', 'movies': 'fa-film',
+        'health': 'fa-heart-pulse', 'salud': 'fa-heart-pulse', 'medical': 'fa-heart-pulse',
+        'shopping': 'fa-bag-shopping', 'compras': 'fa-bag-shopping',
+        'bills': 'fa-file-invoice', 'facturas': 'fa-file-invoice', 'rent': 'fa-house',
+        'salary': 'fa-sack-dollar', 'salario': 'fa-sack-dollar',
+        'income': 'fa-arrow-trend-up', 'ingreso': 'fa-arrow-trend-up',
+        'otros ingresos': 'fa-sack-dollar', 'otros': 'fa-layer-group'
     };
 
     for (const [key, icon] of Object.entries(iconMap)) {
-        if (catLower.includes(key)) {
-            return icon;
-        }
+        if (name.includes(key)) return icon;
     }
 
-    return type === 'income' ? '💵' : '💳';
+    return type === 'income' ? 'fa-arrow-trend-up' : 'fa-receipt';
 }
 
 /**

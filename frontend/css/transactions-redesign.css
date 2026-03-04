@@ -78,6 +78,17 @@
   height: 46px;
   border-radius: 12px;
   font-size: 18px;
+  background: rgba(102, 126, 234, 0.16);
+  border: 1px solid rgba(102, 126, 234, 0.4);
+  color: #c7d2fe;
+}
+
+.transactions-modern .stat-icon-box.green,
+.transactions-modern .stat-icon-box.red,
+.transactions-modern .stat-icon-box.blue {
+  background: rgba(102, 126, 234, 0.16);
+  border: 1px solid rgba(102, 126, 234, 0.4);
+  color: #c7d2fe;
 }
 
 .transactions-modern .stat-number {
@@ -86,6 +97,36 @@
 
 .transactions-modern .category-summary-section {
   margin-bottom: 18px;
+}
+
+.transactions-modern .category-summary-section .section-header {
+  align-items: center;
+  gap: 10px;
+}
+
+.tx-section-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tx-section-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: rgba(102, 126, 234, 0.16);
+  border: 1px solid rgba(102, 126, 234, 0.4);
+  color: #c7d2fe;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.transactions-modern .section-subtitle {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 12px;
 }
 
 .tx-period-filters {
@@ -165,6 +206,43 @@
 .transactions-modern .table-clean tbody tr:hover {
   transform: none;
   background: rgba(255, 255, 255, 0.05);
+}
+
+.transactions-modern .table-icon-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: rgba(102, 126, 234, 0.16);
+  border: 1px solid rgba(102, 126, 234, 0.4);
+  color: #c7d2fe;
+}
+
+.transactions-modern .table-icon-circle.income,
+.transactions-modern .table-icon-circle.expense {
+  background: rgba(102, 126, 234, 0.16);
+  border: 1px solid rgba(102, 126, 234, 0.4);
+  color: #c7d2fe;
+}
+
+.transactions-modern .category-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(102, 126, 234, 0.16);
+  border: 1px solid rgba(102, 126, 234, 0.4);
+  color: #c7d2fe;
+}
+
+.transactions-modern .category-card.expense .category-icon,
+.transactions-modern .category-card.income .category-icon,
+.transactions-modern .category-card:hover .category-icon,
+.transactions-modern .category-card.expense:hover .category-icon,
+.transactions-modern .category-card.income:hover .category-icon {
+  background: rgba(102, 126, 234, 0.16);
+  border: 1px solid rgba(102, 126, 234, 0.4);
+  color: #c7d2fe;
+  transform: none;
+  box-shadow: none;
 }
 
 @media (max-width: 768px) {
