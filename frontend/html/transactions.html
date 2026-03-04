@@ -25,6 +25,7 @@
     <link rel="stylesheet" href="../css/lang-selector.css?v=2">
     <link rel="stylesheet" href="../css/ux-improvements.css?v=2">
     <link rel="stylesheet" href="../css/header-minimal.css?v=6">
+    <link rel="stylesheet" href="../css/transactions-redesign.css?v=1">
 </head>
 
 <body>
@@ -99,30 +100,33 @@
     </header>
 
     <!-- Main Content -->
-    <main class="container">
-        <!-- Page Header -->
-        <div class="page-header-simple">
-            <div>
-                <h1 class="page-title-large" data-i18n="Transactions">Transacciones</h1>
-                <p class="page-subtitle" data-i18n="transactions.subtitle">Rastrea tus ingresos y gastos.</p>
+    <main class="container transactions-modern">
+        <section class="tx-hero">
+            <div class="tx-hero-main">
+                <div class="tx-hero-icon"><i class="fas fa-receipt"></i></div>
+                <div>
+                    <h1 class="page-title-large" data-i18n="Transactions">Transacciones</h1>
+                    <p class="page-subtitle" data-i18n="transactions.subtitle">Rastrea tus gastos e ingresos</p>
+                </div>
             </div>
-            <div class="page-actions">
-                <button class="btn-glass"><i class="fas fa-file-export"></i> <span
-                        data-i18n="Export">Exportar</span></button>
-                <button class="btn-primary-glow" onclick="window.location.href='new-transaction.html'">
-                    <span data-i18n="New Transaction">Nueva Transacción</span> <i class="fas fa-plus"></i>
+            <div class="tx-hero-actions">
+                <button class="tx-icon-btn" title="Buscar" onclick="document.getElementById('searchInput')?.focus()">
+                    <i class="fas fa-search"></i>
+                </button>
+                <button class="tx-icon-btn" title="Filtros" onclick="document.querySelector('.content-panel')?.scrollIntoView({behavior:'smooth'})">
+                    <i class="fas fa-filter"></i>
                 </button>
             </div>
-        </div>
+        </section>
 
         <!-- Stats Section -->
-        <div class="stats-overview">
+        <div class="stats-overview tx-kpi-grid">
             <div class="stat-box summary-card">
                 <div class="stat-icon-box green">
                     <i class="fas fa-arrow-up"></i>
                 </div>
                 <div class="stat-info">
-                    <span class="stat-label" data-i18n="Income">Ingreso</span>
+                    <span class="stat-label" data-i18n="Income">Ingreso Total</span>
                     <span class="stat-number summary-value">$0.00</span>
                 </div>
             </div>
@@ -131,7 +135,7 @@
                     <i class="fas fa-arrow-down"></i>
                 </div>
                 <div class="stat-info">
-                    <span class="stat-label" data-i18n="Expense">Gasto</span>
+                    <span class="stat-label" data-i18n="Expense">Gastos Totales</span>
                     <span class="stat-number summary-value">$0.00</span>
                 </div>
             </div>
@@ -157,36 +161,25 @@
             </div>
         </div>
 
-        <!-- Filtros Rápidos UX Improvement -->
-        <div class="quick-filters">
-            <div class="filter-chip active" data-filter="all" onclick="applyQuickFilter('all')">
-                <i class="fas fa-list"></i>
-                <span data-i18n="filter.all">Todos</span>
+        <div class="tx-period-filters quick-filters">
+            <div class="filter-chip period-chip active" data-filter="last30" onclick="applyQuickFilter('last30', 'period')">
+                <span>Últimos 30 Días</span>
             </div>
-            <div class="filter-chip" data-filter="today" onclick="applyQuickFilter('today')">
-                <i class="fas fa-calendar-day"></i>
-                <span data-i18n="filter.today">Hoy</span>
+            <div class="filter-chip period-chip" data-filter="today" onclick="applyQuickFilter('today', 'period')">
+                <span>Hoy</span>
             </div>
-            <div class="filter-chip" data-filter="week" onclick="applyQuickFilter('week')">
-                <i class="fas fa-calendar-week"></i>
-                <span data-i18n="filter.week">Esta Semana</span>
+            <div class="filter-chip period-chip" data-filter="yesterday" onclick="applyQuickFilter('yesterday', 'period')">
+                <span>Ayer</span>
             </div>
-            <div class="filter-chip" data-filter="month" onclick="applyQuickFilter('month')">
-                <i class="fas fa-calendar"></i>
-                <span data-i18n="filter.month">Este Mes</span>
+            <div class="filter-chip period-chip" data-filter="week" onclick="applyQuickFilter('week', 'period')">
+                <span>Esta Semana</span>
             </div>
-            <div class="filter-chip" data-filter="high" onclick="applyQuickFilter('high')">
-                <i class="fas fa-exclamation-triangle"></i>
-                <span data-i18n="filter.high">Montos Altos</span>
-            </div>
-            <div class="filter-chip" data-filter="income" onclick="applyQuickFilter('income')">
-                <i class="fas fa-arrow-up"></i>
-                <span data-i18n="filter.income">Ingresos</span>
-            </div>
-            <div class="filter-chip" data-filter="expense" onclick="applyQuickFilter('expense')">
-                <i class="fas fa-arrow-down"></i>
-                <span data-i18n="filter.expense">Gastos</span>
-            </div>
+        </div>
+
+        <div class="tx-type-tabs">
+            <button class="tx-type-tab type-chip active" data-filter="all" onclick="applyQuickFilter('all', 'type')">Todos</button>
+            <button class="tx-type-tab type-chip" data-filter="expense" onclick="applyQuickFilter('expense', 'type')">Gastos</button>
+            <button class="tx-type-tab type-chip" data-filter="income" onclick="applyQuickFilter('income', 'type')">Ingreso</button>
         </div>
 
         <!-- Filters & Table Section -->

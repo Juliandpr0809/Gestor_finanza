@@ -1,0 +1,213 @@
+/* ========================================
+   TRANSACTIONS REDESIGN OVERRIDES
+   ======================================== */
+
+.transactions-modern {
+  max-width: 960px;
+  margin: 0 auto;
+  padding-top: 18px;
+}
+
+.tx-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.tx-hero-main {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.tx-hero-icon {
+  width: 58px;
+  height: 58px;
+  border-radius: 14px;
+  background: rgba(102, 126, 234, 0.16);
+  border: 1px solid rgba(102, 126, 234, 0.4);
+  color: #c7d2fe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.transactions-modern .page-title-large {
+  margin-bottom: 2px;
+  font-size: 48px;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+}
+
+.transactions-modern .page-subtitle {
+  font-size: 16px;
+}
+
+.tx-hero-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.tx-icon-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.tx-kpi-grid {
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.transactions-modern .stat-box {
+  border-radius: 18px;
+  padding: 18px;
+  gap: 14px;
+  background: rgba(20, 21, 27, 0.86);
+}
+
+.transactions-modern .stat-icon-box {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  font-size: 18px;
+}
+
+.transactions-modern .stat-number {
+  font-size: 20px;
+}
+
+.transactions-modern .category-summary-section {
+  margin-bottom: 18px;
+}
+
+.tx-period-filters {
+  margin-bottom: 14px;
+  padding: 0;
+  gap: 10px;
+}
+
+.tx-period-filters .filter-chip {
+  border-radius: 999px;
+  padding: 12px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 15px;
+}
+
+.tx-period-filters .filter-chip.active {
+  background: rgba(102, 126, 234, 0.18);
+  border-color: rgba(102, 126, 234, 0.5);
+  color: #c7d2fe;
+  box-shadow: none;
+}
+
+.tx-type-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 6px;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.tx-type-tab {
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 17px;
+  font-weight: 500;
+  padding: 12px 10px;
+  cursor: pointer;
+}
+
+.tx-type-tab.active {
+  background: rgba(102, 126, 234, 0.18);
+  color: #dbe4ff;
+}
+
+.transactions-modern .content-panel {
+  border-radius: 18px;
+  padding: 16px;
+  background: rgba(20, 21, 27, 0.75);
+}
+
+.transactions-modern .filters-toolbar {
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.transactions-modern .search-wrapper {
+  width: 100%;
+  max-width: 350px;
+}
+
+.transactions-modern .filters-group {
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.transactions-modern .table-clean tbody tr {
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.transactions-modern .table-clean tbody tr:hover {
+  transform: none;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+@media (max-width: 768px) {
+  .transactions-modern {
+    padding-top: 8px;
+  }
+
+  .tx-hero-icon {
+    width: 52px;
+    height: 52px;
+    font-size: 21px;
+  }
+
+  .transactions-modern .page-title-large {
+    font-size: 54px;
+    line-height: 0.9;
+  }
+
+  .transactions-modern .page-subtitle {
+    font-size: 13px;
+  }
+
+  .tx-icon-btn {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+  }
+
+  .tx-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .transactions-modern .stat-box {
+    padding: 14px;
+  }
+
+  .tx-period-filters .filter-chip {
+    padding: 10px 15px;
+    font-size: 14px;
+  }
+
+  .tx-type-tab {
+    font-size: 15px;
+    padding: 10px 8px;
+  }
+}

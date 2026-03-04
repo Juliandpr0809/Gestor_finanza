@@ -11,7 +11,8 @@ let currentSort = { field: 'date', direction: 'desc' };
 let editingTransactionId = null;
 let accountsMap = {};
 let categoriesMap = {};
-let currentQuickFilter = 'all'; // Para filtros rápidos
+let currentQuickFilter = 'last30'; // Filtro de periodo
+let currentTypeQuickFilter = 'all'; // Filtro por tipo
 let accountIdFilter = null; // Para filtrar por cuenta desde URL
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -550,7 +551,7 @@ function applyFilters() {
     const filterDateTo = document.getElementById('filterDateTo');
     const dateTo = filterDateTo ? filterDateTo.value : '';
 
-    filteredTransactions = transactions.filter(t => {
+    let baseFiltered = transactions.filter(t => {
         const matchesSearch = !searchTerm ||
             (t.name && t.name.toLowerCase().includes(searchTerm)) ||
             (t.description && t.description.toLowerCase().includes(searchTerm)) ||
@@ -564,6 +565,10 @@ function applyFilters() {
 
         return matchesSearch && matchesType && matchesCategory && matchesAccount && matchesDateFrom && matchesDateTo;
     });
+
+    // Aplicar filtros rápidos (periodo + tipo) sobre filtros avanzados
+    baseFiltered = applyQuickFiltersToList(baseFiltered);
+    filteredTransactions = baseFiltered;
 
     currentPage = 1;
     applySorting();
@@ -727,31 +732,68 @@ window.deleteTransaction = async function (id) {
 /**
  * Aplicar filtro rápido
  */
-function applyQuickFilter(filter) {
-    currentQuickFilter = filter;
+function applyQuickFilter(filter, group = 'period') {
+    if (group === 'type') {
+        currentTypeQuickFilter = filter;
+    } else {
+        currentQuickFilter = filter;
+    }
+
+    filteredTransactions = applyQuickFiltersToList([...transactions]);
+
+    // Estado activo visual de chips
+    document.querySelectorAll('.period-chip').forEach(chip => {
+        chip.classList.toggle('active', chip.dataset.filter === currentQuickFilter);
+    });
+    document.querySelectorAll('.type-chip').forEach(chip => {
+        chip.classList.toggle('active', chip.dataset.filter === currentTypeQuickFilter);
+    });
+
+    currentPage = 1;
+    updateSummary();
+    renderCategorySummary();
+    renderTransactions();
+}
+
+function applyQuickFiltersToList(baseList) {
     const now = new Date();
 
-    filteredTransactions = [...transactions];
+    let list = [...baseList];
 
-    switch (filter) {
+    switch (currentQuickFilter) {
+        case 'last30':
+            const last30 = new Date(now);
+            last30.setDate(last30.getDate() - 30);
+            list = list.filter(t => new Date(t.date) >= last30);
+            break;
+
         case 'today':
-            filteredTransactions = filteredTransactions.filter(t => {
+            list = list.filter(t => {
                 const txDate = new Date(t.date);
                 return txDate.toDateString() === now.toDateString();
+            });
+            break;
+
+        case 'yesterday':
+            const yesterday = new Date(now);
+            yesterday.setDate(yesterday.getDate() - 1);
+            list = list.filter(t => {
+                const txDate = new Date(t.date);
+                return txDate.toDateString() === yesterday.toDateString();
             });
             break;
 
         case 'week':
             const weekAgo = new Date(now);
             weekAgo.setDate(weekAgo.getDate() - 7);
-            filteredTransactions = filteredTransactions.filter(t => {
+            list = list.filter(t => {
                 const txDate = new Date(t.date);
                 return txDate >= weekAgo;
             });
             break;
 
         case 'month':
-            filteredTransactions = filteredTransactions.filter(t => {
+            list = list.filter(t => {
                 const txDate = new Date(t.date);
                 return txDate.getMonth() === now.getMonth() &&
                     txDate.getFullYear() === now.getFullYear();
@@ -760,26 +802,27 @@ function applyQuickFilter(filter) {
 
         case 'high':
             const avgAmount = transactions.reduce((sum, t) => sum + Math.abs(t.amount), 0) / transactions.length;
-            filteredTransactions = filteredTransactions.filter(t => Math.abs(t.amount) > avgAmount * 2);
-            break;
-
-        case 'income':
-            filteredTransactions = filteredTransactions.filter(t => t.type === 'income');
-            break;
-
-        case 'expense':
-            filteredTransactions = filteredTransactions.filter(t => t.type === 'expense');
+            list = list.filter(t => Math.abs(t.amount) > avgAmount * 2);
             break;
 
         case 'all':
         default:
-            // Ya tenemos todas las transacciones
             break;
     }
 
-    currentPage = 1;
-    updateSummary();
-    renderTransactions();
+    switch (currentTypeQuickFilter) {
+        case 'income':
+            list = list.filter(t => t.type === 'income');
+            break;
+        case 'expense':
+            list = list.filter(t => t.type === 'expense');
+            break;
+        case 'all':
+        default:
+            break;
+    }
+
+    return list;
 }
 
 /**
