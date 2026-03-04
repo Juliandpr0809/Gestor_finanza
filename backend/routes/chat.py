@@ -1361,74 +1361,90 @@ También puedes usar:
     # GATE GLOBAL: Si parece transacción, SIEMPRE pedir confirmación visual
     # ============================================================================
     if not wants_simulation and action_intent != 'apply' and not is_confirmation:
-        tx_preview = ai_service.extract_transaction_from_text(user_id, user_input_raw, None)
+        try:
+            tx_preview = ai_service.extract_transaction_from_text(user_id, user_input_raw, None)
+        except Exception as e:
+            print(f"[ERROR] extract_transaction_from_text falló: {e}")
+            tx_preview = None
+        
         if tx_preview and tx_preview.get('amount') and tx_preview.get('transaction_type'):
-            accounts = Account.query.filter_by(user_id=user_id, is_active=True).all()
-            if accounts:
+            try:
+                accounts = Account.query.filter_by(user_id=user_id, is_active=True).all()
+                if accounts:
+                    account = None
+                    if tx_preview.get('account'):
+                        account_names = [a.name for a in accounts]
+                        best_match, score = find_best_match(tx_preview.get('account', ''), account_names)
+                        if best_match and score >= 60:
+                            account = next((a for a in accounts if a.name == best_match), None)
+                    if not account:
+                        account = accounts[0]
+
+                    tx_type = tx_preview.get('transaction_type', 'expense')
+                    categories = Category.query.filter_by(user_id=user_id, category_type=tx_type).all()
+                    category = categories[0] if categories else None
+            except Exception as e:
+                print(f"[ERROR] Buscando account/category: {e}")
                 account = None
-                if tx_preview.get('account'):
-                    account_names = [a.name for a in accounts]
-                    best_match, score = find_best_match(tx_preview.get('account', ''), account_names)
-                    if best_match and score >= 60:
-                        account = next((a for a in accounts if a.name == best_match), None)
-                if not account:
-                    account = accounts[0]
+                category = None
 
-                tx_type = tx_preview.get('transaction_type', 'expense')
-                categories = Category.query.filter_by(user_id=user_id, category_type=tx_type).all()
-                category = categories[0] if categories else None
+                if account and category:
+                    try:
+                        tx_data = {
+                            'amount': abs(float(tx_preview.get('amount', 0))),
+                            'type': tx_type,
+                            'account': account.name,
+                            'account_id': account.id,
+                            'currency': account.currency or user.preferred_currency or 'COP',
+                            'category': category.name if category else 'Sin categoría',
+                            'category_id': category.id if category else None,
+                            'description': tx_preview.get('description', ''),
+                            'date': datetime.now().strftime('%d/%m/%Y')
+                        }
 
-                tx_data = {
-                    'amount': abs(float(tx_preview.get('amount', 0))),
-                    'type': tx_type,
-                    'account': account.name,
-                    'account_id': account.id,
-                    'currency': account.currency or user.preferred_currency or 'COP',
-                    'category': category.name if category else 'Sin categoría',
-                    'category_id': category.id if category else None,
-                    'description': tx_preview.get('description', ''),
-                    'date': datetime.now().strftime('%d/%m/%Y')
-                }
-
-                currency = tx_data['currency']
-                sign = '+' if tx_type == 'income' else '-'
-                ai_response = f"""🧾 **Revisa la transacción**
+                        currency = tx_data['currency']
+                        sign = '+' if tx_type == 'income' else '-'
+                        ai_response = f"""🧾 **Revisa la transacción**
 - **Monto:** {sign}{currency} {tx_data['amount']:,.2f}
 - **Cuenta:** {tx_data['account']}
 - **Descripción:** {tx_data['description'] or 'Sin descripción'}
 
 Marca el chulito para confirmarla."""
 
-                assistant_message = ChatMessage(
-                    user_id=user_id,
-                    role='assistant',
-                    content=ai_response,
-                    message_metadata={
-                        'type': 'confirmation_required',
-                        'ai_service': 'global_tx_gate',
-                        'pending_transaction': tx_data
-                    }
-                )
-                db.session.add(assistant_message)
-                db.session.commit()
+                        assistant_message = ChatMessage(
+                            user_id=user_id,
+                            role='assistant',
+                            content=ai_response,
+                            message_metadata={
+                                'type': 'confirmation_required',
+                                'ai_service': 'global_tx_gate',
+                                'pending_transaction': tx_data
+                            }
+                        )
+                        db.session.add(assistant_message)
+                        db.session.commit()
 
-                return jsonify({
-                    'user_message': {
-                        'id': user_message.id,
-                        'role': 'user',
-                        'content': user_message.content,
-                        'created_at': user_message.created_at.isoformat()
-                    },
-                    'assistant_message': {
-                        'id': assistant_message.id,
-                        'role': 'assistant',
-                        'content': assistant_message.content,
-                        'created_at': assistant_message.created_at.isoformat()
-                    },
-                    'requires_confirmation': True,
-                    'transaction_data': tx_data,
-                    'function': 'create_transaction'
-                }), 201
+                        return jsonify({
+                            'user_message': {
+                                'id': user_message.id,
+                                'role': 'user',
+                                'content': user_message.content,
+                                'created_at': user_message.created_at.isoformat()
+                            },
+                            'assistant_message': {
+                                'id': assistant_message.id,
+                                'role': 'assistant',
+                                'content': assistant_message.content,
+                                'created_at': assistant_message.created_at.isoformat()
+                            },
+                            'requires_confirmation': True,
+                            'transaction_data': tx_data,
+                            'function': 'create_transaction'
+                        }), 201
+                    except Exception as e:
+                        print(f"[ERROR] Construyendo confirmation payload: {e}")
+                        import traceback
+                        traceback.print_exc()
     
     # ============================================================================
     # NUEVA IA MEJORADA: Function Calling para detectar transacciones
