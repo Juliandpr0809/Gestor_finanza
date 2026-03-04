@@ -2,6 +2,9 @@
 // AI CHAT - FUNCTIONALITY
 // ==========================================
 
+// Inicializar componente de confirmación
+let confirmComponent;
+
 document.addEventListener('DOMContentLoaded', () => {
     // La autenticación es manejada por auth-handler.js
 
@@ -14,6 +17,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnHelp = document.getElementById('btnHelp');
     const btnCloseHelp = document.getElementById('btnCloseHelp');
     const helpPanel = document.getElementById('helpPanel');
+    
+    // Inicializar componente de confirmación visual
+    if (typeof TransactionConfirmationComponent !== 'undefined') {
+        confirmComponent = new TransactionConfirmationComponent(chatMessages);
+        console.log('✅ Componente de confirmación inicializado');
+    } else {
+        console.warn('⚠️ TransactionConfirmationComponent no está disponible');
+    }
 
     const openHelpPanel = () => {
         if (!helpPanel) return;
@@ -190,6 +201,27 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.assistant_message) {
                 addMessage(response.assistant_message.content, 'ai');
             }
+            
+            // ✨ NUEVA FUNCIONALIDAD: Mostrar componente de confirmación
+            if (response.requires_confirmation && response.transaction_data && confirmComponent) {
+                console.log('📊 Mostrando componente de confirmación', response.transaction_data);
+                
+                // Pequeño delay para que el mensaje de la IA aparezca primero
+                setTimeout(() => {
+                    confirmComponent.show(
+                        response.transaction_data,
+                        // Callback al confirmar
+                        async () => {
+                            await confirmAndSaveTransaction(response.transaction_data);
+                        },
+                        // Callback al cancelar
+                        () => {
+                            addMessage('❌ Transacción cancelada.', 'ai');
+                        }
+                    );
+                }, 300);
+            }
+            
         } catch (err) {
             hideTypingIndicator();
             console.error('Error sending message:', err);
@@ -197,6 +229,36 @@ document.addEventListener('DOMContentLoaded', () => {
         } finally {
             isLoading = false;
             sendBtn.disabled = false;
+        }
+    }
+    
+    // Confirmar y guardar transacción
+    async function confirmAndSaveTransaction(txData) {
+        try {
+            const response = await fetch('/api/chat/confirm-transaction', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token') || sessionStorage.getItem('token')}`
+                },
+                body: JSON.stringify(txData)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                console.log('✅ Transacción guardada exitosamente');
+                // El componente ya muestra "¡Guardado!" automáticamente
+                // Actualizar el UI si es necesario
+                // await refreshBalances();
+            } else {
+                throw new Error(result.error || 'Error desconocido');
+            }
+            
+        } catch (error) {
+            console.error('❌ Error confirmando transacción:', error);
+            addMessage(`❌ Error: ${error.message}`, 'ai');
+            throw error; // Para que el componente muestre el estado de error
         }
     }
 

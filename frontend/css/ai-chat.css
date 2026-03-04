@@ -29,8 +29,9 @@ body {
     margin: 0 auto !important;
     display: flex !important;
     flex-direction: column !important;
-    height: 100vh !important;
-    min-height: 100vh !important;
+    /* Desktop: restar altura del header principal (64px) */
+    height: calc(100vh - 64px) !important;
+    min-height: calc(100vh - 64px) !important;
     overflow: hidden !important;
     padding: 0 !important;
     background: #06070c !important;
@@ -42,6 +43,7 @@ body {
 @media (max-width: 768px) {
     .chat-container {
         /* Usar 100dvh para altura dinámica del viewport en móviles */
+        /* En móvil el header está oculto, así que usar toda la altura */
         height: 100dvh !important;
         min-height: 100dvh !important;
         max-height: 100dvh !important;

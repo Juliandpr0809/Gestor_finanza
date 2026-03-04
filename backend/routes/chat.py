@@ -16,8 +16,12 @@ from models import db, User, ChatMessage, Transaction, Account, Category
 from datetime import datetime
 from utils.jwt_utils import get_user_id_from_header, AuthError
 from services.ai_service import ai_service
+from services.ai_service_improved import ImprovedAIService
 from utils.backup_utils import create_balance_backup, restore_balance_backup, get_available_backups
 from decimal import Decimal
+
+# Inicializar servicio de IA mejorado
+improved_ai = ImprovedAIService()
 
 chat_bp = Blueprint('chat', __name__)
 
@@ -1331,9 +1335,188 @@ También puedes usar:
     simulate_keywords = ['simula', 'ejemplo', 'simulación', 'muestra ejemplo', 'como sería', 'cómo quedaría']
     wants_simulation = any(keyword in user_input_clean.lower() for keyword in simulate_keywords)
     
-    # NUEVA ARQUITECTURA: La IA detecta primero qué comando es (SI ESTÁ DISPONIBLE)
-    # Pero si falla, el fallback de regex funciona perfectamente
-    print(f"DEBUG CHAT: Detecting command with AI...")
+    # ============================================================================
+    # NUEVA IA MEJORADA: Function Calling para detectar transacciones
+    # ============================================================================
+    print(f"DEBUG CHAT: Using ImprovedAIService with function calling...")
+    
+    try:
+        # Procesar con IA mejorada (function calling)
+        ai_response_improved = improved_ai.chat_with_function_calling(
+            user_message=user_input_clean,
+            user_id=user_id,
+            conversation_history=conversation_history
+        )
+        
+        print(f"DEBUG: AI Response: {ai_response_improved}")
+        
+        # Si la IA detectó una función a ejecutar
+        if ai_response_improved['type'] == 'function_call':
+            function_name = ai_response_improved['function']
+            arguments = ai_response_improved['arguments']
+            requires_confirmation = ai_response_improved.get('requires_confirmation', True)
+            response_text = ai_response_improved.get('response_text', '')
+            
+            print(f"DEBUG: Function={function_name}, Requires Confirmation={requires_confirmation}")
+            
+            # FUNCIÓN: create_transaction
+            if function_name == 'create_transaction':
+                # Buscar cuenta (fuzzy matching)
+                account_name = arguments.get('account_name', '')
+                accounts = Account.query.filter_by(user_id=user_id, is_active=True).all()
+                
+                account = None
+                if accounts:
+                    account_names = [a.name for a in accounts]
+                    best_match, score = find_best_match(account_name, account_names)
+                    
+                    if best_match and score >= 60:
+                        account = next((a for a in accounts if a.name == best_match), None)
+                    
+                    # Si no encontró, usar primera cuenta
+                    if not account:
+                        account = accounts[0]
+                
+                if not account:
+                    ai_response = "❌ No tienes cuentas configuradas. Crea una cuenta primero."
+                    
+                    assistant_message = ChatMessage(
+                        user_id=user_id,
+                        role='assistant',
+                        content=ai_response,
+                        message_metadata={'type': 'error', 'ai_service': 'improved_ai'}
+                    )
+                    db.session.add(assistant_message)
+                    db.session.commit()
+                    
+                    return jsonify({
+                        'user_message': {
+                            'id': user_message.id,
+                            'role': 'user',
+                            'content': user_message.content,
+                            'created_at': user_message.created_at.isoformat()
+                        },
+                        'assistant_message': {
+                            'id': assistant_message.id,
+                            'role': 'assistant',
+                            'content': assistant_message.content,
+                            'created_at': assistant_message.created_at.isoformat()
+                        }
+                    }), 201
+                
+                # Buscar categoría (fuzzy matching)
+                category_name = arguments.get('category', '')
+                tx_type = arguments.get('type', 'expense')
+                
+                categories = Category.query.filter_by(
+                    user_id=user_id,
+                    category_type=tx_type
+                ).all()
+                
+                category = None
+                if categories and category_name:
+                    cat_names = [c.name for c in categories]
+                    best_cat_match, cat_score = find_best_match(category_name, cat_names)
+                    
+                    if best_cat_match and cat_score >= 60:
+                        category = next((c for c in categories if c.name == best_cat_match), None)
+                
+                # Si no encontró, usar primera categoría del tipo
+                if not category and categories:
+                    category = categories[0]
+                
+                # Preparar datos para confirmación
+                tx_data = {
+                    'amount': abs(arguments['amount']),
+                    'type': tx_type,
+                    'account': account.name,
+                    'account_id': account.id,
+                    'category': category.name if category else 'Sin categoría',
+                    'category_id': category.id if category else None,
+                    'description': arguments.get('description', ''),
+                    'date': arguments.get('date', datetime.now().strftime('%d/%m/%Y'))
+                }
+                
+                # Guardar respuesta de la IA
+                assistant_message = ChatMessage(
+                    user_id=user_id,
+                    role='assistant',
+                    content=response_text,
+                    message_metadata={
+                        'type': 'confirmation_required',
+                        'ai_service': 'improved_ai',
+                        'function': 'create_transaction',
+                        'pending_transaction': tx_data
+                    }
+                )
+                db.session.add(assistant_message)
+                db.session.commit()
+                
+                # RETORNAR CON DATOS PARA CONFIRMACIÓN VISUAL
+                return jsonify({
+                    'user_message': {
+                        'id': user_message.id,
+                        'role': 'user',
+                        'content': user_message.content,
+                        'created_at': user_message.created_at.isoformat()
+                    },
+                    'assistant_message': {
+                        'id': assistant_message.id,
+                        'role': 'assistant',
+                        'content': assistant_message.content,
+                        'created_at': assistant_message.created_at.isoformat()
+                    },
+                    'requires_confirmation': True,
+                    'transaction_data': tx_data,
+                    'function': 'create_transaction'
+                }), 201
+            
+            # FUNCIÓN: get_financial_summary
+            elif function_name == 'get_financial_summary':
+                # Aquí iría la lógica de resumen financiero
+                # Por ahora dejamos que siga el flujo normal
+                pass
+            
+            # FUNCIÓN: create_account  
+            elif function_name == 'create_account':
+                # Aquí iría la lógica de crear cuenta
+                # Por ahora dejamos que siga el flujo normal
+                pass
+        
+        # Si es respuesta conversacional normal, continuar con flujo normal
+        elif ai_response_improved['type'] == 'text':
+            # Guardar respuesta y retornar
+            assistant_message = ChatMessage(
+                user_id=user_id,
+                role='assistant',
+                content=ai_response_improved['message'],
+                message_metadata={'type': 'text', 'ai_service': 'improved_ai'}
+            )
+            db.session.add(assistant_message)
+            db.session.commit()
+            
+            return jsonify({
+                'user_message': {
+                    'id': user_message.id,
+                    'role': 'user',
+                    'content': user_message.content,
+                    'created_at': user_message.created_at.isoformat()
+                },
+                'assistant_message': {
+                    'id': assistant_message.id,
+                    'role': 'assistant',
+                    'content': assistant_message.content,
+                    'created_at': assistant_message.created_at.isoformat()
+                }
+            }), 201
+    
+    except Exception as e:
+        print(f"ERROR en ImprovedAIService: {e}")
+        print(f"Cayendo a lógica antigua...")
+        # Si falla la nueva IA, continuar con lógica antigua
+    
+    # FALLBACK: LÓGICA ANTIGUA (si la nueva IA falla)
+    print(f"DEBUG CHAT: Detecting command with AI (fallback)...")
     ai_command = None
     
     # Solo intentar detect_command_with_ai si el servicio está realmente disponible
@@ -2152,6 +2335,121 @@ Balance actualizado: {currency} {account.current_balance:,.2f}"""
         'created_at': assistant_message.created_at.isoformat()
         }
     }), 201
+
+
+# ==========================================
+# CONFIRM TRANSACTION ENDPOINT
+# ==========================================
+
+@chat_bp.route('/confirm-transaction', methods=['POST'])
+def confirm_transaction():
+    """
+    Endpoint para confirmar y guardar transacción desde UI de confirmación visual
+    Recibe: datos de transacción confirmados por el usuario
+    Retorna: success + transaction_id
+    """
+    user, error = get_user()
+    if error:
+        return error
+    
+    user_id = user.id
+    data = request.get_json()
+    
+    try:
+        # Validar datos requeridos
+        if not data.get('account_id'):
+            return jsonify({'success': False, 'error': 'Cuenta no especificada'}), 400
+        
+        if not data.get('amount'):
+            return jsonify({'success': False, 'error': 'Monto no especificado'}), 400
+        
+        # Buscar cuenta
+        account = Account.query.filter_by(
+            id=data['account_id'],
+            user_id=user_id,
+            is_active=True
+        ).first()
+        
+        if not account:
+            return jsonify({'success': False, 'error': 'Cuenta no encontrada'}), 404
+        
+        # Buscar categoría (opcional)
+        category = None
+        if data.get('category_id'):
+            category = Category.query.filter_by(
+                id=data['category_id'],
+                user_id=user_id
+            ).first()
+        
+        # Determinar tipo de transacción
+        tx_type = data.get('type', 'expense')
+        amount = float(data['amount'])
+        
+        # Crear transacción
+        new_transaction = Transaction(
+            user_id=user_id,
+            account_id=account.id,
+            category_id=category.id if category else None,
+            amount=amount if tx_type == 'income' else -abs(amount),
+            description=data.get('description', ''),
+            transaction_type=tx_type,
+            transaction_date=datetime.utcnow()
+        )
+        
+        # Actualizar balance de cuenta
+        if tx_type == 'expense':
+            account.current_balance -= abs(amount)
+        else:
+            account.current_balance += abs(amount)
+        
+        account.updated_at = datetime.utcnow()
+        
+        # Guardar en BD
+        db.session.add(new_transaction)
+        db.session.commit()
+        
+        # Guardar mensaje de confirmación en el chat
+        currency = user.preferred_currency or 'COP'
+        confirmation_msg = f"""✅ **¡Transacción guardada!**
+- **Monto:** {currency} {abs(amount):,.2f}
+- **Cuenta:** {account.name}
+- **Categoría:** {category.name if category else 'Sin categoría'}
+- **Tipo:** {'Ingreso' if tx_type == 'income' else 'Gasto'}
+
+💰 **Nuevo balance:** {currency} {account.current_balance:,.2f}"""
+        
+        assistant_message = ChatMessage(
+            user_id=user_id,
+            role='assistant',
+            content=confirmation_msg,
+            message_metadata={
+                'type': 'transaction_confirmed',
+                'transaction_id': new_transaction.id,
+                'ai_service': 'improved_ai'
+            }
+        )
+        db.session.add(assistant_message)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'transaction_id': new_transaction.id,
+            'message': 'Transacción registrada exitosamente',
+            'new_balance': float(account.current_balance)
+        }), 201
+        
+    except ValueError as e:
+        return jsonify({
+            'success': False,
+            'error': f'Valor inválido: {str(e)}'
+        }), 400
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error confirmando transacción: {e}")
+        return jsonify({
+            'success': False,
+            'error': f'Error al guardar transacción: {str(e)}'
+        }), 500
 
 
 # ==========================================
