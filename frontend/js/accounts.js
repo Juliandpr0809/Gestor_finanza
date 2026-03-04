@@ -119,6 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (type === 'credit') return 'fa-credit-card';
         if (type === 'savings') return 'fa-piggy-bank';
         if (type === 'cash') return 'fa-dollar-sign';
+        if (type === 'checking') return 'fa-university';
         return 'fa-wallet';
     }
 
