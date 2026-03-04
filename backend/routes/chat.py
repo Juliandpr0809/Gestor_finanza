@@ -1505,32 +1505,10 @@ También puedes usar:
                 # Por ahora dejamos que siga el flujo normal
                 pass
         
-        # Si es respuesta conversacional normal, continuar con flujo normal
+        # Si es texto normal, no retornamos aquí.
+        # Dejamos que el flujo local decida si es transacción con confirmación.
         elif ai_response_improved['type'] == 'text':
-            # Guardar respuesta y retornar
-            assistant_message = ChatMessage(
-                user_id=user_id,
-                role='assistant',
-                content=ai_response_improved['message'],
-                message_metadata={'type': 'text', 'ai_service': 'improved_ai'}
-            )
-            db.session.add(assistant_message)
-            db.session.commit()
-            
-            return jsonify({
-                'user_message': {
-                    'id': user_message.id,
-                    'role': 'user',
-                    'content': user_message.content,
-                    'created_at': user_message.created_at.isoformat()
-                },
-                'assistant_message': {
-                    'id': assistant_message.id,
-                    'role': 'assistant',
-                    'content': assistant_message.content,
-                    'created_at': assistant_message.created_at.isoformat()
-                }
-            }), 201
+            print("DEBUG: ImprovedAI text response, continuing to local-first flow")
     
     except Exception as e:
         print(f"ERROR en ImprovedAIService: {e}")
@@ -1867,6 +1845,81 @@ También puedes usar:
         
         transaction_parts = intent.get('transaction_parts', [data['content']])
         multiple = intent.get('multiple_transactions', False)
+
+        # ✅ NUEVO FLUJO: Siempre pedir confirmación visual antes de guardar
+        # Tomamos la primera transacción detectada para confirmar de forma segura.
+        first_part = transaction_parts[0] if transaction_parts else data['content']
+        tx_candidate = ai_service.extract_transaction_from_text(user_id, first_part, None)
+
+        if tx_candidate and tx_candidate.get('amount') and tx_candidate.get('transaction_type'):
+            accounts = Account.query.filter_by(user_id=user_id, is_active=True).all()
+            if not accounts:
+                ai_response = "❌ No tienes cuentas configuradas. Crea una cuenta primero."
+            else:
+                account = None
+                if tx_candidate.get('account'):
+                    account_names = [a.name for a in accounts]
+                    best_match, score = find_best_match(tx_candidate.get('account', ''), account_names)
+                    if best_match and score >= 60:
+                        account = next((a for a in accounts if a.name == best_match), None)
+                if not account:
+                    account = accounts[0]
+
+                tx_type = tx_candidate.get('transaction_type', 'expense')
+                categories = Category.query.filter_by(user_id=user_id, category_type=tx_type).all()
+                category = categories[0] if categories else None
+
+                tx_data = {
+                    'amount': abs(float(tx_candidate.get('amount', 0))),
+                    'type': tx_type,
+                    'account': account.name,
+                    'account_id': account.id,
+                    'category': category.name if category else 'Sin categoría',
+                    'category_id': category.id if category else None,
+                    'description': tx_candidate.get('description', ''),
+                    'date': datetime.now().strftime('%d/%m/%Y')
+                }
+
+                currency = user.preferred_currency or 'COP'
+                sign = '+' if tx_type == 'income' else '-'
+                ai_response = f"""🧾 **Revisa la transacción**
+- **Monto:** {sign}{currency} {tx_data['amount']:,.2f}
+- **Cuenta:** {tx_data['account']}
+- **Descripción:** {tx_data['description'] or 'Sin descripción'}
+
+Marca el chulito para confirmarla."""
+
+                assistant_message = ChatMessage(
+                    user_id=user_id,
+                    role='assistant',
+                    content=ai_response,
+                    message_metadata={
+                        'type': 'confirmation_required',
+                        'ai_service': 'transaction_detection',
+                        'pending_transaction': tx_data,
+                        'multiple_detected': bool(multiple and len(transaction_parts) > 1)
+                    }
+                )
+                db.session.add(assistant_message)
+                db.session.commit()
+
+                return jsonify({
+                    'user_message': {
+                        'id': user_message.id,
+                        'role': 'user',
+                        'content': user_message.content,
+                        'created_at': user_message.created_at.isoformat()
+                    },
+                    'assistant_message': {
+                        'id': assistant_message.id,
+                        'role': 'assistant',
+                        'content': assistant_message.content,
+                        'created_at': assistant_message.created_at.isoformat()
+                    },
+                    'requires_confirmation': True,
+                    'transaction_data': tx_data,
+                    'function': 'create_transaction'
+                }), 201
         
         print(f"DEBUG CHAT: Found {len(transaction_parts)} transaction parts")
         
@@ -2166,17 +2219,16 @@ Si querías registrar un gasto o ingreso, intenta con frases claras:
         has_income_word = any(keyword in user_input_clean.lower() for keyword in income_keywords)
         has_number = any(char.isdigit() for char in user_input_clean)
         
-        # Si tiene palabras de transacción Y número, intentar crear real antes de simulación
+        # Si tiene palabras de transacción Y número, pedir confirmación visual antes de guardar
         if (has_expense_word or has_income_word) and has_number:
-            print(f"DEBUG CHAT: FALLBACK - Attempting to create real transaction despite no intent detection")
+            print(f"DEBUG CHAT: FALLBACK - Building confirmation payload")
             
             # Intentar extraer transacción
             try:
                 transaction_data = ai_service.extract_transaction_from_text(user_id, data['content'], None)
                 
                 if transaction_data and transaction_data.get('amount') and transaction_data.get('transaction_type') and transaction_data.get('description'):
-                    # ✅ Datos válidos - CREAR TRANSACCIÓN REAL
-                    print(f"DEBUG CHAT: FALLBACK SUCCESS - Creating real transaction")
+                    print(f"DEBUG CHAT: FALLBACK SUCCESS - confirmation required")
                     
                     # MEJORADO: Buscar cuenta mencionada en el mensaje con aliases
                     all_accounts = Account.query.filter_by(user_id=user_id, is_active=True).all()
@@ -2257,35 +2309,54 @@ Si querías registrar un gasto o ingreso, intenta con frases claras:
                         category = Category(user_id=user_id, name=default_name, icon='📊', category_type=transaction_data['transaction_type'])
                         db.session.add(category)
                         db.session.commit()
-                    
-                    # Crear transacción
-                    amount = abs(transaction_data['amount'])
-                    balance_change = -amount if transaction_data['transaction_type'] == 'expense' else amount
-                    new_tx = Transaction(
-                        user_id=user_id, account_id=account.id, category_id=category.id,
-                        amount=amount, description=transaction_data['description'],
-                        transaction_type=transaction_data['transaction_type'],
-                        transaction_date=datetime.utcnow()
-                    )
-                    account.current_balance = float(Decimal(str(account.current_balance)) + balance_change)
-                    account.updated_at = datetime.utcnow()
-                    db.session.add(new_tx)
-                    db.session.commit()
-                    
-                    currency = user.preferred_currency
-                    tipo = "Ingreso" if transaction_data['transaction_type'] == 'income' else "Gasto"
-                    ai_response = f"""✅ **Transaccion registrada**
-- **Monto:** {currency} {amount:,.2f}
-- **Cuenta:** {account.name}
-- **Descripcion:** {transaction_data['description']}
-- **Tipo:** {tipo}
 
-Balance actualizado: {currency} {account.current_balance:,.2f}"""
-                    
-                    assistant_message = ChatMessage(user_id=user_id, role='assistant', content=ai_response, message_metadata={'type': 'fallback_transaction_created'})
+                    amount = abs(transaction_data['amount'])
+                    tx_data = {
+                        'amount': amount,
+                        'type': transaction_data['transaction_type'],
+                        'account': account.name,
+                        'account_id': account.id,
+                        'category': category.name,
+                        'category_id': category.id,
+                        'description': transaction_data['description'],
+                        'date': datetime.now().strftime('%d/%m/%Y')
+                    }
+
+                    currency = user.preferred_currency or 'COP'
+                    sign = '+' if tx_data['type'] == 'income' else '-'
+                    ai_response = f"""🧾 **Revisa la transacción**
+- **Monto:** {sign}{currency} {amount:,.2f}
+- **Cuenta:** {account.name}
+- **Descripción:** {transaction_data['description']}
+
+Marca el chulito para confirmarla."""
+
+                    assistant_message = ChatMessage(
+                        user_id=user_id,
+                        role='assistant',
+                        content=ai_response,
+                        message_metadata={'type': 'confirmation_required', 'pending_transaction': tx_data}
+                    )
                     db.session.add(assistant_message)
                     db.session.commit()
-                    return jsonify({'user_message': {'id': user_message.id, 'role': 'user', 'content': user_message.content, 'created_at': user_message.created_at.isoformat()}, 'assistant_message': {'id': assistant_message.id, 'role': 'assistant', 'content': assistant_message.content, 'created_at': assistant_message.created_at.isoformat()}}), 201
+
+                    return jsonify({
+                        'user_message': {
+                            'id': user_message.id,
+                            'role': 'user',
+                            'content': user_message.content,
+                            'created_at': user_message.created_at.isoformat()
+                        },
+                        'assistant_message': {
+                            'id': assistant_message.id,
+                            'role': 'assistant',
+                            'content': assistant_message.content,
+                            'created_at': assistant_message.created_at.isoformat()
+                        },
+                        'requires_confirmation': True,
+                        'transaction_data': tx_data,
+                        'function': 'create_transaction'
+                    }), 201
             except Exception as e:
                 print(f"DEBUG CHAT: FALLBACK FAILED - {str(e)}")
                 # Continuar a simulación
