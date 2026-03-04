@@ -17,7 +17,7 @@ class Config:
     # JWT
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or SECRET_KEY
     JWT_ALGORITHM = 'HS256'
-    JWT_ACCESS_TOKEN_EXPIRES_MIN = int(os.environ.get('JWT_ACCESS_TOKEN_EXPIRES_MIN', 60 * 24))  # 24h
+    JWT_ACCESS_TOKEN_EXPIRES_MIN = int(os.environ.get('JWT_ACCESS_TOKEN_EXPIRES_MIN', 30 * 24 * 60))  # 30 days
     JWT_REMEMBER_TOKEN_EXPIRES_MIN = 30 * 24 * 60  # 30 días para "Remember me"
     
     # Sesiones - Configuración segura

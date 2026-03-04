@@ -82,6 +82,15 @@ class APIClient {
             const data = await response.json();
 
             if (!response.ok) {
+                // Si es 401, la sesión expiró - limpiar token y redirigir
+                if (response.status === 401) {
+                    console.error('❌ 401 UNAUTHORIZED - Sesión expirada');
+                    this.setToken(null);
+                    // Redirigir al login después de 500ms para que el usuario vea el mensaje
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 500);
+                }
                 throw new Error(data.error || `HTTP ${response.status}`);
             }
 

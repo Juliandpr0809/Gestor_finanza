@@ -1219,8 +1219,8 @@ Sé conciso y práctico."""
                         best_score = match[1]
                         best_acc = acc.name
                 
-                # Umbral de confianza (85/100)
-                if best_score >= 82: # Un poco más tolerante que 85
+                # Umbral de confianza: 60% (consistente con chat.py)
+                if best_score >= 60:
                     account_name = best_acc
                     print(f"[AI] Fuzzy match account: '{account_name}' (Score: {best_score})")
         
