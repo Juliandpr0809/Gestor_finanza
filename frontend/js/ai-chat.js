@@ -87,6 +87,18 @@ document.addEventListener('DOMContentLoaded', () => {
         sendBtn.disabled = chatInput.value.trim() === '' || isLoading;
     });
 
+    // Asegurar que el input sea visible cuando recibe foco (fix para móviles)
+    chatInput.addEventListener('focus', () => {
+        setTimeout(() => {
+            // Scroll al final de los mensajes cuando el input recibe foco
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            // En móviles, asegurar que el input esté visible
+            if (window.innerWidth <= 768) {
+                chatInput.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }, 300); // Delay para esperar a que el teclado aparezca
+    });
+
     // Handle Enter key to send message (Shift+Enter for new line)
     chatInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
