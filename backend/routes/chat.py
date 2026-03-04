@@ -1929,7 +1929,9 @@ Marca el chulito para confirmarla."""
         print(f"DEBUG CHAT: Reason: Missing transaction keywords or numbers")
         # Continuar con la IA normal (consultas, análisis, etc.)
     
-    if intent and intent.get('has_intent') and not wants_simulation:
+    # DESHABILITADO: creación automática de múltiples transacciones
+    # Dejar que FALLBACK más abajo maneje la confirmación visual
+    if False and intent and intent.get('has_intent') and not wants_simulation:
         # El usuario quiere crear transacciones REALES (pueden ser múltiples)
         print(f"DEBUG CHAT: Intent detected, processing transactions...")
         
