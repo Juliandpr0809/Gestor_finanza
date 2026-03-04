@@ -14,7 +14,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const accountActionSheet = document.getElementById('accountActionSheet');
     const actionSheetOverlay = document.getElementById('actionSheetOverlay');
     const actionViewDetails = document.getElementById('actionViewDetails');
+    const actionEdit = document.getElementById('actionEdit');
     const actionDelete = document.getElementById('actionDelete');
+    const btnDeleteFromModal = document.getElementById('btnDeleteFromModal');
+    const accountBalanceInput = document.getElementById('accountBalance');
+    const accountCurrencySelect = document.getElementById('accountCurrency');
+    const modalBalancePreview = document.getElementById('modalBalancePreview');
 
     let accountsCache = [];
     let editingAccountId = null;
@@ -81,6 +86,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
         `;
+    };
+
+    const updateModalBalancePreview = () => {
+        if (!modalBalancePreview || !accountBalanceInput || !accountCurrencySelect) return;
+        const amount = parseFloat(accountBalanceInput.value) || 0;
+        const currency = accountCurrencySelect.value || preferredCurrency || 'COP';
+        modalBalancePreview.textContent = formatMoney(amount, currency);
     };
 
     // ==========================================
@@ -264,16 +276,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    accountBalanceInput?.addEventListener('input', updateModalBalancePreview);
+    accountCurrencySelect?.addEventListener('change', updateModalBalancePreview);
+
     // ==========================================
     // OPEN ADD ACCOUNT MODAL
     // ==========================================
 
     btnAddAccount.addEventListener('click', () => {
         editingAccountId = null;
-        document.getElementById('modalTitle').textContent = 'Add New Account';
+        document.getElementById('modalTitle').textContent = 'Nueva cuenta';
+        accountModal.classList.remove('edit-mode');
+        btnDeleteFromModal?.classList.add('hidden');
         accountForm.reset();
+        if (accountTypeSelect) accountTypeSelect.value = 'checking';
+        if (accountCurrencySelect) accountCurrencySelect.value = preferredCurrency || 'COP';
+        if (accountBalanceInput) accountBalanceInput.value = '';
         creditLimitGroup.classList.add('hidden');
         savingsGoalGroup.classList.add('hidden');
+        updateModalBalancePreview();
         accountModal.classList.remove('hidden');
     });
 
@@ -286,7 +307,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!acc) return;
 
         editingAccountId = accountId;
-        document.getElementById('modalTitle').textContent = 'Edit Account';
+        document.getElementById('modalTitle').textContent = 'Editar cuenta';
+        accountModal.classList.add('edit-mode');
+        btnDeleteFromModal?.classList.remove('hidden');
 
         document.getElementById('accountName').value = acc.name || '';
         document.getElementById('accountType').value = acc.account_type || '';
@@ -314,6 +337,7 @@ document.addEventListener('DOMContentLoaded', () => {
             savingsGoalGroup.classList.remove('hidden');
         }
 
+        updateModalBalancePreview();
         accountModal.classList.remove('hidden');
     };
 
@@ -361,9 +385,22 @@ document.addEventListener('DOMContentLoaded', () => {
         viewTransactions(selectedAccountId);
     });
 
+    actionEdit?.addEventListener('click', () => {
+        if (!selectedAccountId) return;
+        closeAccountActions();
+        editAccount(selectedAccountId);
+    });
+
     actionDelete?.addEventListener('click', async () => {
         if (!selectedAccountId) return;
         await deleteAccount(selectedAccountId);
+    });
+
+    btnDeleteFromModal?.addEventListener('click', async () => {
+        if (!editingAccountId) return;
+        const accountIdToDelete = editingAccountId;
+        closeModal();
+        await deleteAccount(accountIdToDelete);
     });
 
     // ==========================================
@@ -380,8 +417,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.closeModal = function () {
         accountModal.classList.add('hidden');
+        accountModal.classList.remove('edit-mode');
+        btnDeleteFromModal?.classList.add('hidden');
         accountForm.reset();
         editingAccountId = null;
+        updateModalBalancePreview();
     };
 
     document.addEventListener('keydown', (e) => {

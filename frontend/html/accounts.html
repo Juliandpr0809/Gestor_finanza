@@ -181,6 +181,10 @@
                 <i class="fas fa-eye"></i>
                 <span>Ver Detalles</span>
             </button>
+            <button class="action-sheet-item" id="actionEdit" type="button">
+                <i class="fas fa-pen"></i>
+                <span>Editar cuenta</span>
+            </button>
             <button class="action-sheet-item danger" id="actionDelete" type="button">
                 <i class="fas fa-trash"></i>
                 <span>Eliminar Cuenta</span>
@@ -193,17 +197,34 @@
         <div class="modal-overlay" onclick="closeModal()"></div>
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="modalTitle" data-i18n="Add New Account">Add New Account</h2>
-                <button class="btn-close-modal" onclick="closeModal()">
-                    <i class="fas fa-times"></i>
+                <button type="button" class="btn-modal-back" onclick="closeModal()" aria-label="Volver">
+                    <i class="fas fa-chevron-left"></i>
                 </button>
+                <h2 id="modalTitle" data-i18n="Edit Account">Editar cuenta</h2>
+                <button type="button" class="btn-modal-delete hidden" id="btnDeleteFromModal" aria-label="Eliminar cuenta">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+
+            <div class="modal-balance-preview">
+                <p class="modal-balance-label">Saldo</p>
+                <p class="modal-balance-amount" id="modalBalancePreview">$0,00</p>
             </div>
 
             <form class="modal-form" id="accountForm">
                 <div class="form-group">
+                    <label class="form-label-highlight" data-i18n="Current Balance">
+                        Saldo inicial
+                    </label>
+                    <input type="number" id="accountBalance" class="form-input form-input-prominent" placeholder="0.00" step="0.01" required>
+                </div>
+
+                <div class="form-section-title">Descripción</div>
+
+                <div class="form-group">
                     <label data-i18n="Account Name">
                         <i class="fas fa-tag"></i>
-                        Account Name
+                        Nombre de la cuenta
                     </label>
                     <input type="text" id="accountName" class="form-input" data-i18n-placeholder="e.g., Main Checking"
                         placeholder="e.g., Main Checking" required>
@@ -254,13 +275,6 @@
                 </div>
 
                 <div class="form-group">
-                    <label data-i18n="Current Balance">
-                        <i class="fas fa-dollar-sign"></i>
-                        Current Balance
-                    </label>
-                    <input type="number" id="accountBalance" class="form-input" placeholder="0.00" step="0.01" required>
-                </div>
-
                 <div class="form-group credit-limit-group hidden">
                     <label data-i18n="Credit Limit">
                         <i class="fas fa-chart-line"></i>
@@ -278,12 +292,8 @@
                 </div>
 
                 <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="closeModal()" data-i18n="Cancel">
-                        Cancel
-                    </button>
                     <button type="submit" class="btn-primary">
-                        <i class="fas fa-save"></i>
-                        <span data-i18n="Save Account">Save Account</span>
+                        <span data-i18n="Save">Guardar</span>
                     </button>
                 </div>
             </form>
