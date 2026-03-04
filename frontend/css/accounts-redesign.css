@@ -28,7 +28,7 @@
 }
 
 .summary-title {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   margin: 0;
   opacity: 0.9;
@@ -36,7 +36,7 @@
 
 .summary-amount {
   margin: 6px 0 0;
-  font-size: 32px;
+  font-size: 28px;
   line-height: 1;
   font-weight: 700;
 }
@@ -45,8 +45,8 @@
   background: rgba(255, 255, 255, 0.16);
   border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 999px;
-  padding: 8px 12px;
-  font-size: 14px;
+  padding: 6px 10px;
+  font-size: 12px;
   font-weight: 600;
 }
 
@@ -73,14 +73,14 @@
 .summary-metric-label {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 12px;
+  gap: 6px;
+  font-size: 11px;
   color: rgba(255, 255, 255, 0.82);
 }
 
 .summary-metric-value {
   margin-top: 4px;
-  font-size: 28px;
+  font-size: 24px;
   line-height: 1;
   font-weight: 700;
 }
@@ -95,15 +95,15 @@
 
 .accounts-section-head h2 {
   margin: 0;
-  font-size: 28px;
+  font-size: 24px;
   line-height: 1.1;
   letter-spacing: -0.01em;
 }
 
 .accounts-section-head p {
-  margin: 6px 0 0;
+  margin: 4px 0 0;
   color: var(--text-tertiary);
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .accounts-controls {
@@ -170,16 +170,16 @@
 }
 
 .account-leading-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.06);
   color: var(--text-primary);
   border: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px;
+  font-size: 22px;
   flex-shrink: 0;
 }
 
@@ -343,13 +343,13 @@
 
 .detail-balance-label {
   margin: 0;
-  font-size: 13px;
+  font-size: 12px;
   opacity: 0.9;
 }
 
 .detail-balance-amount {
   margin: 6px 0 0;
-  font-size: 36px;
+  font-size: 32px;
   line-height: 1;
   font-weight: 700;
 }
@@ -371,14 +371,14 @@
 }
 
 .detail-info-label {
-  font-size: 12px;
+  font-size: 10px;
   color: var(--text-tertiary);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
 }
 
 .detail-info-value {
-  font-size: 15px;
+  font-size: 14px;
   color: var(--text-primary);
   font-weight: 600;
 }
@@ -414,37 +414,38 @@
 
 .modal-balance-label {
   margin: 0;
-  font-size: 18px;
+  font-size: 13px;
   color: var(--text-secondary);
 }
 
 .modal-balance-amount {
   margin: 4px 0 0;
-  font-size: 36px;
+  font-size: 32px;
   line-height: 1;
   font-weight: 700;
   color: #6B9FFF;
 }
 
 .form-section-title {
-  margin-top: 6px;
-  font-size: 14px;
+  margin-top: 8px;
+  font-size: 11px;
   font-weight: 600;
-  color: var(--text-secondary);
+  color: var(--text-tertiary);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
 }
 
 .form-label-highlight {
   color: #6B9FFF !important;
-  font-size: 14px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
 }
 
 .form-input-prominent {
   border: 2px solid #6B9FFF;
-  border-radius: 16px;
-  min-height: 54px;
-  font-size: 20px;
+  border-radius: 14px;
+  min-height: 50px;
+  font-size: 18px;
   font-weight: 600;
   text-align: center;
 }
@@ -554,7 +555,11 @@
   }
 
   .detail-balance-amount {
-    font-size: 34px;
+    font-size: 30px;
+  }
+
+  .detail-info-value {
+    font-size: 13px;
   }
 
   .detail-info-grid {
@@ -579,7 +584,11 @@
   }
 
   .modal-balance-amount {
-    font-size: 34px;
+    font-size: 30px;
+  }
+
+  .modal-balance-label {
+    font-size: 12px;
   }
 
   .modal-form {
@@ -598,10 +607,10 @@
   }
 
   .form-input-prominent {
-    min-height: 56px;
-    font-size: 24px;
-    border-radius: 18px;
-    padding: 10px 16px;
+    min-height: 52px;
+    font-size: 20px;
+    border-radius: 16px;
+    padding: 10px 14px;
   }
 
   .form-actions {
@@ -655,40 +664,46 @@
   }
 
   .summary-title {
-    font-size: 13px;
-  }
-
-  .summary-amount {
-    font-size: 30px;
-  }
-
-  .summary-metric-label {
     font-size: 12px;
   }
 
-  .summary-metric-value {
+  .summary-amount {
     font-size: 26px;
   }
 
+  .summary-metric-label {
+    font-size: 10px;
+  }
+
+  .summary-metric-value {
+    font-size: 22px;
+  }
+
   .accounts-section-head h2 {
-    font-size: 24px;
+    font-size: 20px;
     line-height: 1.1;
   }
 
   .accounts-section-head p {
-    font-size: 13px;
+    font-size: 12px;
   }
 
   .accounts-modern .account-name {
-    font-size: 15px;
+    font-size: 14px;
   }
 
   .account-subtitle {
-    font-size: 13px;
+    font-size: 12px;
   }
 
   .accounts-modern .account-balance {
-    font-size: 15px;
+    font-size: 14px;
+  }
+
+  .account-leading-icon {
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
   }
 
   .accounts-add-fab {
@@ -700,24 +715,38 @@
 
 @media (max-width: 420px) {
   .summary-amount {
-    font-size: 28px;
+    font-size: 24px;
   }
 
   .summary-chip {
-    font-size: 13px;
-    padding: 6px 10px;
+    font-size: 11px;
+    padding: 5px 8px;
+  }
+
+  .summary-metric-value {
+    font-size: 20px;
   }
 
   .accounts-section-head h2 {
-    font-size: 22px;
+    font-size: 18px;
   }
 
   .accounts-modern .account-name,
   .accounts-modern .account-balance {
-    font-size: 14px;
+    font-size: 13px;
+  }
+
+  .account-leading-icon {
+    width: 42px;
+    height: 42px;
+    font-size: 18px;
   }
 
   .modal-balance-amount {
-    font-size: 30px;
+    font-size: 28px;
+  }
+
+  .detail-balance-amount {
+    font-size: 28px;
   }
 }

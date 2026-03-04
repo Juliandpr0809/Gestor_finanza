@@ -73,16 +73,16 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (percentage > 40) usageClass = 'medium';
 
         return `
-            <div class="credit-usage-indicator" style="margin-top: 12px;">
+            <div class="credit-usage-indicator" style="margin-top: 8px;">
                 <div class="usage-label">
-                    <span style="font-size: 11px; color: rgba(255,255,255,0.5);">Crédito Usado</span>
-                    <span class="usage-percentage" style="font-size: 11px; font-weight: 600;">${percentage.toFixed(0)}%</span>
+                    <span style="font-size: 10px; color: rgba(255,255,255,0.5);">Crédito usado</span>
+                    <span class="usage-percentage" style="font-size: 10px; font-weight: 600;">${percentage.toFixed(0)}%</span>
                 </div>
-                <div class="usage-bar" style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; margin-top: 4px; overflow: hidden;">
-                    <div class="usage-fill ${usageClass}" style="width: ${percentage}%; height: 100%; border-radius: 3px; transition: width 0.3s ease;"></div>
+                <div class="usage-bar" style="height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 3px; overflow: hidden;">
+                    <div class="usage-fill ${usageClass}" style="width: ${percentage}%; height: 100%; border-radius: 2px; transition: width 0.3s ease;"></div>
                 </div>
-                <div class="credit-limit" style="font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 4px;">
-                    ${formatMoney(used)} / ${formatMoney(limit)}
+                <div class="credit-limit" style="font-size: 9px; color: rgba(255,255,255,0.4); margin-top: 3px;">
+                    ${formatMoney(used, acc.currency || 'COP')} / ${formatMoney(limit, acc.currency || 'COP')}
                 </div>
             </div>
         `;
@@ -291,7 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
         accountForm.reset();
         if (accountTypeSelect) accountTypeSelect.value = 'checking';
         if (accountCurrencySelect) accountCurrencySelect.value = preferredCurrency || 'COP';
-        if (accountBalanceInput) accountBalanceInput.value = '';
+        if (accountBalanceInput) accountBalanceInput.value = '0';
         creditLimitGroup.classList.add('hidden');
         savingsGoalGroup.classList.add('hidden');
         updateModalBalancePreview();
@@ -355,7 +355,10 @@ document.addEventListener('DOMContentLoaded', () => {
             await api.deleteAccount(accountId);
             await loadAccounts();
             closeAccountActions();
-            alert('Cuenta eliminada');
+            if (accountDetailModal && !accountDetailModal.classList.contains('hidden')) {
+                closeAccountDetail();
+            }
+            alert('Cuenta eliminada correctamente');
         } catch (err) {
             console.error('Error al eliminar cuenta:', err);
             if (ensureAuth(err)) return;
@@ -400,8 +403,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.editAccountFromDetail = function() {
         if (!selectedAccountId) return;
+        const accountId = selectedAccountId; // Guardar el ID antes de cerrar
         closeAccountDetail();
-        editAccount(selectedAccountId);
+        editAccount(accountId);
     };
 
     window.viewTransactionsFromDetail = function() {
@@ -491,7 +495,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const submitBtn = accountForm.querySelector('button[type="submit"]');
-        const resetLoading = setLoadingBtn(submitBtn, editingAccountId ? 'Actualizando...' : 'Guardando...');
+        const resetLoading = setLoadingBtn(submitBtn, editingAccountId ? 'Guardando...' : 'Guardando...');
 
         try {
             if (editingAccountId) {
