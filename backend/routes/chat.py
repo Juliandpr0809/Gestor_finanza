@@ -1383,13 +1383,14 @@ También puedes usar:
                     'type': tx_type,
                     'account': account.name,
                     'account_id': account.id,
+                    'currency': account.currency or user.preferred_currency or 'COP',
                     'category': category.name if category else 'Sin categoría',
                     'category_id': category.id if category else None,
                     'description': tx_preview.get('description', ''),
                     'date': datetime.now().strftime('%d/%m/%Y')
                 }
 
-                currency = user.preferred_currency or 'COP'
+                currency = tx_data['currency']
                 sign = '+' if tx_type == 'income' else '-'
                 ai_response = f"""🧾 **Revisa la transacción**
 - **Monto:** {sign}{currency} {tx_data['amount']:,.2f}
@@ -1525,6 +1526,7 @@ Marca el chulito para confirmarla."""
                     'type': tx_type,
                     'account': account.name,
                     'account_id': account.id,
+                    'currency': account.currency or user.preferred_currency or 'COP',
                     'category': category.name if category else 'Sin categoría',
                     'category_id': category.id if category else None,
                     'description': arguments.get('description', ''),
@@ -1946,13 +1948,14 @@ Marca el chulito para confirmarla."""
                     'type': tx_type,
                     'account': account.name,
                     'account_id': account.id,
+                    'currency': account.currency or user.preferred_currency or 'COP',
                     'category': category.name if category else 'Sin categoría',
                     'category_id': category.id if category else None,
                     'description': tx_candidate.get('description', ''),
                     'date': datetime.now().strftime('%d/%m/%Y')
                 }
 
-                currency = user.preferred_currency or 'COP'
+                currency = tx_data['currency']
                 sign = '+' if tx_type == 'income' else '-'
                 ai_response = f"""🧾 **Revisa la transacción**
 - **Monto:** {sign}{currency} {tx_data['amount']:,.2f}
@@ -2415,13 +2418,14 @@ Si querías registrar un gasto o ingreso, intenta con frases claras:
                         'type': transaction_data['transaction_type'],
                         'account': account.name,
                         'account_id': account.id,
+                        'currency': account.currency or user.preferred_currency or 'COP',
                         'category': category.name,
                         'category_id': category.id,
                         'description': transaction_data['description'],
                         'date': datetime.now().strftime('%d/%m/%Y')
                     }
 
-                    currency = user.preferred_currency or 'COP'
+                    currency = tx_data['currency']
                     sign = '+' if tx_data['type'] == 'income' else '-'
                     ai_response = f"""🧾 **Revisa la transacción**
 - **Monto:** {sign}{currency} {amount:,.2f}
@@ -2601,7 +2605,7 @@ def confirm_transaction():
         db.session.commit()
         
         # Guardar mensaje de confirmación en el chat
-        currency = user.preferred_currency or 'COP'
+        currency = account.currency or user.preferred_currency or 'COP'
         confirmation_msg = f"""✅ **¡Transacción guardada!**
 - **Monto:** {currency} {abs(amount):,.2f}
 - **Cuenta:** {account.name}

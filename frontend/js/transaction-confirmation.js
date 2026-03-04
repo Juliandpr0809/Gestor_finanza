@@ -52,6 +52,7 @@ class TransactionConfirmationComponent {
         const {
             amount,
             type = 'expense',
+            currency = 'COP',
             account,
             category,
             description = '',
@@ -59,7 +60,7 @@ class TransactionConfirmationComponent {
         } = data;
 
         // Formatear monto
-        const formattedAmount = this.formatAmount(amount, type);
+        const formattedAmount = this.formatAmount(amount, type, currency);
         
         // Seleccionar icono según tipo
         const icon = type === 'income' ? 'fa-arrow-down' : 
@@ -238,12 +239,14 @@ class TransactionConfirmationComponent {
      * Formatea el monto según el tipo de transacción
      * @param {Number} amount - Monto
      * @param {String} type - Tipo (expense/income)
+     * @param {String} currency - Moneda de la cuenta
      */
-    formatAmount(amount, type) {
+    formatAmount(amount, type, currency = 'COP') {
         const prefix = type === 'expense' ? '-' : '+';
+        const safeCurrency = (currency || 'COP').toUpperCase();
         const formatted = new Intl.NumberFormat('es-ES', {
             style: 'currency',
-            currency: 'USD',
+            currency: safeCurrency,
             minimumFractionDigits: 2
         }).format(Math.abs(amount));
         
