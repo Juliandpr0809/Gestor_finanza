@@ -8,11 +8,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const accountTypeSelect = document.getElementById('accountType');
     const creditLimitGroup = document.querySelector('.credit-limit-group');
     const savingsGoalGroup = document.querySelector('.savings-goal-group');
-    const filterTabs = document.querySelectorAll('.tab-btn');
+    const accountTypeFilter = document.getElementById('accountTypeFilter');
+    const accountsSortBtn = document.getElementById('accountsSortBtn');
     const accountsGrid = document.getElementById('accountsGrid');
+    const accountActionSheet = document.getElementById('accountActionSheet');
+    const actionSheetOverlay = document.getElementById('actionSheetOverlay');
+    const actionViewDetails = document.getElementById('actionViewDetails');
+    const actionDelete = document.getElementById('actionDelete');
 
     let accountsCache = [];
     let editingAccountId = null;
+    let selectedAccountId = null;
+    let sortAscending = false;
 
     // ==========================================
     // HELPERS
@@ -22,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const formatMoney = (amount, currency = 'USD') => {
         try {
-            return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(amount);
+            return new Intl.NumberFormat('es-CO', { style: 'currency', currency }).format(amount);
         } catch (_) {
             return `${currency} ${amount.toFixed(2)}`;
         }
@@ -89,15 +96,49 @@ document.addEventListener('DOMContentLoaded', () => {
                 preferredCurrency = accountsCache[0].currency;
                 localStorage.setItem('preferredCurrency', preferredCurrency);
             }
-            renderAccounts(data);
             updateFilters(data);
             updateSummary(data);
+            refreshAccountsView();
         } catch (err) {
             console.error('Error al cargar cuentas:', err);
             if (ensureAuth(err)) return;
             accountsGrid.innerHTML = '<p class="empty-text">No se pudieron cargar las cuentas.</p>';
             alert(`No se pudieron cargar las cuentas: ${err.message}`);
         }
+    }
+
+    function getTypeLabel(type) {
+        if (type === 'checking') return 'Corriente';
+        if (type === 'savings') return 'Ahorros';
+        if (type === 'credit') return 'Crédito';
+        if (type === 'cash') return 'Efectivo';
+        return 'Cuenta';
+    }
+
+    function getTypeIcon(type) {
+        if (type === 'credit') return 'fa-credit-card';
+        if (type === 'savings') return 'fa-piggy-bank';
+        if (type === 'cash') return 'fa-dollar-sign';
+        return 'fa-wallet';
+    }
+
+    function getFilteredAndSortedAccounts() {
+        const selectedFilter = accountTypeFilter?.value || 'all';
+        const filtered = selectedFilter === 'all'
+            ? [...accountsCache]
+            : accountsCache.filter(acc => acc.account_type === selectedFilter);
+
+        filtered.sort((left, right) => {
+            const leftBalance = left.current_balance || 0;
+            const rightBalance = right.current_balance || 0;
+            return sortAscending ? leftBalance - rightBalance : rightBalance - leftBalance;
+        });
+
+        return filtered;
+    }
+
+    function refreshAccountsView() {
+        renderAccounts(getFilteredAndSortedAccounts());
     }
 
     function renderAccounts(accounts) {
@@ -113,44 +154,26 @@ document.addEventListener('DOMContentLoaded', () => {
             card.dataset.type = acc.account_type;
             card.style.animation = `fadeInUp 0.5s ease ${index * 0.05}s both`;
 
-            const badgeClass = acc.account_type === 'savings' ? 'savings' : acc.account_type === 'credit' ? 'credit' : 'checking';
             const balanceClass = acc.current_balance < 0 ? 'negative' : '';
+            const typeLabel = getTypeLabel(acc.account_type);
+            const typeIcon = getTypeIcon(acc.account_type);
 
             card.innerHTML = `
-                <div class="account-card-header">
-                    <div class="account-type-badge ${badgeClass}">
-                        <i class="fas ${badgeClass === 'credit' ? 'fa-credit-card' : badgeClass === 'savings' ? 'fa-piggy-bank' : 'fa-university'}"></i>
-                        ${acc.account_type || 'account'}
-                    </div>
-                    <div class="account-actions">
-                        <button class="btn-action" onclick="editAccount(${acc.id})">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn-action" onclick="deleteAccount(${acc.id})">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
+                <div class="account-leading-icon">
+                    <i class="fas ${typeIcon}"></i>
                 </div>
-                <div class="account-card-body">
-                    <div class="account-name">${acc.name}</div>
-                    <div class="account-number">${acc.currency || 'USD'}</div>
-                    <div class="account-balance ${balanceClass}">${formatMoney(acc.current_balance || 0, acc.currency || 'USD')}</div>
-                    <div class="account-bank">
-                        <i class="fas fa-building"></i>
-                        ${acc.account_type}
+
+                <div class="account-content">
+                    <div class="account-main-row">
+                        <div class="account-name">${acc.name}</div>
+                        <div class="account-balance ${balanceClass}">${formatMoney(acc.current_balance || 0, acc.currency || 'USD')}</div>
                     </div>
-                    ${generateCreditUsageIndicator(acc)}
+                    <div class="account-subtitle">${typeLabel}</div>
                 </div>
-                <div class="account-card-footer">
-                    <div class="account-status ${acc.is_active ? 'active' : 'inactive'}">
-                        <i class="fas fa-circle"></i>
-                        ${acc.is_active ? 'Active' : 'Inactive'}
-                    </div>
-                    <button class="btn-view-transactions" onclick="viewTransactions(${acc.id})">
-                        Ver movimientos
-                        <i class="fas fa-arrow-right"></i>
-                    </button>
-                </div>
+
+                <button class="account-more-btn" onclick="openAccountActions(${acc.id})" aria-label="Más opciones">
+                    <i class="fas fa-ellipsis-h"></i>
+                </button>
             `;
             accountsGrid.appendChild(card);
         });
@@ -163,15 +186,21 @@ document.addEventListener('DOMContentLoaded', () => {
             return acc;
         }, {});
 
-        filterTabs.forEach(tab => {
-            const filter = tab.dataset.filter;
-            const countSpan = tab.querySelector('.tab-count');
-            if (filter === 'all') {
-                countSpan.textContent = counts.all || 0;
-            } else {
-                countSpan.textContent = counts[filter] || 0;
-            }
-        });
+        if (accountTypeFilter) {
+            const labelMap = {
+                all: 'Todos',
+                checking: 'Corriente',
+                savings: 'Ahorros',
+                credit: 'Crédito',
+                cash: 'Efectivo'
+            };
+
+            Array.from(accountTypeFilter.options).forEach(option => {
+                const filter = option.value;
+                const total = filter === 'all' ? (counts.all || 0) : (counts[filter] || 0);
+                option.textContent = `${labelMap[filter]} (${total})`;
+            });
+        }
     }
 
     // ==========================================
@@ -181,69 +210,39 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateSummary(accounts) {
         const totalBalance = accounts.reduce((sum, a) => sum + (a.current_balance || 0), 0);
         const displayCurrency = preferredCurrency || accounts[0]?.currency || 'USD';
-        const checkingCount = accounts.filter(a => a.account_type === 'checking').length;
-        const savingsCount = accounts.filter(a => a.account_type === 'savings').length;
-        const creditCount = accounts.filter(a => a.account_type === 'credit').length;
-        const bankCount = checkingCount + savingsCount;
-
-        // Card 1: Balance Total (ID dinámico)
         const totalBalEl = document.getElementById('summaryTotalBalance');
         if (totalBalEl) totalBalEl.textContent = formatMoney(totalBalance, displayCurrency);
-        const loadingInd = document.getElementById('summaryLoadingIndicator');
-        if (loadingInd) loadingInd.style.display = 'none';
 
-        // Card 2: Cuentas Bancarias
-        const bankCountEl = document.getElementById('summaryBankCount');
-        if (bankCountEl) bankCountEl.textContent = String(bankCount);
-        const bankDetailEl = document.getElementById('summaryBankDetail');
-        if (bankDetailEl) bankDetailEl.textContent = `${checkingCount} corriente, ${savingsCount} ahorros`;
+        const activeCount = accounts.filter(a => a.is_active !== false).length;
+        const uniqueTypes = new Set(accounts.map(a => a.account_type).filter(Boolean));
 
-        // Card 3: Tarjetas de Credito
-        const creditCountEl = document.getElementById('summaryCreditCount');
-        if (creditCountEl) creditCountEl.textContent = String(creditCount);
-        const creditDetailEl = document.getElementById('summaryCreditDetail');
-        if (creditDetailEl) {
-            const totalCredit = accounts.filter(a => a.account_type === 'credit')
-                .reduce((s, a) => s + Math.abs(a.current_balance || 0), 0);
-            creditDetailEl.textContent = creditCount > 0
-                ? `${formatMoney(totalCredit, displayCurrency)} usado`
-                : 'Sin tarjetas de crédito';
-        }
+        const accountCountEl = document.getElementById('summaryAccountCount');
+        if (accountCountEl) accountCountEl.textContent = `${accounts.length} cuenta${accounts.length === 1 ? '' : 's'}`;
 
-        // Card 4: Ahorros
-        const savingsEl = document.getElementById('summarySavings');
-        const savingsTotal = accounts.filter(a => a.account_type === 'savings')
-            .reduce((s, a) => s + (a.current_balance || 0), 0);
-        if (savingsEl) savingsEl.textContent = savingsCount > 0
-            ? formatMoney(savingsTotal, displayCurrency)
-            : formatMoney(0, displayCurrency);
-        const savingsDetailEl = document.getElementById('summarySavingsDetail');
-        if (savingsDetailEl) savingsDetailEl.textContent = savingsCount > 0
-            ? `${savingsCount} cuenta(s) de ahorro`
-            : 'Sin cuentas de ahorro';
+        const activeCountEl = document.getElementById('summaryActiveCount');
+        if (activeCountEl) activeCountEl.textContent = `${activeCount} Activo`;
+
+        const portfolioTypesEl = document.getElementById('summaryPortfolioTypes');
+        if (portfolioTypesEl) portfolioTypesEl.textContent = `${uniqueTypes.size} Tipos`;
     }
 
     // ==========================================
-    // FILTER TABS
+    // FILTER & SORT
     // ==========================================
 
-    filterTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            filterTabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-
-            const filter = tab.dataset.filter;
-            const accountCards = accountsGrid.querySelectorAll('.account-card');
-
-            accountCards.forEach(card => {
-                if (filter === 'all' || card.dataset.type === filter) {
-                    card.style.display = 'flex';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
+    if (accountTypeFilter) {
+        accountTypeFilter.addEventListener('change', () => {
+            refreshAccountsView();
         });
-    });
+    }
+
+    if (accountsSortBtn) {
+        accountsSortBtn.addEventListener('click', () => {
+            sortAscending = !sortAscending;
+            accountsSortBtn.classList.toggle('active', sortAscending);
+            refreshAccountsView();
+        });
+    }
 
     // ==========================================
     // ACCOUNT TYPE CHANGE
@@ -330,6 +329,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             await api.deleteAccount(accountId);
             await loadAccounts();
+            closeAccountActions();
             alert('Cuenta eliminada');
         } catch (err) {
             console.error('Error al eliminar cuenta:', err);
@@ -337,6 +337,33 @@ document.addEventListener('DOMContentLoaded', () => {
             alert(`No se pudo eliminar: ${err.message}`);
         }
     };
+
+    // ==========================================
+    // ACTION SHEET
+    // ==========================================
+
+    window.openAccountActions = function (accountId) {
+        selectedAccountId = accountId;
+        accountActionSheet?.classList.remove('hidden');
+    };
+
+    function closeAccountActions() {
+        selectedAccountId = null;
+        accountActionSheet?.classList.add('hidden');
+    }
+
+    actionSheetOverlay?.addEventListener('click', closeAccountActions);
+
+    actionViewDetails?.addEventListener('click', () => {
+        if (!selectedAccountId) return;
+        closeAccountActions();
+        viewTransactions(selectedAccountId);
+    });
+
+    actionDelete?.addEventListener('click', async () => {
+        if (!selectedAccountId) return;
+        await deleteAccount(selectedAccountId);
+    });
 
     // ==========================================
     // VIEW TRANSACTIONS
@@ -359,6 +386,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && !accountModal.classList.contains('hidden')) {
             closeModal();
+        }
+
+        if (e.key === 'Escape' && accountActionSheet && !accountActionSheet.classList.contains('hidden')) {
+            closeAccountActions();
         }
     });
 

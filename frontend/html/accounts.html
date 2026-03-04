@@ -24,6 +24,7 @@
     <link rel="stylesheet" href="../css/ux-improvements.css?v=2">
     <link rel="stylesheet" href="../css/header-minimal.css?v=6">
     <link rel="stylesheet" href="../css/bottom-navigation.css?v=2">
+    <link rel="stylesheet" href="../css/accounts-redesign.css?v=1">
 </head>
 
 <body>
@@ -98,94 +99,65 @@
     </header>
 
     <!-- Main Content -->
-    <main class="accounts-container">
-        <!-- Page Header -->
-        <div class="page-header">
-            <div class="page-header-left">
-                <h1 data-i18n="Accounts">Cuentas</h1>
-                <p data-i18n="accounts.subtitle">Gestiona tus cuentas bancarias y balances</p>
-            </div>
-            <button class="btn-add-account" id="btnAddAccount">
-                <i class="fas fa-plus"></i>
-                <span data-i18n="Add Account">Agregar Cuenta</span>
+    <main class="accounts-container accounts-modern">
+        <div class="accounts-mobile-topbar">
+            <button class="mobile-back-btn" onclick="window.location.href='index.html'" aria-label="Volver">
+                <i class="fas fa-chevron-left"></i>
             </button>
+            <h1>Gestión de Cuentas</h1>
+            <div class="accounts-mobile-topbar-spacer"></div>
         </div>
 
-        <!-- Summary Cards -->
-        <div class="summary-cards">
-            <div class="summary-card">
-                <div class="summary-icon">
+        <section class="accounts-summary-card">
+            <div class="summary-top-row">
+                <div>
+                    <p class="summary-title">Saldo Total</p>
+                    <p class="summary-amount" id="summaryTotalBalance">—</p>
+                </div>
+                <span class="summary-chip" id="summaryAccountCount">0 cuentas</span>
+            </div>
+
+            <div class="summary-metrics-row">
+                <div class="summary-metric-item">
+                    <div class="summary-metric-label">
+                        <i class="fas fa-wallet"></i>
+                        <span>Cuentas</span>
+                    </div>
+                    <div class="summary-metric-value" id="summaryActiveCount">0 Activo</div>
+                </div>
+
+                <div class="summary-metric-item">
+                    <div class="summary-metric-label">
+                        <i class="fas fa-chart-pie"></i>
+                        <span>Portafolio</span>
+                    </div>
+                    <div class="summary-metric-value" id="summaryPortfolioTypes">0 Tipos</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="accounts-section-head">
+            <div>
+                <h2>Cuentas</h2>
+                <p>Gestiona tus cuentas</p>
+            </div>
+
+            <div class="accounts-controls">
+                <button class="accounts-control-btn active" type="button" id="accountsViewBtn" aria-label="Vista cuentas">
                     <i class="fas fa-wallet"></i>
-                </div>
-                <div class="summary-content">
-                    <div class="summary-label" data-i18n="Total Balance">Balance Total</div>
-                    <div class="summary-value" id="summaryTotalBalance">—</div>
-                    <div class="summary-change positive">
-                        <i class="fas fa-spinner fa-spin" id="summaryLoadingIndicator"></i>
-                        <span id="summaryChangeText"></span>
-                    </div>
-                </div>
+                </button>
+                <button class="accounts-control-btn" type="button" id="accountsSortBtn" aria-label="Ordenar">
+                    <i class="fas fa-right-left"></i>
+                </button>
+                <select id="accountTypeFilter" class="accounts-filter-select" aria-label="Filtrar cuentas">
+                    <option value="all">Todos</option>
+                    <option value="checking">Corriente</option>
+                    <option value="savings">Ahorros</option>
+                    <option value="credit">Crédito</option>
+                    <option value="cash">Efectivo</option>
+                </select>
             </div>
-
-            <div class="summary-card">
-                <div class="summary-icon">
-                    <i class="fas fa-university"></i>
-                </div>
-                <div class="summary-content">
-                    <div class="summary-label" data-i18n="Bank Accounts">Cuentas Bancarias</div>
-                    <div class="summary-value" id="summaryBankCount">—</div>
-                    <div class="summary-subtitle" id="summaryBankDetail"></div>
-                </div>
-            </div>
-
-            <div class="summary-card">
-                <div class="summary-icon">
-                    <i class="fas fa-credit-card"></i>
-                </div>
-                <div class="summary-content">
-                    <div class="summary-label" data-i18n="Credit Cards">Tarjetas de Crédito</div>
-                    <div class="summary-value" id="summaryCreditCount">—</div>
-                    <div class="summary-subtitle" id="summaryCreditDetail"></div>
-                </div>
-            </div>
-
-            <div class="summary-card">
-                <div class="summary-icon">
-                    <i class="fas fa-piggy-bank"></i>
-                </div>
-                <div class="summary-content">
-                    <div class="summary-label" data-i18n="Savings Goals">Metas de Ahorro</div>
-                    <div class="summary-value" id="summarySavings">—</div>
-                    <div class="summary-change">
-                        <i class="fas fa-bullseye"></i>
-                        <span id="summarySavingsDetail"></span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Filter Tabs -->
-        <div class="filter-tabs">
-            <button class="tab-btn active" data-filter="all">
-                <span data-i18n="All Accounts">Todas las Cuentas</span>
-                <span class="tab-count">5</span>
-            </button>
-            <button class="tab-btn" data-filter="checking">
-                <i class="fas fa-university"></i>
-                <span data-i18n="Checking">Corriente</span>
-                <span class="tab-count">2</span>
-            </button>
-            <button class="tab-btn" data-filter="savings">
-                <i class="fas fa-piggy-bank"></i>
-                <span data-i18n="Savings">Ahorros</span>
-                <span class="tab-count">1</span>
-            </button>
-            <button class="tab-btn" data-filter="credit">
-                <i class="fas fa-credit-card"></i>
-                <span data-i18n="Credit">Crédito</span>
-                <span class="tab-count">2</span>
-            </button>
-        </div>
+        </section>
 
         <!-- Accounts Grid -->
         <div class="accounts-grid" id="accountsGrid">
@@ -194,7 +166,27 @@
                 <i class="fas fa-spinner fa-spin"></i> Cargando cuentas...
             </div>
         </div>
+
+        <button class="accounts-add-fab" id="btnAddAccount" type="button">
+            <i class="fas fa-wallet"></i>
+            <span>Añadir cuenta</span>
+        </button>
     </main>
+
+    <div class="account-action-sheet hidden" id="accountActionSheet">
+        <div class="action-sheet-overlay" id="actionSheetOverlay"></div>
+        <div class="action-sheet-panel" role="dialog" aria-modal="true" aria-label="Acciones de cuenta">
+            <div class="action-sheet-handle"></div>
+            <button class="action-sheet-item" id="actionViewDetails" type="button">
+                <i class="fas fa-eye"></i>
+                <span>Ver Detalles</span>
+            </button>
+            <button class="action-sheet-item danger" id="actionDelete" type="button">
+                <i class="fas fa-trash"></i>
+                <span>Eliminar Cuenta</span>
+            </button>
+        </div>
+    </div>
 
     <!-- Add/Edit Account Modal -->
     <div class="modal hidden" id="accountModal">
