@@ -107,34 +107,41 @@
 
     <!-- Main Content -->
     <main class="chat-container">
-        <!-- Chat Header -->
         <div class="chat-header">
             <div class="chat-header-left">
                 <button class="btn-back" onclick="window.location.href='index.html'" title="Volver">
                     <i class="fas fa-arrow-left"></i>
                 </button>
-                <div class="ai-avatar">
-                    <i class="fas fa-robot"></i>
-                </div>
                 <div class="chat-header-info">
-                    <h1>Asistente Financiero IA</h1>
+                    <h1>Asistente de OrdenC</h1>
                     <p class="chat-status">
                         <span class="status-dot"></span>
-                        <span class="privacy-badge" title="Chat privado - Solo tú puedes verlo">🔒 Privado</span>
+                        <span class="privacy-badge" title="Chat privado - Solo tú puedes verlo">Privado</span>
                     </p>
                 </div>
             </div>
-        <div class="chat-header-actions">
+            <div class="chat-header-actions">
                 <button class="btn-help" id="btnHelp" title="Ver ejemplos de uso">
-                    <i class="fas fa-question-circle"></i>
-                </button>                <button class="btn-clean-chat" id="btnCleanChat" title="Limpiar historial de chat">
+                    <i class="fas fa-circle-info"></i>
+                </button>
+                <button class="btn-clean-chat" id="btnCleanChat" title="Limpiar historial de chat">
                     <i class="fas fa-trash"></i>
-                </button>                <button class="btn-new-chat">
-                    <i class="fas fa-plus"></i>
-                    Nuevo Chat
                 </button>
             </div>
         </div>
+
+        <section class="quick-suggestions">
+            <div class="greeting-block">
+                <p class="greeting-name">Hola, Invitado</p>
+                <h2>¿Por dónde empezamos?</h2>
+            </div>
+            <div class="suggestions-grid">
+                <button class="suggestion-chip" data-prompt="Analiza mis gastos del mes y dame 3 recomendaciones">Analizar mis gastos</button>
+                <button class="suggestion-chip" data-prompt="Ayúdame a registrar una transacción de ingreso">Añadir transacción</button>
+                <button class="suggestion-chip" data-prompt="Revisa mi presupuesto actual y dime cómo voy">Revisar presupuesto</button>
+                <button class="suggestion-chip" data-prompt="¿Cómo puedo ahorrar más este mes?">¿Cómo puedo ahorrar más?</button>
+            </div>
+        </section>
 
         <!-- Help Panel (Hidden by default) -->
         <div class="help-panel" id="helpPanel" style="display: none;">
@@ -213,7 +220,6 @@
             </div>
         </div>
 
-        <!-- Chat Messages Area -->
         <div class="chat-messages" id="chatMessages">
             <!-- Welcome Message -->
             <div class="message-group ai-message">
@@ -230,6 +236,17 @@
                 </div>
             </div>
         </div>
+
+        <section class="automation-strip">
+            <button class="automation-card suggestion-chip" data-prompt="Convierte gimnasio en una suscripción mensual">
+                <span class="automation-title">Convertir gimnasio a suscripción</span>
+                <span class="automation-subtitle">Automatización inteligente</span>
+            </button>
+            <button class="automation-card suggestion-chip" data-prompt="Planificar ahorro automático de 200000 cada mes">
+                <span class="automation-title">Planificar ahorro mensual</span>
+                <span class="automation-subtitle">Automatización inteligente</span>
+            </button>
+        </section>
 
         <!-- Chat Input Area -->
         <div class="chat-input-container">
@@ -253,11 +270,9 @@
                 </button>
 
                 <button type="submit" class="btn-send" id="sendBtn">
-                    <i class="fas fa-paper-plane"></i>
+                    <i class="fas fa-arrow-up"></i>
                 </button>
             </form>
-
-            
         </div>
     </main>
 

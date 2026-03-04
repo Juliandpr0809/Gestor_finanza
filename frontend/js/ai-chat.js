@@ -15,6 +15,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnCloseHelp = document.getElementById('btnCloseHelp');
     const helpPanel = document.getElementById('helpPanel');
 
+    const openHelpPanel = () => {
+        if (!helpPanel) return;
+        helpPanel.classList.add('show');
+    };
+
+    const closeHelpPanel = () => {
+        if (!helpPanel) return;
+        helpPanel.classList.remove('show');
+    };
+
     let isLoading = false;
 
     // Historial de mensajes para navegación con flechas
@@ -25,13 +35,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Help panel toggle
     if (btnHelp) {
         btnHelp.addEventListener('click', () => {
-            helpPanel.style.display = 'flex';
+            openHelpPanel();
         });
     }
 
     if (btnCloseHelp) {
         btnCloseHelp.addEventListener('click', () => {
-            helpPanel.style.display = 'none';
+            closeHelpPanel();
         });
     }
 
@@ -39,15 +49,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (helpPanel) {
         helpPanel.addEventListener('click', (e) => {
             if (e.target === helpPanel) {
-                helpPanel.style.display = 'none';
+                closeHelpPanel();
             }
         });
     }
 
     // Close help panel with ESC key
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && helpPanel.style.display === 'flex') {
-            helpPanel.style.display = 'none';
+        if (e.key === 'Escape' && helpPanel?.classList.contains('show')) {
+            closeHelpPanel();
         }
     });
 
@@ -132,6 +142,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.messages && data.messages.length > 0) {
                 // Clear welcome message if history exists
                 chatMessages.innerHTML = '';
+                document.querySelector('.quick-suggestions')?.remove();
+                document.querySelector('.automation-strip')?.remove();
 
                 data.messages.forEach(msg => {
                     addMessage(msg.content, msg.role === 'user' ? 'user' : 'ai', false);
@@ -154,6 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Remove suggestions if present
         document.querySelector('.quick-suggestions')?.remove();
+        document.querySelector('.automation-strip')?.remove();
 
         // Show typing indicator
         showTypingIndicator();
