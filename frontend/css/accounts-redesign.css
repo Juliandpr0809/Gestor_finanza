@@ -28,7 +28,7 @@
 }
 
 .summary-title {
-  font-size: 16px;
+  font-size: 13px;
   font-weight: 500;
   margin: 0;
   opacity: 0.9;
@@ -36,7 +36,7 @@
 
 .summary-amount {
   margin: 6px 0 0;
-  font-size: 44px;
+  font-size: 32px;
   line-height: 1;
   font-weight: 700;
 }
@@ -74,13 +74,13 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 15px;
+  font-size: 12px;
   color: rgba(255, 255, 255, 0.82);
 }
 
 .summary-metric-value {
   margin-top: 4px;
-  font-size: 36px;
+  font-size: 28px;
   line-height: 1;
   font-weight: 700;
 }
@@ -95,14 +95,15 @@
 
 .accounts-section-head h2 {
   margin: 0;
-  font-size: 56px;
-  line-height: 0.9;
+  font-size: 28px;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
 }
 
 .accounts-section-head p {
   margin: 6px 0 0;
   color: var(--text-tertiary);
-  font-size: 15px;
+  font-size: 13px;
 }
 
 .accounts-controls {
@@ -196,20 +197,20 @@
 
 .accounts-modern .account-name {
   margin: 0;
-  font-size: 18px;
+  font-size: 15px;
   line-height: 1.2;
   font-weight: 600;
 }
 
 .account-subtitle {
   margin-top: 4px;
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-tertiary);
 }
 
 .accounts-modern .account-balance {
   margin: 0;
-  font-size: 17px;
+  font-size: 15px;
   font-weight: 700;
   line-height: 1;
   white-space: nowrap;
@@ -306,6 +307,107 @@
   color: var(--danger);
 }
 
+.modal-detail .modal-header {
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.modal-detail .modal-header h2 {
+  text-align: center;
+  margin: 0;
+}
+
+.btn-modal-action {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.detail-balance-card {
+  background: linear-gradient(135deg, #6B9FFF 0%, #8B6BFF 100%);
+  color: #ffffff;
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.detail-balance-label {
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.detail-balance-amount {
+  margin: 6px 0 0;
+  font-size: 36px;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.detail-info-grid {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.detail-info-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.detail-info-label {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.detail-info-value {
+  font-size: 15px;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.detail-actions {
+  margin-top: auto;
+  padding-top: 12px;
+}
+
+.btn-detail-transactions {
+  width: 100%;
+  min-height: 50px;
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-detail-transactions:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
 .modal-balance-preview {
   margin: 8px 0 10px;
 }
@@ -318,7 +420,7 @@
 
 .modal-balance-amount {
   margin: 4px 0 0;
-  font-size: 52px;
+  font-size: 36px;
   line-height: 1;
   font-weight: 700;
   color: #6B9FFF;
@@ -326,9 +428,11 @@
 
 .form-section-title {
   margin-top: 6px;
-  font-size: 20px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .form-label-highlight {
@@ -338,10 +442,11 @@
 
 .form-input-prominent {
   border: 2px solid #6B9FFF;
-  border-radius: 20px;
-  min-height: 58px;
-  font-size: 24px;
+  border-radius: 16px;
+  min-height: 54px;
+  font-size: 20px;
   font-weight: 600;
+  text-align: center;
 }
 
 .btn-modal-back,
@@ -405,6 +510,11 @@
     overflow-y: auto;
   }
 
+  .modal-detail {
+    display: flex;
+    flex-direction: column;
+  }
+
   .modal-header {
     margin-bottom: 12px;
     display: grid;
@@ -424,11 +534,40 @@
     border: 0;
   }
 
+  .btn-modal-action {
+    background: transparent;
+    border: 0;
+    border-radius: 12px;
+    font-size: 20px;
+  }
+
   .btn-modal-delete {
     background: transparent;
     border: 0;
     border-radius: 12px;
     font-size: 22px;
+  }
+
+  .detail-balance-card {
+    border-radius: 18px;
+    padding: 18px;
+  }
+
+  .detail-balance-amount {
+    font-size: 34px;
+  }
+
+  .detail-info-grid {
+    margin-bottom: 24px;
+  }
+
+  .detail-actions {
+    margin-top: auto;
+    padding-top: 20px;
+  }
+
+  .btn-detail-transactions {
+    min-height: 52px;
   }
 
   .btn-close-modal {
@@ -440,7 +579,7 @@
   }
 
   .modal-balance-amount {
-    font-size: 56px;
+    font-size: 34px;
   }
 
   .modal-form {
@@ -459,9 +598,9 @@
   }
 
   .form-input-prominent {
-    min-height: 62px;
-    font-size: 34px;
-    border-radius: 22px;
+    min-height: 56px;
+    font-size: 24px;
+    border-radius: 18px;
     padding: 10px 16px;
   }
 
@@ -516,32 +655,32 @@
   }
 
   .summary-title {
-    font-size: 15px;
-  }
-
-  .summary-amount {
-    font-size: 34px;
-  }
-
-  .summary-metric-label {
     font-size: 13px;
   }
 
+  .summary-amount {
+    font-size: 30px;
+  }
+
+  .summary-metric-label {
+    font-size: 12px;
+  }
+
   .summary-metric-value {
-    font-size: 28px;
+    font-size: 26px;
   }
 
   .accounts-section-head h2 {
-    font-size: 22px;
+    font-size: 24px;
     line-height: 1.1;
   }
 
   .accounts-section-head p {
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .accounts-modern .account-name {
-    font-size: 16px;
+    font-size: 15px;
   }
 
   .account-subtitle {
@@ -561,20 +700,24 @@
 
 @media (max-width: 420px) {
   .summary-amount {
-    font-size: 32px;
+    font-size: 28px;
   }
 
   .summary-chip {
-    font-size: 14px;
-    padding: 7px 12px;
+    font-size: 13px;
+    padding: 6px 10px;
   }
 
   .accounts-section-head h2 {
-    font-size: 20px;
+    font-size: 22px;
   }
 
   .accounts-modern .account-name,
   .accounts-modern .account-balance {
-    font-size: 15px;
+    font-size: 14px;
+  }
+
+  .modal-balance-amount {
+    font-size: 30px;
   }
 }

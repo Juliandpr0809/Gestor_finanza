@@ -13,9 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const accountsGrid = document.getElementById('accountsGrid');
     const accountActionSheet = document.getElementById('accountActionSheet');
     const actionSheetOverlay = document.getElementById('actionSheetOverlay');
-    const actionViewDetails = document.getElementById('actionViewDetails');
     const actionEdit = document.getElementById('actionEdit');
     const actionDelete = document.getElementById('actionDelete');
+    const accountDetailModal = document.getElementById('accountDetailModal');
     const btnDeleteFromModal = document.getElementById('btnDeleteFromModal');
     const accountBalanceInput = document.getElementById('accountBalance');
     const accountCurrencySelect = document.getElementById('accountCurrency');
@@ -369,7 +369,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.openAccountActions = function (accountId) {
         selectedAccountId = accountId;
-        accountActionSheet?.classList.remove('hidden');
+        const acc = accountsCache.find(a => a.id === accountId);
+        if (!acc) return;
+        
+        // Show detail modal directly instead of action sheet on mobile
+        if (window.innerWidth <= 768) {
+            showAccountDetail(acc);
+        } else {
+            accountActionSheet?.classList.remove('hidden');
+        }
+    };
+
+    function showAccountDetail(acc) {
+        selectedAccountId = acc.id;
+        
+        document.getElementById('detailAccountName').textContent = acc.name || 'Cuenta';
+        document.getElementById('detailBalanceAmount').textContent = formatMoney(acc.current_balance || 0, acc.currency || 'USD');
+        document.getElementById('detailAccountType').textContent = getTypeLabel(acc.account_type);
+        document.getElementById('detailAccountCurrency').textContent = acc.currency || 'USD';
+        document.getElementById('detailAccountBank').textContent = acc.bank || acc.account_type || '—';
+        document.getElementById('detailAccountStatus').textContent = acc.is_active !== false ? 'Activa' : 'Inactiva';
+        
+        accountDetailModal?.classList.remove('hidden');
+    }
+
+    window.closeAccountDetail = function() {
+        accountDetailModal?.classList.add('hidden');
+        selectedAccountId = null;
+    };
+
+    window.editAccountFromDetail = function() {
+        if (!selectedAccountId) return;
+        closeAccountDetail();
+        editAccount(selectedAccountId);
+    };
+
+    window.viewTransactionsFromDetail = function() {
+        if (!selectedAccountId) return;
+        viewTransactions(selectedAccountId);
     };
 
     function closeAccountActions() {
@@ -378,12 +415,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     actionSheetOverlay?.addEventListener('click', closeAccountActions);
-
-    actionViewDetails?.addEventListener('click', () => {
-        if (!selectedAccountId) return;
-        closeAccountActions();
-        viewTransactions(selectedAccountId);
-    });
 
     actionEdit?.addEventListener('click', () => {
         if (!selectedAccountId) return;
@@ -431,6 +462,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (e.key === 'Escape' && accountActionSheet && !accountActionSheet.classList.contains('hidden')) {
             closeAccountActions();
+        }
+
+        if (e.key === 'Escape' && accountDetailModal && !accountDetailModal.classList.contains('hidden')) {
+            closeAccountDetail();
         }
     });
 

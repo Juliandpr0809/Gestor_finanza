@@ -177,10 +177,6 @@
         <div class="action-sheet-overlay" id="actionSheetOverlay"></div>
         <div class="action-sheet-panel" role="dialog" aria-modal="true" aria-label="Acciones de cuenta">
             <div class="action-sheet-handle"></div>
-            <button class="action-sheet-item" id="actionViewDetails" type="button">
-                <i class="fas fa-eye"></i>
-                <span>Ver Detalles</span>
-            </button>
             <button class="action-sheet-item" id="actionEdit" type="button">
                 <i class="fas fa-pen"></i>
                 <span>Editar cuenta</span>
@@ -189,6 +185,53 @@
                 <i class="fas fa-trash"></i>
                 <span>Eliminar Cuenta</span>
             </button>
+        </div>
+    </div>
+
+    <!-- Account Detail Modal -->
+    <div class="modal hidden" id="accountDetailModal">
+        <div class="modal-overlay" onclick="closeAccountDetail()"></div>
+        <div class="modal-content modal-detail">
+            <div class="modal-header">
+                <button type="button" class="btn-modal-back" onclick="closeAccountDetail()" aria-label="Volver">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <h2 id="detailAccountName">Cuenta</h2>
+                <button type="button" class="btn-modal-action" onclick="editAccountFromDetail()" aria-label="Editar">
+                    <i class="fas fa-pen"></i>
+                </button>
+            </div>
+
+            <div class="detail-balance-card">
+                <p class="detail-balance-label">Saldo</p>
+                <p class="detail-balance-amount" id="detailBalanceAmount">$0,00</p>
+            </div>
+
+            <div class="detail-info-grid">
+                <div class="detail-info-item">
+                    <span class="detail-info-label">Tipo de cuenta</span>
+                    <span class="detail-info-value" id="detailAccountType">—</span>
+                </div>
+                <div class="detail-info-item">
+                    <span class="detail-info-label">Moneda</span>
+                    <span class="detail-info-value" id="detailAccountCurrency">—</span>
+                </div>
+                <div class="detail-info-item">
+                    <span class="detail-info-label">Banco/Institución</span>
+                    <span class="detail-info-value" id="detailAccountBank">—</span>
+                </div>
+                <div class="detail-info-item">
+                    <span class="detail-info-label">Estado</span>
+                    <span class="detail-info-value" id="detailAccountStatus">—</span>
+                </div>
+            </div>
+
+            <div class="detail-actions">
+                <button type="button" class="btn-detail-transactions" onclick="viewTransactionsFromDetail()">
+                    <i class="fas fa-list"></i>
+                    <span>Ver transacciones</span>
+                </button>
+            </div>
         </div>
     </div>
 
