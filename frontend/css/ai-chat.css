@@ -451,7 +451,7 @@ body {
     min-height: 0;  /* CRUCIAL para que flex: 1 funcione en FF y Chrome */
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 16px 16px 8px 16px;  /* Reducir padding para móvil */
+    padding: 16px 16px 120px 16px;
     display: flex;
     flex-direction: column;
     gap: 16px;

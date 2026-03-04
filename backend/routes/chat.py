@@ -1356,6 +1356,78 @@ También puedes usar:
     # Detectar si el usuario quiere SIMULAR (no crear real)
     simulate_keywords = ['simula', 'ejemplo', 'simulación', 'muestra ejemplo', 'como sería', 'cómo quedaría']
     wants_simulation = any(keyword in user_input_clean.lower() for keyword in simulate_keywords)
+
+    # ============================================================================
+    # GATE GLOBAL: Si parece transacción, SIEMPRE pedir confirmación visual
+    # ============================================================================
+    if not wants_simulation and action_intent != 'apply' and not is_confirmation:
+        tx_preview = ai_service.extract_transaction_from_text(user_id, user_input_raw, None)
+        if tx_preview and tx_preview.get('amount') and tx_preview.get('transaction_type'):
+            accounts = Account.query.filter_by(user_id=user_id, is_active=True).all()
+            if accounts:
+                account = None
+                if tx_preview.get('account'):
+                    account_names = [a.name for a in accounts]
+                    best_match, score = find_best_match(tx_preview.get('account', ''), account_names)
+                    if best_match and score >= 60:
+                        account = next((a for a in accounts if a.name == best_match), None)
+                if not account:
+                    account = accounts[0]
+
+                tx_type = tx_preview.get('transaction_type', 'expense')
+                categories = Category.query.filter_by(user_id=user_id, category_type=tx_type).all()
+                category = categories[0] if categories else None
+
+                tx_data = {
+                    'amount': abs(float(tx_preview.get('amount', 0))),
+                    'type': tx_type,
+                    'account': account.name,
+                    'account_id': account.id,
+                    'category': category.name if category else 'Sin categoría',
+                    'category_id': category.id if category else None,
+                    'description': tx_preview.get('description', ''),
+                    'date': datetime.now().strftime('%d/%m/%Y')
+                }
+
+                currency = user.preferred_currency or 'COP'
+                sign = '+' if tx_type == 'income' else '-'
+                ai_response = f"""🧾 **Revisa la transacción**
+- **Monto:** {sign}{currency} {tx_data['amount']:,.2f}
+- **Cuenta:** {tx_data['account']}
+- **Descripción:** {tx_data['description'] or 'Sin descripción'}
+
+Marca el chulito para confirmarla."""
+
+                assistant_message = ChatMessage(
+                    user_id=user_id,
+                    role='assistant',
+                    content=ai_response,
+                    message_metadata={
+                        'type': 'confirmation_required',
+                        'ai_service': 'global_tx_gate',
+                        'pending_transaction': tx_data
+                    }
+                )
+                db.session.add(assistant_message)
+                db.session.commit()
+
+                return jsonify({
+                    'user_message': {
+                        'id': user_message.id,
+                        'role': 'user',
+                        'content': user_message.content,
+                        'created_at': user_message.created_at.isoformat()
+                    },
+                    'assistant_message': {
+                        'id': assistant_message.id,
+                        'role': 'assistant',
+                        'content': assistant_message.content,
+                        'created_at': assistant_message.created_at.isoformat()
+                    },
+                    'requires_confirmation': True,
+                    'transaction_data': tx_data,
+                    'function': 'create_transaction'
+                }), 201
     
     # ============================================================================
     # NUEVA IA MEJORADA: Function Calling para detectar transacciones
@@ -1920,6 +1992,33 @@ Marca el chulito para confirmarla."""
                     'transaction_data': tx_data,
                     'function': 'create_transaction'
                 }), 201
+
+        # Si hubo intención de transacción pero no pudimos construir payload confiable,
+        # NO registrar automáticamente por seguridad.
+        ai_response = "❌ No pude preparar la transacción para confirmar. Intenta con: 'gasté 20k en cerveza en nu'."
+        assistant_message = ChatMessage(
+            user_id=user_id,
+            role='assistant',
+            content=ai_response,
+            message_metadata={'type': 'confirmation_build_failed', 'ai_service': 'transaction_detection'}
+        )
+        db.session.add(assistant_message)
+        db.session.commit()
+
+        return jsonify({
+            'user_message': {
+                'id': user_message.id,
+                'role': 'user',
+                'content': user_message.content,
+                'created_at': user_message.created_at.isoformat()
+            },
+            'assistant_message': {
+                'id': assistant_message.id,
+                'role': 'assistant',
+                'content': assistant_message.content,
+                'created_at': assistant_message.created_at.isoformat()
+            }
+        }), 201
         
         print(f"DEBUG CHAT: Found {len(transaction_parts)} transaction parts")
         
